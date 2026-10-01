@@ -4,7 +4,6 @@
   const TZ = 'Europe/Berlin';
   const $view = document.getElementById('view');
   const $title = document.getElementById('title');
-  const $back = document.getElementById('back');
   const $toast = document.getElementById('toast');
   const $offline = document.getElementById('offline');
 
@@ -83,12 +82,17 @@
   const enc = encodeURIComponent;
   function link(...parts) { return '#/' + parts.map(enc).join('/'); }
   function go(hash) { depth++; location.hash = hash; }
-  $back.addEventListener('click', () => { if (depth > 0) { depth--; history.back(); } else location.hash = kommune ? link('k', kommune) : link(); });
+  function back() { if (depth > 0) { depth--; history.back(); } else location.hash = kommune ? link('k', kommune) : link(); }
+  // Logo: immer zur Startseite (Suche), Eingabe zurücksetzen
+  document.getElementById('home').addEventListener('click', (e) => {
+    e.preventDefault(); depth = 0; q = '';
+    if (location.hash === '#/' || location.hash === '') route(); else location.hash = '#/';
+  });
   window.addEventListener('hashchange', () => route());
   document.querySelectorAll('.tabs button').forEach((b) => b.addEventListener('click', () => {
     depth = 0;
     const tab = b.dataset.tab;
-    if (tab === 'wahl' || !kommune) location.hash = link('wahl');
+    if (tab === 'wahl' || !kommune) location.hash = '#/';
     else if (tab === 'start') location.hash = link('k', kommune);
     else location.hash = link('abo');
   }));
@@ -114,25 +118,23 @@
       } else if (r.v === 'abo' && kommune) {
         tab = 'abo';
         await vAbo();
-      } else if (!r.v && kommune && bodyIdx.has(kommune)) {
-        location.replace(link('k', kommune));
-        return;
       } else {
         vWahl();
       }
     } catch (err) {
-      setTitle('<span class="brand">Ratsblick</span>');
+      setTitle('');
       $view.innerHTML = `<div class="card empty">Das konnte nicht geladen werden (${esc(err.message)}). Prüfen Sie die Verbindung und laden Sie die Seite neu.</div>`;
     }
-    $back.hidden = !(r.v === 's' || r.v === 'v');
     document.querySelectorAll('.tabs button').forEach((b) => b.setAttribute('aria-current', b.dataset.tab === tab ? 'page' : 'false'));
     window.scrollTo(0, 0);
   }
 
-  function setTitle(html) { $title.innerHTML = html; }
+  function setTitle(text) { $title.textContent = text || ''; }
+  const backLink = '<button class="backlink" type="button" data-back><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Zurück</button>';
 
   // Klicks auf Einträge: Navigation über data-Attribute
   $view.addEventListener('click', (e) => {
+    if (e.target.closest('[data-back]')) { e.preventDefault(); back(); return; }
     const el = e.target.closest('[data-go]');
     if (el) { e.preventDefault(); go(el.dataset.go); }
   });
@@ -153,35 +155,64 @@
     document.getElementById('instx')?.addEventListener('click', () => { store.set('installHidden', true); route(); });
   }
 
-  // ---------- Ansicht: Kommune wählen ----------
+  // ---------- Ansicht: Startseite (nur Suche) ----------
+  const rang = { Ortsgemeinde: 0, Stadt: 0, Ortsbezirk: 1, Verbandsgemeinde: 2, Zweckverband: 3, Sonstige: 4 };
+  function suche(text) {
+    const t = text.trim().toLowerCase();
+    if (!t) return [];
+    const plz = /^\d+$/.test(t);
+    const hits = [];
+    for (const qq of INDEX.quellen) for (const k of qq.koerperschaften) {
+      const name = k.name.toLowerCase(), kurz = kurzName(k.name).toLowerCase();
+      let score = -1;
+      if (plz) { if ((k.plz || '').startsWith(t)) score = 10; }
+      else if (kurz.startsWith(t)) score = 30;
+      else if (name.includes(t) || (k.ort || '').toLowerCase().startsWith(t)) score = 20;
+      if (score >= 0) hits.push({ k, qq, score: score - (rang[k.art] ?? 5) });
+    }
+    return hits.sort((a, b) => b.score - a.score || a.k.name.localeCompare(b.k.name, 'de')).slice(0, 8);
+  }
+  function kommuneRow({ k, qq }) {
+    return `<button class="row" type="button" data-go="${esc(link('k', k.id))}"><div class="body"><span class="title">${esc(k.name)}</span><span class="meta">${esc([k.plz, qq.landkreis].filter(Boolean).join(' · '))}${k.kommend ? ` · ${k.kommend} Sitzung${k.kommend > 1 ? 'en' : ''} geplant` : ''}</span></div>${chev}</button>`;
+  }
   function vWahl() {
-    setTitle('<span class="brand">Ratsblick<small>Rheinland-Pfalz</small></span>');
-    const query = q.trim().toLowerCase();
-    const match = (k) => !query || k.name.toLowerCase().includes(query) || (k.plz || '').startsWith(query) || (k.ort || '').toLowerCase().includes(query);
-    const rang = { Verbandsgemeinde: 0, Stadt: 1, Ortsgemeinde: 2, Ortsbezirk: 3, Zweckverband: 4, Sonstige: 5 };
-    const lists = INDEX.quellen.map((qq) => {
-      const items = qq.koerperschaften.filter(match)
-        .sort((a, b) => (rang[a.art] ?? 9) - (rang[b.art] ?? 9) || a.name.localeCompare(b.name, 'de'));
-      if (!items.length) return '';
-      return `<section><h2>${esc(qq.name)}${qq.landkreis ? ' · ' + esc(qq.landkreis) : ''}</h2><div class="list">${items.map((k) => `
-        <button class="row" type="button" data-go="${esc(link('k', k.id))}"><div class="body"><span class="title">${esc(k.name)}</span><span class="meta">${k.plz ? esc(k.plz + ' ' + (k.ort || '')) : esc(k.art)}${k.kommend ? ` · ${k.kommend} Sitzung${k.kommend > 1 ? 'en' : ''} geplant` : ''}</span></div>${kommune === k.id ? '<span class="pill">gewählt</span>' : ''}${chev}</button>`).join('')}</div></section>`;
-    }).join('');
+    setTitle('');
+    const zuletzt = store.get('zuletzt', []).filter((id) => bodyIdx.has(id))
+      .map((id) => ({ k: bodyIdx.get(id).k, qq: INDEX.quellen.find((x) => x.id === bodyIdx.get(id).q) }));
+    const anzahl = INDEX.quellen.reduce((n, x) => n + x.koerperschaften.filter((k) => k.art !== 'Zweckverband' && k.art !== 'Sonstige').length, 0);
     $view.innerHTML = `
-      ${installCard()}
-      <section class="hero">
-        <h3>Was beschließt Ihr Gemeinderat?</h3>
-        <p class="muted">Sitzungen, Tagesordnungen und Vorlagen aus den Ratsinformationssystemen – an einem Ort. Wählen Sie Ihre Kommune.</p>
-      </section>
-      <input class="search" id="q" type="search" placeholder="Gemeinde oder Postleitzahl" value="${esc(q)}" aria-label="Kommune suchen" autocomplete="off">
-      <div id="lists" style="display:grid;gap:20px">${lists || '<div class="empty card">Keine Kommune gefunden. Bisher sind sechs Ratsinformationssysteme aus Rheinland-Pfalz angebunden.</div>'}</div>
-      <p class="stand">Datenstand ${esc(stand(INDEX.erstellt))} · ${INDEX.quellen.length} Ratsinformationssysteme · Quelle: OParl</p>`;
+      <div class="home">
+        ${installCard()}
+        <section class="hero">
+          <h3>Was beschließt Ihr Gemeinderat?</h3>
+          <p class="lead">Sitzungen, Tagesordnungen und Vorlagen Ihrer Kommune – verständlich an einem Ort.</p>
+        </section>
+        <form class="searchbox" id="sf" role="search" autocomplete="off">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+          <input id="q" type="search" inputmode="search" enterkeyhint="search" placeholder="Kommune oder Postleitzahl" value="${esc(q)}" aria-label="Kommune oder Postleitzahl">
+        </form>
+        <div id="hits"></div>
+        ${zuletzt.length ? `<section id="recent"><h2>Zuletzt angesehen</h2><div class="list">${zuletzt.map(kommuneRow).join('')}</div></section>` : ''}
+        <p class="coverage">${anzahl} Kommunen in Rheinland-Pfalz · Datenstand ${esc(stand(INDEX.erstellt))}</p>
+      </div>`;
     const input = document.getElementById('q');
-    input.addEventListener('input', () => {
+    const $hits = document.getElementById('hits');
+    const $recent = document.getElementById('recent');
+    const show = () => {
       q = input.value;
-      const pos = input.selectionStart;
-      vWahl();
-      const n = document.getElementById('q'); n.focus(); try { n.setSelectionRange(pos, pos); } catch {}
+      const hits = suche(q);
+      if ($recent) $recent.hidden = !!q.trim();
+      $hits.innerHTML = !q.trim() ? '' : hits.length
+        ? `<div class="list suggest">${hits.map(kommuneRow).join('')}</div>`
+        : `<div class="card empty">Für „${esc(q.trim())}“ gibt es noch keine Daten. Bisher sind ${INDEX.quellen.length} Ratsinformationssysteme aus Rheinland-Pfalz angebunden.</div>`;
+    };
+    input.addEventListener('input', show);
+    document.getElementById('sf').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const first = suche(input.value)[0];
+      if (first) { input.blur(); go(link('k', first.k.id)); }
     });
+    show();
     bindInstall();
   }
 
@@ -204,7 +235,8 @@
     const k = x.k.get(kid);
     const eb = ebenen(x, kid);
     const sel = eb.find((e) => e.key === ebene && !e.off) || eb.find((e) => !e.off);
-    setTitle(`<span class="brand">${esc(kurzName(k.name))}</span>`);
+    setTitle(kurzName(k.name));
+    store.set('zuletzt', [kid, ...store.get('zuletzt', []).filter((x) => x !== kid)].slice(0, 4));
     const t = now();
     const sitz = x.sByK.get(sel.id) || [];
     const kommend = sitz.filter((m) => m.start >= t);
@@ -248,9 +280,10 @@
   function vSitzung(x, id) {
     const m = x.s.get(id);
     if (!m) throw new Error('Diese Sitzung ist nicht im aktuellen Datenstand');
-    setTitle('Sitzung');
+    setTitle(kurzName(x.k.get(m.k)?.name));
     const docs = m.dateien.filter((f) => f.url);
     $view.innerHTML = `
+      ${backLink}
       <section class="hero">
         <span class="meta">${statusPill(m)}<span>${esc(x.k.get(m.k)?.name)}</span></span>
         <h3>${esc(String(m.gremien[0] || m.name).replace(/\s+/g, ' '))}</h3>
@@ -275,11 +308,12 @@
   function vVorlage(x, id) {
     const v = x.v.get(id);
     if (!v) throw new Error('Diese Vorlage ist nicht im aktuellen Datenstand');
-    setTitle(`<span class="mono">${esc(v.nr)}</span>`);
+    setTitle(kurzName(x.k.get(v.k)?.name));
     const docs = v.dateien.filter((f) => f.url);
     const steps = v.beratung.filter((b) => b.gremium || b.datum);
     const t = now();
     $view.innerHTML = `
+      ${backLink}
       <section class="hero">
         <span class="meta"><span class="mono">${esc(v.nr)}</span><span>${esc(v.art || '')}</span><span>${esc(datum(v.datum))}</span></span>
         <h3>${esc(v.name)}</h3>
@@ -321,7 +355,7 @@
   async function vAbo() {
     const x = await quelle(bodyIdx.get(kommune).q);
     const k = x.k.get(kommune);
-    setTitle('Themen-Abo');
+    setTitle(kurzName(k.name));
     const a = abo();
     const terms = [...a.themen.flatMap((t) => THEMEN[t] || []), ...[a.stichwort, a.strasse].filter(Boolean).map((s) => s.toLowerCase())];
     const ids = ebenen(x, kommune).filter((e) => !e.off).map((e) => e.id);

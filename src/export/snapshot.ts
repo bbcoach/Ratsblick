@@ -33,6 +33,13 @@ export function cleanText(text: string | null | undefined, max: number): string 
   return t.length > max ? `${t.slice(0, max).replace(/\s\S*$/, '')} …` : t;
 }
 
+/** Schneidet den Formularkopf einer Vorlage ab (Drucksache-Nr., Beratungsfolge, Betreff), der Titel steht ohnehin oben. */
+export function ohneKopf(text: string | null | undefined): string | null | undefined {
+  if (!text) return text;
+  const i = text.search(/Sachverhalt\s*(\/\s*Begründung)?\s*:|Inhalt der Mitteilung\s*:/);
+  return i > 0 ? text.slice(i) : text;
+}
+
 export function art(name: string): string {
   if (name.startsWith('Ortsgemeinde')) return 'Ortsgemeinde';
   if (name.startsWith('Ortsbezirk')) return 'Ortsbezirk';
@@ -160,7 +167,7 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
       name: cleanText(s(p.name), 300),
       datum: s(p.date),
       art: s(p.paper_type),
-      text: cleanText(raw.mainFile?.text, textLength),
+      text: cleanText(ohneKopf(raw.mainFile?.text), textLength),
       beratung,
       dateien: filesOf('paper', pid),
     };

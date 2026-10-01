@@ -29,6 +29,8 @@ html, body { margin: 0; }
   --accent: #1f4e79;
   --accent-fg: #ffffff;
   --accent-soft: #e5edf5;
+  --bar: #1f4e79;
+  --bar-fg: #ffffff;
   --ok: #2f6b45;
   --ok-soft: #e3efe7;
   --warn: #8a5a0b;
@@ -42,14 +44,14 @@ html, body { margin: 0; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0e151d; --surface: #16202b; --fg: #e3e9ef; --muted: #96a4b2; --line: #273444;
-    --accent: #86b4e0; --accent-fg: #0e151d; --accent-soft: #1a2d41;
+    --accent: #86b4e0; --accent-fg: #0e151d; --accent-soft: #1a2d41; --bar: #173a5c; --bar-fg: #ffffff;
     --ok: #86c79c; --ok-soft: #183026; --warn: #e2b866; --warn-soft: #34290f; --bad: #ec9a9a; --bad-soft: #3a1c1c;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0e151d; --surface: #16202b; --fg: #e3e9ef; --muted: #96a4b2; --line: #273444;
-  --accent: #86b4e0; --accent-fg: #0e151d; --accent-soft: #1a2d41;
+  --accent: #86b4e0; --accent-fg: #0e151d; --accent-soft: #1a2d41; --bar: #173a5c; --bar-fg: #ffffff;
   --ok: #86c79c; --ok-soft: #183026; --warn: #e2b866; --warn-soft: #34290f; --bad: #ec9a9a; --bad-soft: #3a1c1c;
   color-scheme: dark;
 }
@@ -64,14 +66,25 @@ button { font: inherit; color: inherit; }
 .app { max-width: 640px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
 .bar {
   position: sticky; top: 0; z-index: 5;
-  background: var(--accent); color: var(--accent-fg);
+  background: var(--bar); color: var(--bar-fg);
   display: flex; align-items: center; gap: 8px; padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px; min-height: 54px;
 }
-.bar h1 { font-size: 17px; font-weight: 600; margin: 0; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bar .back { background: none; border: 0; color: inherit; padding: 6px 8px 6px 0; cursor: pointer; display: flex; align-items: center; gap: 2px; font-weight: 500; }
-.bar .back[hidden] { display: none; }
-.brand { font-weight: 700; letter-spacing: .02em; }
-.brand small { font-weight: 400; opacity: .8; margin-left: 6px; letter-spacing: 0; }
+.logo { display: flex; align-items: center; gap: 8px; color: inherit; text-decoration: none; font-weight: 700; font-size: 18px; letter-spacing: .01em; flex: none; padding: 4px 6px 4px 0; border-radius: 8px; }
+.logo svg { width: 28px; height: 28px; flex: none; }
+.logo:active { opacity: .75; }
+.ctx { flex: 1; min-width: 0; text-align: right; font-size: 14px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; font-weight: 500; }
+.backlink { justify-self: start; display: inline-flex; align-items: center; gap: 2px; background: none; border: 0; padding: 4px 8px 4px 0; color: var(--accent); font-weight: 600; cursor: pointer; font-size: 15px; }
+
+/* Startseite: nur Suche */
+.home { display: grid; gap: 22px; padding-top: 6vh; }
+.home h3 { font-size: 28px; line-height: 1.2; }
+.home .lead { color: var(--muted); font-size: 16px; }
+.searchbox { position: relative; }
+.searchbox svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--muted); pointer-events: none; }
+.searchbox input { width: 100%; padding: 16px 16px 16px 46px; font: inherit; font-size: 17px; border: 2px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--fg); }
+.searchbox input:focus { outline: none; border-color: var(--accent); }
+.suggest .row .title { -webkit-line-clamp: 1; }
+.coverage { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.5; }
 
 main { flex: 1; padding: 16px 16px 96px; display: grid; gap: 20px; align-content: start; }
 section { display: grid; gap: 10px; min-width: 0; }
@@ -131,7 +144,7 @@ details.beschluss p { margin-top: 6px; font-size: 14px; color: var(--muted); }
 .kurz ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
 .kurz .hint { font-size: 12px; color: var(--muted); }
 
-.excerpt { padding: 14px; font-size: 14px; color: var(--fg); line-height: 1.6; max-height: 220px; overflow: hidden; position: relative; }
+.excerpt { overflow-wrap: anywhere; padding: 14px; font-size: 14px; color: var(--fg); line-height: 1.6; max-height: 220px; overflow: hidden; position: relative; }
 .excerpt.open { max-height: none; }
 .excerpt:not(.open)::after { content: ""; position: absolute; inset: auto 0 0 0; height: 60px; background: linear-gradient(transparent, var(--surface)); }
 .more { border: 0; border-top: 1px solid var(--line); background: none; width: 100%; padding: 10px; color: var(--accent); font-weight: 600; cursor: pointer; }
@@ -188,18 +201,19 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
 <body>
 <div class="app">
   <header class="bar">
-    <button class="back" id="back" type="button" hidden aria-label="Zurück">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-    </button>
-    <h1 id="title"><span class="brand">Ratsblick</span></h1>
+    <a class="logo" href="#/" id="home" aria-label="Ratsblick – zur Startseite">
+      <svg viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="currentColor" opacity=".16"/><g fill="currentColor"><path d="M256 104 L408 184 L104 184 Z"/><rect x="120" y="196" width="272" height="20" rx="4"/><rect x="144" y="228" width="36" height="140" rx="6"/><rect x="207" y="228" width="36" height="140" rx="6"/><rect x="269" y="228" width="36" height="140" rx="6"/><rect x="332" y="228" width="36" height="140" rx="6"/><rect x="104" y="380" width="304" height="28" rx="6"/></g></svg>
+      <span>Ratsblick</span>
+    </a>
+    <p class="ctx" id="title"></p>
   </header>
   <div id="offline" class="offline" hidden>Offline – Sie sehen den zuletzt geladenen Stand.</div>
   <main id="view"><div class="loading">Lade Daten …</div></main>
   <nav class="tabs" aria-label="Bereiche">
     <div class="inner">
       <button type="button" data-tab="wahl">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
-        Kommune
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+        Suche
       </button>
       <button type="button" data-tab="start">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
