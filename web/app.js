@@ -12,8 +12,9 @@
     set(k, v) { try { localStorage.setItem('ratsblick:' + k, JSON.stringify(v)); } catch {} },
   };
 
-  let INDEX = null;                    // Verzeichnis aller Quellen und Körperschaften
-  const bodyIdx = new Map();           // Körperschafts-ID → { k, q }
+  let INDEX = null;                    // Verzeichnis: Gebiete, Zuordnung zu Quellen, Quellen
+  const G = new Map();                 // Gebiets-ID → { id, name, art, typ, plz, kreis, vg, ew, q?, b? }
+  const gebietVonBody = new Map();     // Körperschafts-ID → Gebiets-ID
   const loaded = new Map();            // Quellen-ID → aufbereitete Daten
   let kommune = store.get('kommune', null);
   let q = '';
@@ -82,7 +83,7 @@
   const enc = encodeURIComponent;
   function link(...parts) { return '#/' + parts.map(enc).join('/'); }
   function go(hash) { depth++; location.hash = hash; }
-  function back() { if (depth > 0) { depth--; history.back(); } else location.hash = kommune ? link('k', kommune) : link(); }
+  function back() { if (depth > 0) { depth--; history.back(); } else location.hash = kommune ? link('g', kommune) : '#/'; }
   // Logo: immer zur Startseite (Suche), Eingabe zurücksetzen
   document.getElementById('home').addEventListener('click', (e) => {
     e.preventDefault(); depth = 0; q = '';
@@ -93,7 +94,7 @@
     depth = 0;
     const tab = b.dataset.tab;
     if (tab === 'wahl' || !kommune) location.hash = '#/';
-    else if (tab === 'start') location.hash = link('k', kommune);
+    else if (tab === 'start') location.hash = link('g', kommune);
     else location.hash = link('abo');
   }));
 
@@ -106,16 +107,20 @@
     const r = parse();
     let tab = 'wahl';
     try {
-      if (r.v === 'k' && bodyIdx.has(r.a)) {
+      if (r.v === 'k') {
+        // ältere Links auf Körperschaften
+        location.replace(link('g', gebietVonBody.get(r.a) ?? 'b:' + r.a, ...(r.b ? [r.b] : [])));
+        return;
+      } else if (r.v === 'g' && G.has(r.a)) {
         kommune = r.a; store.set('kommune', kommune); tab = 'start';
-        await vStart(r.a, r.b);
+        await vGebiet(r.a, r.b);
       } else if (r.v === 's' || r.v === 'v') {
         tab = 'start';
         const qid = quelleFuerObjekt(r.a);
         if (!qid) throw new Error('Unbekannte Quelle');
         const x = await quelle(qid);
         if (r.v === 's') vSitzung(x, r.a); else vVorlage(x, r.a);
-      } else if (r.v === 'abo' && kommune) {
+      } else if (r.v === 'abo' && kommune && G.has(kommune)) {
         tab = 'abo';
         await vAbo();
       } else {
@@ -155,31 +160,78 @@
     document.getElementById('instx')?.addEventListener('click', () => { store.set('installHidden', true); route(); });
   }
 
+  // ---------- Gebiete ----------
+  const fmtZahl = (n) => (n == null ? '' : new Intl.NumberFormat('de-DE').format(n));
+  const kreisKurz = (name) => String(name || '').replace(/^Landkreis /, '');
+  /** Daten vorhanden: selbst oder über Verbandsgemeinde bzw. Kreis */
+  const hatDaten = (g) => !!(g && (g.q || (g.vg && G.get(g.vg)?.q) || (g.kreis && G.get(g.kreis)?.q)));
+
+  function ladeIndex(idx) {
+    INDEX = idx;
+    for (const [id, name, art] of idx.kreise) G.set(id, { id, name, art, typ: art === 'Kreisfreie Stadt' ? 'kreisfrei' : 'kreis' });
+    for (const [id, name, kreis] of idx.vgs) G.set(id, { id, name, art: 'Verbandsgemeinde', typ: 'vg', kreis });
+    for (const [id, name, art, plz, kreis, vg, ew] of idx.gemeinden) G.set(id, { id, name, art, typ: 'gemeinde', plz, kreis, vg, ew });
+    for (const [id, [qid, bid]] of Object.entries(idx.daten)) {
+      const g = G.get(id); if (g) { g.q = qid; g.b = bid; }
+      gebietVonBody.set(bid, id);
+    }
+    // Körperschaften ohne Gebietskörperschaft (Zweckverbände u. a.)
+    for (const qq of idx.quellen) for (const w of qq.weitere) {
+      if (/^Verbandsgemeinde /.test(w.name)) continue; // ehemalige Verbandsgemeinden
+      const id = 'b:' + w.id;
+      G.set(id, { id, name: w.name, art: w.art, typ: 'body', plz: w.plz, q: qq.id, b: w.id, kreis: G.get(qq.gebiet)?.kreis ?? null, vg: G.get(qq.gebiet)?.typ === 'vg' ? qq.gebiet : null });
+      gebietVonBody.set(w.id, id);
+    }
+    // frühere Auswahl (Körperschafts-ID) übernehmen
+    const migr = (id) => (G.has(id) ? id : gebietVonBody.get(id) ?? null);
+    kommune = kommune ? migr(kommune) : null;
+    store.set('zuletzt', store.get('zuletzt', []).map(migr).filter(Boolean));
+  }
+
+  function anzeigeName(g) {
+    if (g.typ === 'gemeinde') return g.art === 'Ortsgemeinde' || g.art === 'Gemeinde' ? `${g.art} ${g.name}` : g.art === 'Stadt' ? `Stadt ${g.name}` : g.name;
+    return g.name;
+  }
+  function untertitel(g) {
+    const teile = [];
+    if (g.typ === 'gemeinde') teile.push(g.plz);
+    if (g.typ === 'gemeinde' && g.art === 'Kreisfreie Stadt') teile.push('kreisfreie Stadt');
+    if (g.vg && g.typ !== 'vg') teile.push(G.get(g.vg)?.name.replace('Verbandsgemeinde', 'VG'));
+    if (g.kreis) teile.push(G.get(g.kreis)?.name);
+    if (g.typ === 'body') teile.unshift(g.art);
+    return teile.filter(Boolean).join(' · ');
+  }
+
   // ---------- Ansicht: Startseite (nur Suche) ----------
-  const rang = { Ortsgemeinde: 0, Stadt: 0, Ortsbezirk: 1, Verbandsgemeinde: 2, Zweckverband: 3, Sonstige: 4 };
+  const rang = { gemeinde: 0, kreisfrei: 0, vg: 1, kreis: 2, body: 3 };
   function suche(text) {
     const t = text.trim().toLowerCase();
     if (!t) return [];
     const plz = /^\d+$/.test(t);
     const hits = [];
-    for (const qq of INDEX.quellen) for (const k of qq.koerperschaften) {
-      const name = k.name.toLowerCase(), kurz = kurzName(k.name).toLowerCase();
+    for (const g of G.values()) {
+      if (g.typ === 'kreisfrei') continue; // die Stadt selbst steht bei den Gemeinden
       let score = -1;
-      if (plz) { if ((k.plz || '').startsWith(t)) score = 10; }
-      else if (kurz.startsWith(t)) score = 30;
-      else if (name.includes(t) || (k.ort || '').toLowerCase().startsWith(t)) score = 20;
-      if (score >= 0) hits.push({ k, qq, score: score - (rang[k.art] ?? 5) });
+      if (plz) { if (g.typ === 'gemeinde' && (g.plz || '').startsWith(t)) score = 10; }
+      else {
+        const name = g.name.toLowerCase(), kurz = kurzName(kreisKurz(g.name)).toLowerCase();
+        if (kurz === t) score = 40;
+        else if (kurz.startsWith(t)) score = 30;
+        else if (name.includes(t)) score = 20;
+      }
+      if (score < 0) continue;
+      hits.push({ g, score: score - rang[g.typ] * 2 + (hatDaten(g) ? 1 : 0) + Math.min((g.ew || 0) / 1e6, 0.5) });
     }
-    return hits.sort((a, b) => b.score - a.score || a.k.name.localeCompare(b.k.name, 'de')).slice(0, 8);
+    return hits.sort((a, b) => b.score - a.score || a.g.name.localeCompare(b.g.name, 'de')).slice(0, 8).map((h) => h.g);
   }
-  function kommuneRow({ k, qq }) {
-    return `<button class="row" type="button" data-go="${esc(link('k', k.id))}"><div class="body"><span class="title">${esc(k.name)}</span><span class="meta">${esc([k.plz, qq.landkreis].filter(Boolean).join(' · '))}${k.kommend ? ` · ${k.kommend} Sitzung${k.kommend > 1 ? 'en' : ''} geplant` : ''}</span></div>${chev}</button>`;
+  function gebietRow(g) {
+    return `<button class="row" type="button" data-go="${esc(link('g', g.id))}"><div class="body"><span class="title">${esc(anzeigeName(g))}</span><span class="meta">${esc(untertitel(g))}</span></div>${hatDaten(g) ? '' : '<span class="pill plain">ohne Daten</span>'}${chev}</button>`;
   }
   function vWahl() {
     setTitle('');
-    const zuletzt = store.get('zuletzt', []).filter((id) => bodyIdx.has(id))
-      .map((id) => ({ k: bodyIdx.get(id).k, qq: INDEX.quellen.find((x) => x.id === bodyIdx.get(id).q) }));
-    const anzahl = INDEX.quellen.reduce((n, x) => n + x.koerperschaften.filter((k) => k.art !== 'Zweckverband' && k.art !== 'Sonstige').length, 0);
+    const zuletzt = store.get('zuletzt', []).filter((id) => G.has(id)).map((id) => G.get(id));
+    const gemeinden = INDEX.gemeinden.length;
+    const mitDaten = INDEX.gemeinden.filter(([id]) => hatDaten(G.get(id))).length;
     $view.innerHTML = `
       <div class="home">
         ${installCard()}
@@ -192,8 +244,8 @@
           <input id="q" type="search" inputmode="search" enterkeyhint="search" placeholder="Kommune oder Postleitzahl" value="${esc(q)}" aria-label="Kommune oder Postleitzahl">
         </form>
         <div id="hits"></div>
-        ${zuletzt.length ? `<section id="recent"><h2>Zuletzt angesehen</h2><div class="list">${zuletzt.map(kommuneRow).join('')}</div></section>` : ''}
-        <p class="coverage">${anzahl} Kommunen in Rheinland-Pfalz · Datenstand ${esc(stand(INDEX.erstellt))}</p>
+        ${zuletzt.length ? `<section id="recent"><h2>Zuletzt angesehen</h2><div class="list">${zuletzt.map(gebietRow).join('')}</div></section>` : ''}
+        <p class="coverage">Alle ${fmtZahl(gemeinden)} Gemeinden in Rheinland-Pfalz · Sitzungsdaten für ${fmtZahl(mitDaten)} davon<br>Datenstand ${esc(stand(INDEX.erstellt))}</p>
       </div>`;
     const input = document.getElementById('q');
     const $hits = document.getElementById('hits');
@@ -203,52 +255,66 @@
       const hits = suche(q);
       if ($recent) $recent.hidden = !!q.trim();
       $hits.innerHTML = !q.trim() ? '' : hits.length
-        ? `<div class="list suggest">${hits.map(kommuneRow).join('')}</div>`
-        : `<div class="card empty">Für „${esc(q.trim())}“ gibt es noch keine Daten. Bisher sind ${INDEX.quellen.length} Ratsinformationssysteme aus Rheinland-Pfalz angebunden.</div>`;
+        ? `<div class="list suggest">${hits.map(gebietRow).join('')}</div>`
+        : `<div class="card empty">Keine Kommune in Rheinland-Pfalz gefunden für „${esc(q.trim())}“.</div>`;
     };
     input.addEventListener('input', show);
     document.getElementById('sf').addEventListener('submit', (e) => {
       e.preventDefault();
       const first = suche(input.value)[0];
-      if (first) { input.blur(); go(link('k', first.k.id)); }
+      if (first) { input.blur(); go(link('g', first.id)); }
     });
     show();
     bindInstall();
   }
 
   // ---------- Ebenen ----------
-  function ebenen(x, kid) {
-    const k = x.k.get(kid);
-    const vg = x.D.vg && x.k.get(x.D.vg);
-    const istVg = k.art === 'Verbandsgemeinde';
+  function ebenen(g) {
+    if (g.typ === 'body') {
+      return [
+        { key: 'gemeinde', label: 'Verband', sub: kurzName(g.name), g, off: false },
+        { key: 'vg', label: 'VG', sub: g.vg ? kurzName(G.get(g.vg).name) : '–', g: g.vg ? G.get(g.vg) : null, off: !g.vg },
+        { key: 'kreis', label: 'Kreis', sub: g.kreis ? kreisKurz(G.get(g.kreis).name) : '–', g: g.kreis ? G.get(g.kreis) : null, off: !g.kreis },
+      ];
+    }
+    const gem = g.typ === 'gemeinde' ? g : null;
+    const vg = g.typ === 'vg' ? g : g.vg ? G.get(g.vg) : null;
+    const kreis = g.typ === 'kreis' ? g : g.kreis ? G.get(g.kreis) : null;
     return [
-      { key: 'gemeinde', label: k.art === 'Zweckverband' ? 'Verband' : 'Gemeinde', sub: istVg ? '–' : kurzName(k.name), id: istVg ? null : k.id, off: istVg },
-      { key: 'vg', label: 'VG', sub: vg ? kurzName(vg.name) : 'keine', id: vg?.id ?? (istVg ? k.id : null), off: !vg && !istVg },
-      { key: 'kreis', label: 'Landkreis', sub: x.D.quelle.landkreis || 'kreisfrei', id: null, off: true },
+      { key: 'gemeinde', label: gem?.art === 'Kreisfreie Stadt' || gem?.art === 'Stadt' ? 'Stadt' : 'Gemeinde', sub: gem ? gem.name : '–', g: gem, off: !gem },
+      { key: 'vg', label: 'VG', sub: vg ? kurzName(vg.name) : gem ? 'verbandsfrei' : '–', g: vg, off: !vg },
+      { key: 'kreis', label: 'Kreis', sub: kreis ? kreisKurz(kreis.name) : gem?.art === 'Kreisfreie Stadt' ? 'kreisfrei' : '–', g: kreis, off: !kreis },
     ];
   }
 
-  // ---------- Ansicht: Startseite der Kommune ----------
-  async function vStart(kid, ebene) {
-    const qid = bodyIdx.get(kid).q;
-    const x = await quelle(qid);
-    const k = x.k.get(kid);
-    const eb = ebenen(x, kid);
-    const sel = eb.find((e) => e.key === ebene && !e.off) || eb.find((e) => !e.off);
-    setTitle(kurzName(k.name));
-    store.set('zuletzt', [kid, ...store.get('zuletzt', []).filter((x) => x !== kid)].slice(0, 4));
-    const t = now();
-    const sitz = x.sByK.get(sel.id) || [];
-    const kommend = sitz.filter((m) => m.start >= t);
-    const vergangen = sitz.filter((m) => m.start < t).reverse().slice(0, 6);
-    const vorl = (x.vByK.get(sel.id) || []).slice(0, 10);
-    const target = x.k.get(sel.id);
-    const hint = sel.key === 'vg' && k.art !== 'Verbandsgemeinde'
-      ? 'Die Verbandsgemeinde entscheidet u. a. über Grundschulen, Feuerwehr, Wasser, Abwasser und den Flächennutzungsplan.'
-      : `${target.art}${x.D.quelle.landkreis ? ' im Landkreis ' + x.D.quelle.landkreis : ''}`;
-    $view.innerHTML = `
-      <div class="seg" role="group" aria-label="Ebene">${eb.map((e) => `<button type="button" ${e.off ? 'disabled' : `data-go="${esc(link('k', kid, e.key))}"`} aria-pressed="${e.key === sel.key}" title="${e.key === 'kreis' ? 'Der Landkreis ist noch nicht angebunden' : ''}">${e.label}<small>${esc(e.sub)}</small></button>`).join('')}</div>
-      <section class="hero"><h3>${esc(target.name)}</h3><p class="muted small">${esc(hint)}</p></section>
+  // ---------- Ansicht: Kommune (eine Ebene) ----------
+  const ERKLAERUNG = {
+    vg: 'Die Verbandsgemeinde entscheidet u. a. über Grundschulen, Feuerwehr, Wasser, Abwasser und den Flächennutzungsplan.',
+    kreis: 'Der Kreis ist u. a. zuständig für weiterführende Schulen, Kreisstraßen, Abfall, Rettungsdienst und Soziales.',
+  };
+  async function vGebiet(id, ebene) {
+    let g = G.get(id);
+    if (g.typ === 'kreisfrei') { location.replace(link('g', id + '000')); return; }
+    const eb = ebenen(g);
+    const sel = eb.find((e) => e.key === ebene && !e.off)
+      || eb.find((e) => !e.off && e.g.q) || eb.find((e) => !e.off);
+    setTitle(kurzName(kreisKurz(g.name)));
+    store.set('zuletzt', [id, ...store.get('zuletzt', []).filter((x) => x !== id)].slice(0, 4));
+    const seg = `<div class="seg" role="group" aria-label="Ebene">${eb.map((e) => `<button type="button" ${e.off ? 'disabled' : `data-go="${esc(link('g', id, e.key))}"`} aria-pressed="${e.key === sel.key}" class="${!e.off && !e.g.q ? 'nodata' : ''}">${e.label}<small>${esc(e.sub)}</small></button>`).join('')}</div>`;
+    const t = sel.g;
+    const kopf = `<section class="hero"><h3>${esc(anzeigeName(t))}</h3><p class="muted small">${esc([t.ew ? fmtZahl(t.ew) + ' Einwohner' : '', sel.key !== 'gemeinde' ? ERKLAERUNG[sel.key] : untertitel(t)].filter(Boolean).join(' · '))}</p></section>`;
+
+    if (!t.q) {
+      $view.innerHTML = seg + kopf + ohneDaten(t, eb);
+      return;
+    }
+    const x = await quelle(t.q);
+    const sitz = x.sByK.get(t.b) || [];
+    const jetzt = now();
+    const kommend = sitz.filter((m) => m.start >= jetzt);
+    const vergangen = sitz.filter((m) => m.start < jetzt).reverse().slice(0, 6);
+    const vorl = (x.vByK.get(t.b) || []).slice(0, 10);
+    $view.innerHTML = `${seg}${kopf}
       <section><h2>Nächste Sitzungen</h2>
         ${kommend.length ? `<div class="list">${kommend.map(sitzungRow).join('')}</div>` : '<div class="card empty">Zurzeit sind keine Sitzungen angekündigt.</div>'}
       </section>
@@ -258,9 +324,25 @@
       ${vergangen.length ? `<section><h2>Zuletzt getagt</h2><div class="list">${vergangen.map(sitzungRow).join('')}</div></section>` : ''}
       <p class="stand">Abgleich mit ${esc(x.D.quelle.name)}: ${esc(stand(x.D.quelle.abgleich))}</p>`;
   }
+
+  function ohneDaten(t, eb) {
+    const ris = INDEX.ris[t.id] || (t.typ === 'gemeinde' && t.vg ? INDEX.ris[t.vg] : null);
+    let grund;
+    if (ris?.status === 'inaktiv') grund = 'Das Ratsinformationssystem hat eine Standardschnittstelle (OParl), sie ist aber nicht freigeschaltet. Sobald die Verwaltung sie freischaltet, können wir die Daten hier zeigen.';
+    else if (ris?.status === 'robots') grund = 'Der Anbieter des Ratsinformationssystems untersagt automatische Abrufe. Wir zeigen die Daten erst, wenn das geklärt ist.';
+    else if (t.art === 'Ortsgemeinde') grund = 'Ortsgemeinden veröffentlichen ihre Sitzungen meist im Ratsinformationssystem der Verbandsgemeinde. Für diese ist noch keine offene Schnittstelle bekannt.';
+    else grund = 'Für dieses Ratsinformationssystem ist noch keine offene Schnittstelle bekannt.';
+    const andere = eb.filter((e) => !e.off && e.g.q && e.g !== t);
+    return `<div class="card empty-state">
+        <p><strong>Noch keine Sitzungsdaten</strong></p>
+        <p class="muted">${esc(grund)}</p>
+        ${ris ? `<a class="btn ghost" href="${esc(ris.url)}" target="_blank" rel="noopener">Ratsinformationssystem öffnen</a>` : ''}
+      </div>
+      ${andere.length ? `<section><h2>Mit Daten</h2><div class="list">${andere.map((e) => `<button class="row" type="button" data-go="${esc(link('g', kommune, e.key))}"><div class="body"><span class="title">${esc(anzeigeName(e.g))}</span><span class="meta">${esc({ gemeinde: 'Gemeinde', vg: 'Verbandsgemeinde', kreis: 'Kreis' }[e.key])}</span></div>${chev}</button>`).join('')}</div></section>` : ''}`;
+  }
   // Die Ebenen-Schalter navigieren ohne Verlaufseintrag
   $view.addEventListener('click', (e) => {
-    const b = e.target.closest('.seg [data-go]');
+    const b = e.target.closest('.seg [data-go], .empty-state ~ section [data-go]');
     if (b) { e.stopImmediatePropagation(); e.preventDefault(); location.replace(b.dataset.go); }
   }, true);
 
@@ -353,19 +435,25 @@
   const saveAbo = (patch) => store.set('abo', { ...abo(), ...patch });
 
   async function vAbo() {
-    const x = await quelle(bodyIdx.get(kommune).q);
-    const k = x.k.get(kommune);
-    setTitle(kurzName(k.name));
+    const g = G.get(kommune);
+    setTitle(kurzName(kreisKurz(g.name)));
     const a = abo();
     const terms = [...a.themen.flatMap((t) => THEMEN[t] || []), ...[a.stichwort, a.strasse].filter(Boolean).map((s) => s.toLowerCase())];
-    const ids = ebenen(x, kommune).filter((e) => !e.off).map((e) => e.id);
-    const treffer = !terms.length ? [] : x.D.vorlagen.filter((v) => ids.includes(v.k)).map((v) => {
+    const mitDaten = ebenen(g).filter((e) => !e.off && e.g.q).map((e) => e.g);
+    const vorlagen = [];
+    for (const e of mitDaten) {
+      const x = await quelle(e.q);
+      for (const v of x.vByK.get(e.b) || []) vorlagen.push({ v, x });
+    }
+    vorlagen.sort((p, r) => String(r.v.datum).localeCompare(String(p.v.datum)));
+    const treffer = !terms.length ? [] : vorlagen.map(({ v, x }) => {
       const hay = ((v.name || '') + ' ' + (v.text || '')).toLowerCase();
       const hit = terms.find((t) => hay.includes(t));
-      return hit ? { v, hit } : null;
+      return hit ? { v, x, hit } : null;
     }).filter(Boolean).slice(0, 15);
+    const fuer = mitDaten.map((e) => anzeigeName(e)).join(', ');
     $view.innerHTML = `
-      <section class="hero"><h3>Bescheid wissen, wenn es um Ihr Thema geht</h3><p class="muted small">Für ${esc(k.name)}${x.D.vg && x.D.vg !== kommune ? ' und die ' + esc(x.k.get(x.D.vg)?.name) : ''}.</p></section>
+      <section class="hero"><h3>Bescheid wissen, wenn es um Ihr Thema geht</h3><p class="muted small">${mitDaten.length ? `Für ${esc(fuer)}.` : `Für ${esc(anzeigeName(g))} liegen noch keine Sitzungsdaten vor. Sie können Ihre Themen trotzdem schon festlegen.`}</p></section>
       <section><h2>Themen</h2><div class="chips">${Object.keys(THEMEN).map((t) => `<button type="button" class="chip" data-thema="${esc(t)}" aria-pressed="${a.themen.includes(t)}">${esc(t)}</button>`).join('')}</div></section>
       <section class="field"><label for="stw">Stichwort</label><input type="text" id="stw" value="${esc(a.stichwort)}" placeholder="z. B. Dorfgemeinschaftshaus" enterkeyhint="done"></section>
       <section class="field"><label for="str">Ihre Straße</label><input type="text" id="str" value="${esc(a.strasse)}" placeholder="z. B. Hauptstraße" autocomplete="address-line1" enterkeyhint="done"><p class="muted small">Wird nur auf diesem Gerät gespeichert.</p></section>
@@ -374,7 +462,7 @@
         <label class="switch" for="mail"><span>E-Mail</span><input type="checkbox" id="mail" ${a.mail ? 'checked' : ''}></label>
       </div><p class="notice">Benachrichtigungen werden noch nicht verschickt. Ihre Auswahl bleibt auf diesem Gerät gespeichert.</p></section>
       <section><h2>Das wäre zuletzt gekommen (${treffer.length})</h2>
-        ${treffer.length ? `<div class="list">${treffer.map(({ v, hit }) => `<button class="row" type="button" data-go="${esc(link('v', v.id))}"><div class="body"><span class="meta"><span class="mono">${esc(v.nr)}</span><span>${esc(datum(v.datum))}</span><span>${esc(kurzName(x.k.get(v.k)?.name))}</span></span><span class="title">${esc(v.name)}</span><span class="meta">Treffer: <mark>${esc(hit)}</mark></span></div>${chev}</button>`).join('')}</div>` : '<div class="card empty">Keine passenden Vorlagen im aktuellen Datenstand.</div>'}
+        ${treffer.length ? `<div class="list">${treffer.map(({ v, x, hit }) => `<button class="row" type="button" data-go="${esc(link('v', v.id))}"><div class="body"><span class="meta"><span class="mono">${esc(v.nr)}</span><span>${esc(datum(v.datum))}</span><span>${esc(kurzName(x.k.get(v.k)?.name))}</span></span><span class="title">${esc(v.name)}</span><span class="meta">Treffer: <mark>${esc(hit)}</mark></span></div>${chev}</button>`).join('')}</div>` : '<div class="card empty">Keine passenden Vorlagen im aktuellen Datenstand.</div>'}
       </section>`;
     $view.querySelectorAll('[data-thema]').forEach((el) => el.addEventListener('click', () => {
       const t = el.dataset.thema; const cur = abo().themen;
@@ -398,9 +486,7 @@
 
   // ---------- Start ----------
   getJson('data/index.json').then((idx) => {
-    INDEX = idx;
-    for (const qq of INDEX.quellen) for (const k of qq.koerperschaften) bodyIdx.set(k.id, { k, q: qq.id });
-    if (kommune && !bodyIdx.has(kommune)) kommune = null;
+    ladeIndex(idx);
     route();
   }).catch((err) => {
     $view.innerHTML = `<div class="card empty">Die Daten konnten nicht geladen werden (${esc(err.message)}). Prüfen Sie die Verbindung und laden Sie die Seite neu.</div>`;

@@ -17,6 +17,8 @@ export interface SourceRecord {
   landkreis?: string | null;
   url: string;
   status?: string | null;
+  /** Amtlicher Schlüssel des Gebiets der Quelle (data/gebiete-rlp.json). */
+  gebiet?: string;
 }
 
 export interface SyncOptions {

@@ -123,6 +123,9 @@ p { margin: 0; }
 .seg button small { font-weight: 400; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
 .seg button:disabled { opacity: .45; cursor: not-allowed; }
+.seg button.nodata:not([aria-pressed="true"]) { opacity: .7; font-weight: 500; }
+.empty-state { padding: 16px; display: grid; gap: 10px; }
+.btn.ghost { background: none; color: var(--accent); border: 1px solid var(--accent); text-decoration: none; text-align: center; justify-self: start; }
 
 .search { width: 100%; padding: 12px 14px; font: inherit; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); color: var(--fg); }
 .hero { display: grid; gap: 6px; }

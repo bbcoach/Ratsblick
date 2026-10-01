@@ -1,0 +1,53 @@
+import { describe, expect, it } from 'vitest';
+import { vergleiche, zuordnen } from '../src/export/gebiete.js';
+import type { Gebiete } from '../src/sync/discover.js';
+
+const g: Gebiete = {
+  kreise: [{ id: '07143', name: 'Westerwaldkreis', art: 'Landkreis' }],
+  verbandsgemeinden: [
+    { id: '071435004', name: 'Verbandsgemeinde Montabaur', kreis: '07143' },
+    { id: '071435009', name: 'Verbandsgemeinde Westerburg', kreis: '07143' },
+  ],
+  gemeinden: [
+    { id: '07143072', name: 'Stahlhofen', art: 'Ortsgemeinde', kreis: '07143', vg: '071435004' },
+    { id: '07143293', name: 'Stahlhofen am Wiesensee', art: 'Ortsgemeinde', kreis: '07143', vg: '071435009' },
+    { id: '07143048', name: 'Montabaur', art: 'Stadt', kreis: '07143', vg: '071435004' },
+  ],
+};
+
+describe('Zuordnung zu Gebietskörperschaften', () => {
+  it('vergleicht Namen tolerant', () => {
+    expect(vergleiche('Ortsgemeinde Girod', 'Girod')).toBe(2);
+    expect(vergleiche('Ortsgemeinde Stahlhofen a.W.', 'Stahlhofen am Wiesensee')).toBe(1);
+    expect(vergleiche('Ortsgemeinde Herxheim', 'Herxheim bei Landau/ Pfalz')).toBe(1);
+    expect(vergleiche('Ortsgemeinde Herxheimweyher', 'Herxheim bei Landau/ Pfalz')).toBe(0);
+    expect(vergleiche('Ortsgemeinde Herxheim', 'Herxheimweyher')).toBe(0);
+    expect(vergleiche('Ortsgemeinde Auw b. Prüm', 'Auw bei Prüm')).toBe(1);
+  });
+
+  it('ordnet nur innerhalb der Verbandsgemeinde der Quelle zu', () => {
+    const montabaur = zuordnen(g, '071435004', [
+      { id: 'b1', name: 'Ortsgemeinde Stahlhofen' },
+      { id: 'b2', name: 'Stadt Montabaur' },
+      { id: 'b3', name: 'Verbandsgemeinde Montabaur' },
+      { id: 'b4', name: 'Kindergartenzweckverband Gackenbach-Horbach' },
+    ]);
+    expect(Object.fromEntries(montabaur)).toEqual({ '07143072': 'b1', '07143048': 'b2', '071435004': 'b3' });
+
+    const westerburg = zuordnen(g, '071435009', [{ id: 'w1', name: 'Ortsgemeinde Stahlhofen a.W.' }]);
+    expect(Object.fromEntries(westerburg)).toEqual({ '07143293': 'w1' });
+  });
+
+  it('ordnet Systeme einer einzelnen Stadt direkt zu', () => {
+    const r = zuordnen(g, '07143048', [{ id: 's1', name: 'Stadtverwaltung Montabaur' }]);
+    expect(Object.fromEntries(r)).toEqual({ '07143048': 's1' });
+  });
+});
+
+describe('Links zu Ratsinformationssystemen', () => {
+  it('leitet die Startseite aus der OParl-Adresse ab', async () => {
+    const { risStartseite } = await import('../src/export/web.js');
+    expect(risStartseite('https://adenau.gremien.info/oparl/system')).toBe('https://adenau.gremien.info/');
+    expect(risStartseite('https://www.hagenbach.sitzung-online.de/bi/oparl/1.0/system.asp')).toBe('https://www.hagenbach.sitzung-online.de/bi/');
+  });
+});

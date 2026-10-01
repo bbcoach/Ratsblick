@@ -4,6 +4,7 @@ import { openDb } from './db/index.js';
 import { OParlClient } from './oparl/client.js';
 import { writeSnapshot } from './export/snapshot.js';
 import { buildWeb } from './export/web.js';
+import { kandidaten, pruefe, type Gebiete } from './sync/discover.js';
 import { probeSource, saveProbe } from './sync/probe.js';
 import { syncSource, type SourceRecord } from './sync/sync.js';
 
@@ -15,6 +16,7 @@ const USAGE = `Ratsblick – Datenebene
   npm run snapshot -- --id vg-montabaur --out x.json
                                       Momentaufnahme einer Quelle als JSON (für Prototypen)
   npm run web -- --out dist           Web-App mit Daten aller Quellen bauen (GitHub Pages)
+  npm run discover                    gremien.info-Systeme zu allen Kommunen im Gemeindeverzeichnis suchen
 
 Optionen:
   --id <id>          nur diese Quelle (mehrfach möglich)
@@ -46,7 +48,7 @@ async function main(): Promise<void> {
     },
   });
   const cmd = positionals[0];
-  if (values.help || !cmd || !['probe', 'sync', 'snapshot', 'web'].includes(cmd)) {
+  if (values.help || !cmd || !['probe', 'sync', 'snapshot', 'web', 'discover'].includes(cmd)) {
     console.log(USAGE);
     process.exitCode = cmd && !values.help ? 1 : 0;
     return;
@@ -64,7 +66,10 @@ async function main(): Promise<void> {
 
   if (cmd === 'web') {
     const r = buildWeb(openDb(values.db!), values.out ?? 'dist');
-    console.log(`Web-App mit ${r.quellen} Quellen und ${r.koerperschaften} Körperschaften → ${values.out ?? 'dist'}`);
+    console.log(
+      `Web-App: ${r.quellen} Quellen, ${r.gebiete} Gebietskörperschaften mit eigenen Daten, ` +
+        `${r.gemeindenMitDaten} von ${r.gemeinden} Gemeinden mit Daten (selbst oder über die VG) → ${values.out ?? 'dist'}`,
+    );
     return;
   }
 
@@ -77,6 +82,22 @@ async function main(): Promise<void> {
   if (values.id?.length) {
     sources = sources.filter((s) => values.id!.includes(s.id));
     if (!sources.length) throw new Error(`Keine Quelle mit id ${values.id.join(', ')} in data/endpoints.json`);
+  }
+
+  if (cmd === 'discover') {
+    const gebiete = JSON.parse(readFileSync(new URL('../data/gebiete-rlp.json', import.meta.url), 'utf8')) as Gebiete;
+    const bekannt = new Set(loadSources().map((s) => s.url));
+    const liste = kandidaten(gebiete, bekannt);
+    console.log(`${liste.length} Kandidaten, Dauer etwa ${Math.ceil(liste.length / 60)} min`);
+    for (const k of liste) {
+      try {
+        const f = await pruefe(client, k);
+        if (f) console.log(JSON.stringify(f));
+      } catch (err) {
+        console.log(JSON.stringify({ ...k, fehler: (err as Error).message }));
+      }
+    }
+    return;
   }
 
   if (cmd === 'probe') {

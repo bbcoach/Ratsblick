@@ -21,8 +21,14 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
 - In RLP ist bei den gefundenen Fällen **more!rubin** (more! software) verbreitet, gehostet auf
   `<name>.gremien.info`. OParl ist dort eingebaut: `/oparl/system` liefert entweder Daten,
   `{"type":".../Error","message":"OParl is not active."}` (mit HTTP 200!) oder 404 bei unbekannter Subdomain.
-- Aktiv: VG Montabaur, VG Westerburg, VG Herxheim, VG Enkenbach-Alsenborn, Emmelshausen, Stadt Bad Kreuznach.
-- Vorhanden, nicht freigeschaltet: Donnersbergkreis, VG Edenkoben, VG Weilerbach.
+- Quellen in `data/endpoints.json` mit amtlichem Gebietsschlüssel (`gebiet`). Stand 01.10.2026: 30 aktiv,
+  39 more!rubin-Systeme ohne freigeschaltetes OParl, 2 auf `sitzung-online.de` (robots.txt) – Hagenbach, Boppard.
+  Gefunden über `npm run discover` (prüft `<name>.gremien.info/oparl/system` für alle VGs, Kreise, verbandsfreien
+  Gemeinden; unbekannte Subdomains liefern 404) und die OParl-Endpunktliste (github.com/OParl/resources).
+- Alle Gebietskörperschaften des Landes: `data/gebiete-rlp.json` aus dem Destatis-Gemeindeverzeichnis
+  (`scripts/gemeindeverzeichnis.py`): 2 300 Gemeinden, 129 VGs, 24 Landkreise, 12 kreisfreie Städte.
+  Zuordnung OParl-Körperschaft → Gebiet in `src/export/gebiete.ts` (nur innerhalb des Gebiets der Quelle,
+  erstes Wort exakt, weitere dürfen abgekürzt sein: „Auw b. Prüm“ ↔ „Auw bei Prüm“).
 - `npm run probe` (01.10.2026): alle sechs aktiven Systeme liefern auch die Körperschaftsliste; Pirmasens HTTP 403.
 - Alle `*.gremien.info` liegen auf **einer** IP → Drosselung gilt je Server (Hauptdomain), nicht je Subdomain
   (`serverKey` in `src/oparl/client.ts`). Quellen laufen parallel, teilen sich aber diese Grenze.
@@ -54,7 +60,8 @@ Stil: ruhig und behördennah, Akzent #1F4E79, Schrift Public Sans, Vorlagennumme
 2. Volltext aus `mainFile.text` in `file.text_extracted` übernehmen, Suche darüber.
 3. „Kurz erklärt“ automatisch erzeugen (statt von Hand).
 4. Benachrichtigungen fürs Themen-Abo (braucht kleinen Server für Web Push/E-Mail).
-5. Landkreise und weitere Systeme anbinden.
+5. Weitere Systeme: andere Anbieter (ALLRIS, SessionNet, Somacos) mit OParl suchen; bei „nicht freigeschaltet“
+   ggf. Verwaltungen ansprechen; robots.txt-Frage bei sitzung-online.de klären.
 
 ## Konventionen
 - Oberflächentexte, Kommentare, Fehlermeldungen und Doku auf Deutsch.

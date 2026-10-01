@@ -28,7 +28,9 @@ kostenlosen „DB Browser for SQLite“.
 
 | Pfad | Inhalt |
 |---|---|
-| `data/endpoints.json` | Quellen aus dem RIS-Verzeichnis RLP (Stand 01.10.2026) |
+| `data/endpoints.json` | Ratsinformationssysteme mit Status und amtlichem Gebietsschlüssel |
+| `data/gebiete-rlp.json` | Alle Gebietskörperschaften in RLP (Destatis-Gemeindeverzeichnis, `scripts/gemeindeverzeichnis.py`) |
+| `src/sync/discover.ts` | Suche nach gremien.info-Systemen für alle Kommunen (`npm run discover`) |
 | `src/oparl/client.ts` | OParl-Client: Seitenweises Lesen, Wiederholung bei Serverfehlern, Drosselung je Server |
 | `src/db/schema.sql` | Datenmodell |
 | `src/sync/sync.ts` | Abgleich System → Körperschaften → Gremien, Sitzungen, Vorlagen |
@@ -82,4 +84,5 @@ Einmalig einrichten: im Repository unter **Settings → Pages → Build and depl
 - [x] Web-App (PWA) nach den Entwürfen, automatisch aktualisiert
 - [ ] Volltext für die Suche (more!rubin liefert ihn bereits in `mainFile.text`)
 - [ ] Benachrichtigungen für das Themen-Abo
-- [ ] Landkreise und weitere Systeme
+- [x] Alle 2 300 Gemeinden, VGs und Kreise in der Suche; 30 Systeme mit Daten
+- [ ] Weitere Anbieter mit OParl (ALLRIS, SessionNet, Somacos)
