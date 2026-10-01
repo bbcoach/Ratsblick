@@ -1,0 +1,38 @@
+# Prüft von GitHub aus, ob Ratsinformationssysteme erreichbar sind, und schreibt den Anfang der Antworten ins Protokoll.
+# Dient der Entwicklung von Scrapern für Systeme, die aus anderen Umgebungen nicht erreichbar sind.
+name: Erreichbarkeit
+
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: 'Adressen, durch Leerzeichen getrennt'
+        required: true
+      zeichen:
+        description: 'Wie viele Zeichen je Antwort ins Protokoll'
+        default: '30000'
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Abrufen (eine Anfrage je Adresse, 2 s Abstand)
+        env:
+          URLS: ${{ inputs.urls }}
+          ZEICHEN: ${{ inputs.zeichen }}
+        run: |
+          for u in $URLS; do
+            echo "::group::$u"
+            curl -sS -m 30 -L -A "Ratsblick/0.1 (OParl-Abgleich; Kontakt: https://github.com/bbcoach/Ratsblick)" \
+              -w '\n[HTTP %{http_code} %{content_type} %{size_download} Bytes %{time_total} s]\n' \
+              -o antwort.bin "$u" > status.txt 2>&1 || true
+            cat status.txt
+            iconv -f windows-1252 -t utf-8 antwort.bin 2>/dev/null | head -c "$ZEICHEN" || head -c "$ZEICHEN" antwort.bin
+            echo
+            echo "::endgroup::"
+            sleep 2
+          done
