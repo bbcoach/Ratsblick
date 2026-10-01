@@ -41,6 +41,20 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
   nach Fusion 2020) – maßgeblich ist die mit den jüngsten Sitzungen.
 - Quellenliste: `data/endpoints.json` (aus dem RIS-Verzeichnis RLP).
 
+## Kreisfreie Städte und Landkreise (Erhebung 01.10.2026)
+Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinfo./bi./ris. …; Achtung:
+`*.more-rubin1.de`, `*.worms.de`, `*.mainz-bingen.de` lösen jeden Namen auf) und je robots.txt + Startseite.
+- OParl aktiv (more!rubin): Bernkastel-Wittlich, Rhein-Hunsrück (`rheinhunsrueck.gremien.info`),
+  Rhein-Lahn (`rheinlahnkreis.gremien.info`). Nicht freigeschaltet: Altenkirchen, Alzey-Worms, Donnersberg.
+- SessionNet, Abruf erlaubt (keine robots.txt) → `status: geplant`: Koblenz, Mainz, Ahrweiler,
+  Trier-Saarburg, Kusel (PHP-Variante: `si0040.php` usw.), Neustadt (ASP wie Kaiserslautern).
+  Kaiserslautern läuft bereits (Scraper + Weiterleiter).
+- robots.txt „Disallow: /“: alle `*.sitzung-online.de` (ALLRIS: Kreis Bad Kreuznach, Germersheim; Bitburg-Prüm),
+  `sessionnet.owl-it.de` (Westerwaldkreis, Neuwied, Südliche Weinstraße), Vulkaneifel (SD.NET RIM), Trier (ALLRIS 4).
+- Bot-Schutz (MyraCloud): Ludwigshafen. Pirmasens: OParl-Adresse antwortet 403.
+- Unklar (nicht gefunden oder nicht erreichbar): Frankenthal, Landau, Speyer, Worms, Zweibrücken, Birkenfeld,
+  Cochem-Zell, Mayen-Koblenz, Bad Dürkheim, Kreis Kaiserslautern, Rhein-Pfalz-Kreis, Mainz-Bingen, Südwestpfalz.
+
 ## Scraper und Weiterleiter
 - `typ: "sessionnet"` in `endpoints.json` → `src/scrape/sessionnet.ts` statt OParl. Liest Kalender (`si0040`),
   Tagesordnung (`si0057`) und Vorlage (`vo0050`) und schreibt OParl-förmige Objekte über die upsert-Funktionen.
@@ -72,7 +86,8 @@ Stil: ruhig und behördennah, Akzent #1F4E79, Schrift Public Sans, Vorlagennumme
 2. Volltext aus `mainFile.text` in `file.text_extracted` übernehmen, Suche darüber.
 3. „Kurz erklärt“ automatisch erzeugen (statt von Hand).
 4. Benachrichtigungen fürs Themen-Abo (braucht kleinen Server für Web Push/E-Mail).
-5. Weitere SessionNet-Kommunen mit dem Scraper anbinden (robots.txt beachten; sitzung-online.de verbietet es).
+5. SessionNet-Scraper um die PHP-Variante erweitern und die sechs „geplant“-Quellen anbinden
+   (Koblenz, Mainz, Neustadt, Ahrweiler, Trier-Saarburg, Kusel); robots.txt vorher erneut prüfen.
 6. Weitere Systeme: andere Anbieter (ALLRIS, SessionNet, Somacos) mit OParl suchen; bei „nicht freigeschaltet“
    ggf. Verwaltungen ansprechen; robots.txt-Frage bei sitzung-online.de klären.
 

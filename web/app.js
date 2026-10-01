@@ -330,6 +330,8 @@
     let grund;
     if (ris?.status === 'inaktiv') grund = 'Das Ratsinformationssystem hat eine Standardschnittstelle (OParl), sie ist aber nicht freigeschaltet. Sobald die Verwaltung sie freischaltet, können wir die Daten hier zeigen.';
     else if (ris?.status === 'robots') grund = 'Der Anbieter des Ratsinformationssystems untersagt automatische Abrufe. Wir zeigen die Daten erst, wenn das geklärt ist.';
+    else if (ris?.status === 'blockiert') grund = 'Das Ratsinformationssystem weist automatische Abrufe mit einem Bot-Schutz ab.';
+    else if (ris?.status === 'geplant') grund = 'Das Ratsinformationssystem erlaubt automatische Abrufe. Die Anbindung ist geplant.';
     else if (t.art === 'Ortsgemeinde') grund = 'Ortsgemeinden veröffentlichen ihre Sitzungen meist im Ratsinformationssystem der Verbandsgemeinde. Für diese ist noch keine offene Schnittstelle bekannt.';
     else grund = 'Für dieses Ratsinformationssystem ist noch keine offene Schnittstelle bekannt.';
     const andere = eb.filter((e) => !e.off && e.g.q && e.g !== t);
