@@ -7,7 +7,7 @@ import type { FetchLike } from '../oparl/client.js';
  * Umgebung:
  *   RATSBLICK_RELAY_URL         z. B. https://ratsblick-relay.vercel.app
  *   RATSBLICK_RELAY_SCHLUESSEL  derselbe Wert wie RELAY_SCHLUESSEL beim Weiterleiter
- *   RATSBLICK_RELAY_HOSTS       kommagetrennt (Standard: die Liste in relay/api/erlaubt.js)
+ *   RATSBLICK_RELAY_HOSTS       kommagetrennt (Standard: die Liste in relay/lib/erlaubt.js)
  */
 export interface RelayConfig {
   url: string;
@@ -20,7 +20,11 @@ export function relayConfigAusUmgebung(env: NodeJS.ProcessEnv = process.env): Re
   return {
     url: env.RATSBLICK_RELAY_URL.replace(/\/+$/, ''),
     schluessel: env.RATSBLICK_RELAY_SCHLUESSEL,
-    hosts: (env.RATSBLICK_RELAY_HOSTS || 'ris.kaiserslautern.de,gremieninfo.trier.de') // wie relay/lib/erlaubt.js.split(',').map((h) => h.trim().toLowerCase()).filter(Boolean),
+    // Standard wie relay/lib/erlaubt.js
+    hosts: (env.RATSBLICK_RELAY_HOSTS || 'ris.kaiserslautern.de,gremieninfo.trier.de')
+      .split(',')
+      .map((h) => h.trim().toLowerCase())
+      .filter(Boolean),
   };
 }
 
