@@ -27,6 +27,21 @@ describe('Weiterleiter (relay/api/abruf.js)', () => {
     expect(gesehen?.ua).toMatch(/^Ratsblick/);
   });
 
+  it('reicht Sitzungs-Cookie und Wicket-Kennzeichen durch und meldet neue Cookies zurück', async () => {
+    let gesendet: Headers | undefined;
+    const f: typeof fetch = async (_u, i) => {
+      gesendet = new Headers(i?.headers);
+      return new Response('<ajax-response/>', { headers: { 'set-cookie': 'JSESSIONID=neu; Path=/public; HttpOnly' } });
+    };
+    const req = new Request(`https://relay.example/api/abruf?url=${encodeURIComponent(ziel)}`, {
+      headers: { authorization: `Bearer ${SCHLUESSEL}`, 'x-ratsblick-cookie': 'JSESSIONID=alt', 'wicket-ajax': 'true', 'wicket-ajax-baseurl': 'si018' },
+    });
+    const r = await abruf(req, env, f);
+    expect(gesendet?.get('cookie')).toBe('JSESSIONID=alt');
+    expect(gesendet?.get('wicket-ajax')).toBe('true');
+    expect(r.headers.get('x-ratsblick-set-cookie')).toBe('JSESSIONID=neu');
+  });
+
   it('lehnt falschen Schlüssel ab', async () => {
     expect((await abruf(anfrage(ziel, 'Bearer falsch'), env, ok)).status).toBe(401);
     expect((await abruf(anfrage(ziel, ''), env, ok)).status).toBe(401);

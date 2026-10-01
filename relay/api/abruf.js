@@ -108,6 +108,13 @@ export async function abruf(request, env = process.env, fetchImpl = fetch) {
   }
 
   const kopf = { 'User-Agent': UA, Accept: request.headers.get('accept') || '*/*' };
+  // Für zustandsbehaftete Oberflächen (ALLRIS 4/Wicket): Sitzungs-Cookie und Ajax-Kennzeichen durchreichen
+  const cookie = request.headers.get('x-ratsblick-cookie');
+  if (cookie) kopf.Cookie = cookie;
+  for (const h of ['wicket-ajax', 'wicket-ajax-baseurl', 'x-requested-with']) {
+    const v = request.headers.get(h);
+    if (v) kopf[h] = v;
+  }
   let res;
   try {
     try {
@@ -127,6 +134,9 @@ export async function abruf(request, env = process.env, fetchImpl = fetch) {
     const v = res.headers.get(h);
     if (v) headers.set(h, v);
   }
+  // Set-Cookie nicht als Cookie des Weiterleiters setzen, sondern in eigener Kopfzeile zurückgeben
+  const gesetzt = typeof res.headers.getSetCookie === 'function' ? res.headers.getSetCookie() : [res.headers.get('set-cookie')].filter(Boolean);
+  if (gesetzt.length) headers.set('x-ratsblick-set-cookie', gesetzt.map((c) => c.split(';')[0]).join('; '));
   // Weiterleitungen nur innerhalb der freigegebenen Hosts melden, nicht selbst folgen
   const loc = res.headers.get('location');
   if (loc) headers.set('x-ratsblick-location', new URL(loc, url).toString());
