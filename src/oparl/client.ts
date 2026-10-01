@@ -38,6 +38,16 @@ export class OParlHttpError extends Error {
   }
 }
 
+/**
+ * Drosselung je Server statt je Subdomain: z. B. liegen alle `*.gremien.info` auf derselben Maschine.
+ * Vereinfachung: die letzten zwei Namensteile (für .de/.info/.com ausreichend).
+ */
+export function serverKey(url: string): string {
+  const host = new URL(url).hostname;
+  if (/^[\d.]+$/.test(host) || host.includes(':')) return host;
+  return host.split('.').slice(-2).join('.');
+}
+
 const defaultSleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 function isErrorObject(x: unknown): x is OParlErrorObject {
@@ -57,7 +67,8 @@ export class OParlClient {
   private readonly userAgent: string;
   private readonly maxPages: number;
   private readonly sleep: (ms: number) => Promise<void>;
-  private readonly lastRequestAt = new Map<string, number>();
+  /** Nächster freier Zeitpunkt je Server. */
+  private readonly nextSlot = new Map<string, number>();
   requestCount = 0;
 
   constructor(opts: ClientOptions = {}) {
@@ -70,14 +81,16 @@ export class OParlClient {
     this.sleep = opts.sleep ?? defaultSleep;
   }
 
+  /**
+   * Reserviert den nächsten freien Zeitpunkt für den Server. Die Reservierung geschieht synchron,
+   * damit auch parallel laufende Abgleiche den Mindestabstand einhalten.
+   */
   private async throttle(url: string): Promise<void> {
-    const host = new URL(url).host;
-    const last = this.lastRequestAt.get(host);
-    if (last !== undefined) {
-      const wait = last + this.minIntervalMs - Date.now();
-      if (wait > 0) await this.sleep(wait);
-    }
-    this.lastRequestAt.set(host, Date.now());
+    const key = serverKey(url);
+    const now = Date.now();
+    const slot = Math.max(now, this.nextSlot.get(key) ?? 0);
+    this.nextSlot.set(key, slot + this.minIntervalMs);
+    if (slot > now) await this.sleep(slot - now);
   }
 
   /** Holt ein OParl-Objekt. Wiederholt bei 429/5xx und Netzfehlern mit wachsender Pause. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { OParlClient, OParlHttpError, OParlServerError } from '../src/oparl/client.js';
+import { serverKey, OParlClient, OParlHttpError, OParlServerError } from '../src/oparl/client.js';
 import { fakeServer } from './fixtures.js';
 
 const noSleep = async () => {};
@@ -68,5 +68,24 @@ describe('OParlClient', () => {
     await client.get(`${U}/b`);
     expect(waits).toHaveLength(1);
     expect(waits[0]).toBeGreaterThan(900);
+  });
+
+  it('drosselt Subdomains desselben Anbieters gemeinsam, auch bei parallelen Anfragen', async () => {
+    const waits: number[] = [];
+    const routes = {
+      'https://a.gremien.info/oparl/system': { id: 'a' },
+      'https://b.gremien.info/oparl/system': { id: 'b' },
+      'https://c.gremien.info/oparl/system': { id: 'c' },
+    };
+    const { fetchImpl } = fakeServer(routes);
+    const client = new OParlClient({ fetchImpl, minIntervalMs: 1000, sleep: async (ms) => void waits.push(ms) });
+    await Promise.all(Object.keys(routes).map((u) => client.get(u)));
+    expect(waits).toHaveLength(2);
+    expect(waits[1]! - waits[0]!).toBeGreaterThan(900);
+  });
+
+  it('ermittelt den Server aus der URL', () => {
+    expect(serverKey('https://montabaur.gremien.info/oparl/system')).toBe('gremien.info');
+    expect(serverKey('https://oparl.stadt-pirmasens.de/oparl/system')).toBe('stadt-pirmasens.de');
   });
 });

@@ -3,6 +3,7 @@ import { parseArgs } from 'node:util';
 import { openDb } from './db/index.js';
 import { OParlClient } from './oparl/client.js';
 import { writeSnapshot } from './export/snapshot.js';
+import { buildWeb } from './export/web.js';
 import { probeSource, saveProbe } from './sync/probe.js';
 import { syncSource, type SourceRecord } from './sync/sync.js';
 
@@ -13,6 +14,7 @@ const USAGE = `Ratsblick – Datenebene
   npm run sync                        alle Quellen mit Status "aktiv" abgleichen
   npm run snapshot -- --id vg-montabaur --out x.json
                                       Momentaufnahme einer Quelle als JSON (für Prototypen)
+  npm run web -- --out dist           Web-App mit Daten aller Quellen bauen (GitHub Pages)
 
 Optionen:
   --id <id>          nur diese Quelle (mehrfach möglich)
@@ -20,7 +22,7 @@ Optionen:
   --full             Stand ignorieren, alles neu laden
   --max-pages <n>    höchstens n Seiten je Liste (zum Ausprobieren)
   --interval <ms>    Mindestabstand je Server (Standard: 1000)
-  --out <pfad>       Zieldatei für snapshot
+  --out <pfad>       Zieldatei für snapshot bzw. Zielordner für web
 `;
 
 function loadSources(): SourceRecord[] {
@@ -44,7 +46,7 @@ async function main(): Promise<void> {
     },
   });
   const cmd = positionals[0];
-  if (values.help || !cmd || !['probe', 'sync', 'snapshot'].includes(cmd)) {
+  if (values.help || !cmd || !['probe', 'sync', 'snapshot', 'web'].includes(cmd)) {
     console.log(USAGE);
     process.exitCode = cmd && !values.help ? 1 : 0;
     return;
@@ -57,6 +59,12 @@ async function main(): Promise<void> {
       `${snap.koerperschaften.length} Körperschaften, ${snap.sitzungen.length} Sitzungen, ` +
         `${snap.vorlagen.length} Vorlagen → ${values.out}`,
     );
+    return;
+  }
+
+  if (cmd === 'web') {
+    const r = buildWeb(openDb(values.db!), values.out ?? 'dist');
+    console.log(`Web-App mit ${r.quellen} Quellen und ${r.koerperschaften} Körperschaften → ${values.out ?? 'dist'}`);
     return;
   }
 
@@ -84,21 +92,25 @@ async function main(): Promise<void> {
   }
 
   const targets = values.id?.length ? sources : sources.filter((s) => s.status === 'aktiv');
-  for (const s of targets) {
-    console.log(`\n▶ ${s.name} (${s.id})`);
-    const t0 = Date.now();
-    try {
-      const st = await syncSource(db, client, s, { full: values.full, log: console.log });
-      console.log(
-        `✓ ${st.bodies} Körperschaften, ${st.organizations} Gremien, ${st.meetings} Sitzungen, ` +
-          `${st.agendaItems} TOPs, ${st.papers} Vorlagen, ${st.consultations} Beratungen, ${st.files} Dateien ` +
-          `in ${Math.round((Date.now() - t0) / 1000)} s`,
-      );
-    } catch (err) {
-      console.error(`✗ ${(err as Error).message}`);
-      process.exitCode = 1;
-    }
-  }
+  // Quellen liegen auf verschiedenen Servern; die Drosselung gilt je Server, daher parallel abgleichen.
+  await Promise.all(
+    targets.map(async (s) => {
+      const log = (msg: string) => console.log(`[${s.id}] ${msg}`);
+      log(`▶ ${s.name}`);
+      const t0 = Date.now();
+      try {
+        const st = await syncSource(db, client, s, { full: values.full, log });
+        log(
+          `✓ ${st.bodies} Körperschaften, ${st.organizations} Gremien, ${st.meetings} Sitzungen, ` +
+            `${st.agendaItems} TOPs, ${st.papers} Vorlagen, ${st.consultations} Beratungen, ${st.files} Dateien ` +
+            `in ${Math.round((Date.now() - t0) / 1000)} s`,
+        );
+      } catch (err) {
+        log(`✗ ${(err as Error).message}`);
+        process.exitCode = 1;
+      }
+    }),
+  );
 }
 
 main().catch((err) => {

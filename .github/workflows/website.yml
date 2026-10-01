@@ -1,0 +1,83 @@
+# Baut die Web-App und veröffentlicht sie auf GitHub Pages.
+# - Zeitplan (alle 6 Stunden) und manueller Start: Abgleich aller aktiven Quellen, dann neu bauen.
+# - Push auf den Standard-Branch: Prüfen und mit dem zuletzt abgeglichenen Datenstand neu bauen.
+name: Website
+
+on:
+  push:
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      abgleich:
+        description: 'Daten neu abgleichen'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: website
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+      - name: Letzten Datenstand holen
+        id: db
+        uses: actions/cache/restore@v4
+        with:
+          path: data/ratsblick.sqlite
+          key: ratsblick-db-${{ github.run_id }}
+          restore-keys: ratsblick-db-
+
+      # Bei Pushes nur abgleichen, wenn noch kein Datenstand existiert. Höchstens 1 Anfrage/Sekunde je Server.
+      - name: Abgleich mit den Ratsinformationssystemen
+        id: sync
+        if: >-
+          github.event_name == 'schedule' ||
+          (github.event_name == 'workflow_dispatch' && inputs.abgleich) ||
+          steps.db.outputs.cache-matched-key == ''
+        continue-on-error: true
+        run: npm run sync
+
+      - name: Datenstand sichern
+        if: steps.sync.outcome != 'skipped'
+        uses: actions/cache/save@v4
+        with:
+          path: data/ratsblick.sqlite
+          key: ratsblick-db-${{ github.run_id }}
+
+      - run: npm run web -- --out dist
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    # Nur der Standard-Branch wird veröffentlicht (Zeitplan läuft immer dort).
+    if: github.event_name != 'push' || github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -33,8 +33,9 @@ export function cleanText(text: string | null | undefined, max: number): string 
   return t.length > max ? `${t.slice(0, max).replace(/\s\S*$/, '')} …` : t;
 }
 
-function art(name: string): string {
+export function art(name: string): string {
   if (name.startsWith('Ortsgemeinde')) return 'Ortsgemeinde';
+  if (name.startsWith('Ortsbezirk')) return 'Ortsbezirk';
   if (name.startsWith('Stadt')) return 'Stadt';
   if (name.startsWith('Verbandsgemeinde')) return 'Verbandsgemeinde';
   if (/zweckverband/i.test(name)) return 'Zweckverband';
@@ -165,6 +166,15 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
     };
   });
 
+  // Manche Systeme enthalten mehrere Verbandsgemeinden (z. B. vor und nach einer Fusion): die aktuellste gilt.
+  const vg = db
+    .prepare(
+      `SELECT b.id FROM body b LEFT JOIN meeting m ON m.body_id = b.id
+       WHERE b.source_id = ? AND b.name LIKE 'Verbandsgemeinde %'
+       GROUP BY b.id ORDER BY MAX(m.start) DESC LIMIT 1`,
+    )
+    .get(sourceId) as Row | undefined;
+
   return {
     erstellt: new Date().toISOString(),
     stichtag: now,
@@ -176,6 +186,7 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
       system: s(source.system_url),
       abgleich: s(source.last_sync_at),
     },
+    vg: vg ? String(vg.id) : null,
     koerperschaften: bodies.map((b) => {
       const raw = JSON.parse(String(b.raw)) as { location?: { postalCode?: string; locality?: string } };
       return {

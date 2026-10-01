@@ -17,6 +17,8 @@ npm test                                  # Tests mit nachgebauten OParl-Antwort
 npm run probe                             # Welche Schnittstellen antworten gerade?
 npm run sync -- --id vg-montabaur --max-pages 2   # kleiner Probelauf
 npm run sync                              # alle Quellen mit Status "aktiv"
+npm run web -- --out dist                 # Web-App mit allen Daten bauen
+cd dist && python3 -m http.server 8000    # lokal ansehen: http://localhost:8000
 ```
 
 Die Daten landen in `data/ratsblick.sqlite`. Ansehen lässt sich die Datei z. B. mit dem
@@ -31,7 +33,11 @@ kostenlosen „DB Browser for SQLite“.
 | `src/db/schema.sql` | Datenmodell |
 | `src/sync/sync.ts` | Abgleich System → Körperschaften → Gremien, Sitzungen, Vorlagen |
 | `src/sync/probe.ts` | Schnelltest einer Schnittstelle |
-| `src/cli.ts` | Befehle `probe` und `sync` |
+| `src/export/` | Momentaufnahme je Quelle und Bau der Web-App |
+| `web/` | Web-App (PWA): Kommune wählen, Übersicht, Sitzung, Vorlage, Themen-Abo |
+| `data/kurz-erklaert.json` | „Kurz erklärt“-Texte je Vorlage |
+| `.github/workflows/website.yml` | Abgleich alle 6 Stunden und Veröffentlichung auf GitHub Pages |
+| `src/cli.ts` | Befehle `probe`, `sync`, `snapshot` und `web` |
 | `test/` | Tests |
 
 ## Datenmodell
@@ -54,20 +60,26 @@ Verbandsgemeinde samt ihrer Ortsgemeinden. Der Abgleich liest deshalb alle Körp
 
 ## Verhalten gegenüber den Servern
 
-- Höchstens eine Anfrage pro Sekunde je Server (`--interval` ändert das).
-- Nach dem ersten Vollabgleich werden nur geänderte Objekte geholt (`modified_since`).
-- Der User-Agent nennt das Projekt. **Vor dem ersten echten Lauf** in `src/oparl/client.ts`
-  `[KONTAKT-E-MAIL]` durch eine echte Kontaktadresse ersetzen, damit Verwaltungen sich melden können.
+- Höchstens eine Anfrage pro Sekunde je Server (`--interval` ändert das). Subdomains zählen als ein
+  Server – alle `*.gremien.info` liegen auf derselben Maschine.
+- Abgleich mit `modified_since`. more!rubin meldet allerdings jedes Objekt als heute geändert,
+  daher ist dort jeder Lauf ein Vollabgleich.
+- Der User-Agent nennt das Projekt und als Kontakt dieses Repository.
+
+## Web-App auf dem Handy
+
+Die Web-App ist eine installierbare PWA: Sie läuft im Browser, lässt sich auf den Startbildschirm
+legen und zeigt offline den zuletzt geladenen Stand. GitHub Actions gleicht alle 6 Stunden ab und
+veröffentlicht sie auf GitHub Pages (`https://<konto>.github.io/Ratsblick/`).
+
+Einmalig einrichten: im Repository unter **Settings → Pages → Build and deployment → Source**
+„GitHub Actions“ wählen. Danach unter **Actions → Website → Run workflow** den ersten Lauf starten.
 
 ## Stand und nächste Schritte
 
 - [x] OParl-Client, Datenmodell, Abgleich, Schnelltest, Tests
-- [ ] Erster Lauf gegen die echten Server (siehe unten)
-- [ ] Volltext aus PDFs (`file.text_extracted`)
-- [ ] Programmierschnittstelle für Website und App
-- [ ] Website nach den Entwürfen „Ratsblick – Kernansichten“
-
-**Noch ungeprüft gegen echte Server:** In der Entwicklungsumgebung waren die kommunalen Server
-nicht erreichbar. Beim Test der Schnittstellen von außen antworteten die System-Objekte, die
-Körperschaftsliste (`/oparl/Body`) lieferte aber Fehler. Der erste `npm run probe` zeigt, ob das
-dauerhaft so ist; der Status „teilweise“ steht genau für diesen Fall.
+- [x] Erster Lauf gegen die echten Server: alle sechs aktiven Systeme lesbar
+- [x] Web-App (PWA) nach den Entwürfen, automatisch aktualisiert
+- [ ] Volltext für die Suche (more!rubin liefert ihn bereits in `mainFile.text`)
+- [ ] Benachrichtigungen für das Themen-Abo
+- [ ] Landkreise und weitere Systeme
