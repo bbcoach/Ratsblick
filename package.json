@@ -10,6 +10,7 @@
   "scripts": {
     "probe": "node --disable-warning=ExperimentalWarning --import tsx src/cli.ts probe",
     "sync": "node --disable-warning=ExperimentalWarning --import tsx src/cli.ts sync",
+    "snapshot": "node --disable-warning=ExperimentalWarning --import tsx src/cli.ts snapshot",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },

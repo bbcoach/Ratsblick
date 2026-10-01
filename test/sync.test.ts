@@ -82,6 +82,17 @@ describe('syncSource', () => {
     expect(db.prepare('SELECT COUNT(*) AS n FROM meeting').get()).toEqual({ n: 2 });
   });
 
+  it('merkt sich keinen Stand für Listen, die wegen maxPages abgeschnitten wurden', async () => {
+    const db = openDb(':memory:');
+    const { fetchImpl } = fx.fakeServer(routes());
+    const client = new OParlClient({ fetchImpl, minIntervalMs: 0, sleep: async () => {}, maxPages: 1 });
+    await syncSource(db, client, source);
+
+    const stand = db.prepare('SELECT list FROM sync_state WHERE body_id = ? ORDER BY list').all(`${H}/Body/1`);
+    // Sitzungen haben zwei Seiten und wurden abgeschnitten; Gremien und Vorlagen passen auf eine Seite.
+    expect(stand.map((r) => r.list)).toEqual(['organization', 'paper']);
+  });
+
   it('ist bei wiederholtem Vollabgleich idempotent', async () => {
     const db = openDb(':memory:');
     for (let i = 0; i < 2; i++) {

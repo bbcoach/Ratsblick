@@ -234,7 +234,9 @@ export async function syncSource(
       const since = opts.full ? undefined : getSince(db, body.id, list);
       const startedAt = new Date().toISOString();
       let count = 0;
-      for await (const item of client.paginate<{ id: string }>(url, { modifiedSince: since })) {
+      let truncated = false;
+      const onTruncated = () => (truncated = true);
+      for await (const item of client.paginate<{ id: string }>(url, { modifiedSince: since, onTruncated })) {
         if (!item?.id) continue;
         tx(db, () => {
           if (list === 'organization') upsertOrganization(db, body.id, item as OParlOrganization);
@@ -246,8 +248,9 @@ export async function syncSource(
       if (list === 'organization') stats.organizations += count;
       else if (list === 'meeting') stats.meetings += count;
       else stats.papers += count;
-      setSince(db, body.id, list, startedAt);
-      log(`    ${list}: ${count}${since ? ` (geändert seit ${since})` : ''}`);
+      // Nur nach vollständigem Lesen als Stand merken, sonst überspringt der nächste Lauf den Rest.
+      if (!truncated) setSince(db, body.id, list, startedAt);
+      log(`    ${list}: ${count}${since ? ` (geändert seit ${since})` : ''}${truncated ? ' (abgeschnitten)' : ''}`);
     }
   }
 

@@ -65,7 +65,7 @@ export class OParlClient {
     this.minIntervalMs = opts.minIntervalMs ?? 1000;
     this.maxRetries = opts.maxRetries ?? 3;
     this.timeoutMs = opts.timeoutMs ?? 30_000;
-    this.userAgent = opts.userAgent ?? 'Ratsblick/0.1 (OParl-Abgleich; Kontakt: [KONTAKT-E-MAIL])';
+    this.userAgent = opts.userAgent ?? 'Ratsblick/0.1 (OParl-Abgleich; Kontakt: https://github.com/bbcoach/Ratsblick)';
     this.maxPages = opts.maxPages ?? 10_000;
     this.sleep = opts.sleep ?? defaultSleep;
   }
@@ -128,8 +128,12 @@ export class OParlClient {
   /**
    * Durchläuft eine paginierte OParl-Liste über `links.next`.
    * `modifiedSince` nutzt den Standardfilter `modified_since` für inkrementelle Abgleiche.
+   * `onTruncated` meldet, dass die Liste wegen `maxPages` nicht vollständig gelesen wurde.
    */
-  async *paginate<T>(listUrl: string, params: { modifiedSince?: string } = {}): AsyncGenerator<T> {
+  async *paginate<T>(
+    listUrl: string,
+    params: { modifiedSince?: string; onTruncated?: () => void } = {},
+  ): AsyncGenerator<T> {
     const first = new URL(listUrl);
     if (params.modifiedSince) first.searchParams.set('modified_since', params.modifiedSince);
 
@@ -138,7 +142,10 @@ export class OParlClient {
     let pages = 0;
     while (next) {
       if (seen.has(next)) break; // fehlerhafter Server verweist auf bereits gelesene Seite
-      if (pages >= this.maxPages) break;
+      if (pages >= this.maxPages) {
+        params.onTruncated?.();
+        break;
+      }
       seen.add(next);
       pages++;
       const page: OParlListResponse<T> = await this.get<OParlListResponse<T>>(next);

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { openDb } from './db/index.js';
 import { OParlClient } from './oparl/client.js';
+import { writeSnapshot } from './export/snapshot.js';
 import { probeSource, saveProbe } from './sync/probe.js';
 import { syncSource, type SourceRecord } from './sync/sync.js';
 
@@ -10,6 +11,8 @@ const USAGE = `Ratsblick – Datenebene
   npm run probe                       alle Endpunkte prüfen
   npm run sync -- --id vg-montabaur   eine Quelle abgleichen
   npm run sync                        alle Quellen mit Status "aktiv" abgleichen
+  npm run snapshot -- --id vg-montabaur --out x.json
+                                      Momentaufnahme einer Quelle als JSON (für Prototypen)
 
 Optionen:
   --id <id>          nur diese Quelle (mehrfach möglich)
@@ -17,6 +20,7 @@ Optionen:
   --full             Stand ignorieren, alles neu laden
   --max-pages <n>    höchstens n Seiten je Liste (zum Ausprobieren)
   --interval <ms>    Mindestabstand je Server (Standard: 1000)
+  --out <pfad>       Zieldatei für snapshot
 `;
 
 function loadSources(): SourceRecord[] {
@@ -35,13 +39,24 @@ async function main(): Promise<void> {
       full: { type: 'boolean', default: false },
       'max-pages': { type: 'string' },
       interval: { type: 'string', default: '1000' },
+      out: { type: 'string' },
       help: { type: 'boolean', short: 'h', default: false },
     },
   });
   const cmd = positionals[0];
-  if (values.help || !cmd || !['probe', 'sync'].includes(cmd)) {
+  if (values.help || !cmd || !['probe', 'sync', 'snapshot'].includes(cmd)) {
     console.log(USAGE);
     process.exitCode = cmd && !values.help ? 1 : 0;
+    return;
+  }
+
+  if (cmd === 'snapshot') {
+    if (values.id?.length !== 1 || !values.out) throw new Error('snapshot braucht genau eine --id und --out <pfad>');
+    const snap = writeSnapshot(openDb(values.db!), values.id[0]!, values.out);
+    console.log(
+      `${snap.koerperschaften.length} Körperschaften, ${snap.sitzungen.length} Sitzungen, ` +
+        `${snap.vorlagen.length} Vorlagen → ${values.out}`,
+    );
     return;
   }
 
