@@ -24,7 +24,7 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
 - In RLP ist bei den gefundenen Fällen **more!rubin** (more! software) verbreitet, gehostet auf
   `<name>.gremien.info`. OParl ist dort eingebaut: `/oparl/system` liefert entweder Daten,
   `{"type":".../Error","message":"OParl is not active."}` (mit HTTP 200!) oder 404 bei unbekannter Subdomain.
-- Quellen in `data/endpoints.json` mit amtlichem Gebietsschlüssel (`gebiet`). Stand 01.10.2026: 30 aktiv,
+- Quellen in `data/endpoints.json` mit amtlichem Gebietsschlüssel (`gebiet`). Stand 01.10.2026: 30 OParl aktiv,
   39 more!rubin-Systeme ohne freigeschaltetes OParl, 2 auf `sitzung-online.de` (robots.txt) – Hagenbach, Boppard.
   Gefunden über `npm run discover` (prüft `<name>.gremien.info/oparl/system` für alle VGs, Kreise, verbandsfreien
   Gemeinden; unbekannte Subdomains liefern 404) und die OParl-Endpunktliste (github.com/OParl/resources).
@@ -55,8 +55,16 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - robots.txt „Disallow: /“: alle `*.sitzung-online.de` (ALLRIS: Kreis Bad Kreuznach, Germersheim; Bitburg-Prüm),
   `sessionnet.owl-it.de` (Westerwaldkreis, Neuwied, Südliche Weinstraße; erlaubt nur `/stadt-weingarten/bi/`; Kreis Kaiserslautern läuft trotzdem, s. o.), Vulkaneifel (SD.NET RIM), Trier (ALLRIS 4).
 - Bot-Schutz (MyraCloud): Ludwigshafen. Pirmasens: OParl-Adresse antwortet 403.
-- Unklar (nicht gefunden oder nicht erreichbar): Frankenthal, Landau, Speyer, Worms, Zweibrücken, Birkenfeld,
-  Cochem-Zell, Mayen-Koblenz, Bad Dürkheim, Rhein-Pfalz-Kreis, Mainz-Bingen, Südwestpfalz.
+- Nachträglich angebunden (SessionNet, keine robots.txt): Speyer (`buergerinfo2.speyer.de`, PHP; Vorlagenlinks mit
+  `&smcspf=4`), Frankenthal (`ris.frankenthal.de/bi/`, ASP), Kreis Bad Dürkheim (`www.buergerinfo-kreis-duew.de`, PHP,
+  unvollständige Zertifikatskette → über den Weiterleiter).
+- Cochem-Zell und Zweibrücken laufen auf `sessionnet.owl-it.de` (robots.txt). Südwestpfalz und Rhein-Pfalz-Kreis:
+  more!rubin ohne OParl (`rubin-api` nur nach Rücksprache). Worms: `worms.gremien.info` ohne OParl.
+- Unklar: Landau, Birkenfeld (kein RIS-Link gefunden), Mayen-Koblenz (Ratsinfo in die Kreis-Website eingebettet,
+  Quelle unbekannt), Mainz-Bingen (Verweis auf cc-egov, ohne Treffer).
+- Trier (ALLRIS 4): Kalender per Wicket-Ajax mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch),
+  Sitzungen `to010?SILFDNR=`, Vorlagen `vo020?VOLFDNR=` (mit Beschlussvorschlag/Begründung als HTML) ohne Sitzung
+  abrufbar. Scraper zurückgestellt (Sicherheitsprüfung von Claude Code hat die Abrufe gestoppt, 01.10.2026).
 
 ## more!rubin ohne OParl (geprüft an rockenhausen.gremien.info, 01.10.2026)
 - Neuere more!rubin-Oberfläche ist eine JavaScript-App; Daten über eine interne JSON-Schnittstelle, ohne Anmeldung:
