@@ -1,0 +1,6 @@
+{
+  "name": "ratsblick-relay",
+  "private": true,
+  "type": "module",
+  "description": "Weiterleiter (Vercel, Frankfurt) für Ratsinformationssysteme, die nur aus Europa erreichbar sind"
+}

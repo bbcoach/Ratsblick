@@ -55,6 +55,10 @@ jobs:
           (github.event_name == 'workflow_dispatch' && inputs.abgleich) ||
           steps.db.outputs.cache-matched-key == ''
         continue-on-error: true
+        env:
+          # Weiterleiter in Frankfurt für Server, die nur aus Europa erreichbar sind (relay/README.md)
+          RATSBLICK_RELAY_URL: ${{ vars.RATSBLICK_RELAY_URL }}
+          RATSBLICK_RELAY_SCHLUESSEL: ${{ secrets.RATSBLICK_RELAY_SCHLUESSEL }}
         run: npm run sync
 
       - name: Datenstand sichern

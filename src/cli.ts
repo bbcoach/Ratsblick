@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { openDb } from './db/index.js';
+import { relayConfigAusUmgebung, relayFetch } from './net/relay.js';
 import { OParlClient } from './oparl/client.js';
 import { writeSnapshot } from './export/snapshot.js';
 import { buildWeb } from './export/web.js';
@@ -74,6 +75,7 @@ async function main(): Promise<void> {
   }
 
   const client = new OParlClient({
+    fetchImpl: relayFetch(relayConfigAusUmgebung()),
     minIntervalMs: Number(values.interval),
     maxPages: values['max-pages'] ? Number(values['max-pages']) : undefined,
   });

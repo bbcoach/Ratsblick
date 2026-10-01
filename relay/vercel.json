@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["fra1"],
+  "functions": { "api/abruf.js": { "maxDuration": 30 } },
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ."
+}
