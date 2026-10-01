@@ -8,7 +8,7 @@
     { "id": "vg-emmelshausen", "name": "VG Hunsrück-Mittelrhein (Emmelshausen)", "ebene": "Verbandsgemeinde", "landkreis": "Rhein-Hunsrück-Kreis", "url": "https://emmelshausen.gremien.info/oparl/system", "status": "aktiv", "gebiet": "071405009" },
     { "id": "stadt-bad-kreuznach", "name": "Stadt Bad Kreuznach", "ebene": "Große kreisangehörige Stadt", "landkreis": "Bad Kreuznach", "url": "https://bad-kreuznach-stadt.gremien.info/oparl/system", "status": "aktiv", "gebiet": "07133006" },
     { "id": "stadt-pirmasens", "name": "Stadt Pirmasens", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://oparl.stadt-pirmasens.de/oparl/system", "status": "liste", "gebiet": "07317000" },
-    { "id": "donnersbergkreis", "name": "Donnersbergkreis", "ebene": "Landkreis", "landkreis": "Donnersbergkreis", "url": "https://donnersbergkreis.gremien.info/oparl/system", "status": "inaktiv", "gebiet": "07333" },
+    { "id": "donnersbergkreis", "name": "Donnersbergkreis", "ebene": "Landkreis", "landkreis": "Donnersbergkreis", "url": "https://donnersbergkreis.gremien.info/", "status": "aktiv", "gebiet": "07333", "typ": "rubin-api" },
     { "id": "vg-edenkoben", "name": "VG Edenkoben", "ebene": "Verbandsgemeinde", "landkreis": "Südliche Weinstraße", "url": "https://edenkoben.gremien.info/oparl/system", "status": "inaktiv", "gebiet": "073375003" },
     { "id": "vg-weilerbach", "name": "VG Weilerbach", "ebene": "Verbandsgemeinde", "landkreis": "Kaiserslautern", "url": "https://weilerbach.gremien.info/oparl/system", "status": "inaktiv", "gebiet": "073355009" },
     { "id": "vg-adenau", "name": "VG Adenau", "ebene": "Verbandsgemeinde", "landkreis": "Ahrweiler", "url": "https://adenau.gremien.info/oparl/system", "status": "inaktiv", "gebiet": "071315001" },
