@@ -1,0 +1,15 @@
+{
+  "_hinweis": "Quelle: RIS-Verzeichnis RLP, Stand 01.10.2026. 'status' wie dort: aktiv | liste | inaktiv.",
+  "endpoints": [
+    { "id": "vg-montabaur", "name": "VG Montabaur", "ebene": "Verbandsgemeinde", "landkreis": "Westerwaldkreis", "url": "https://montabaur.gremien.info/oparl/system", "status": "aktiv" },
+    { "id": "vg-westerburg", "name": "VG Westerburg", "ebene": "Verbandsgemeinde", "landkreis": "Westerwaldkreis", "url": "https://westerburg.gremien.info/oparl/system", "status": "aktiv" },
+    { "id": "vg-herxheim", "name": "VG Herxheim", "ebene": "Verbandsgemeinde", "landkreis": "Südliche Weinstraße", "url": "https://herxheim.gremien.info/oparl/system", "status": "aktiv" },
+    { "id": "vg-enkenbach-alsenborn", "name": "VG Enkenbach-Alsenborn", "ebene": "Verbandsgemeinde", "landkreis": "Kaiserslautern", "url": "https://enkenbach-alsenborn.gremien.info/oparl/system", "status": "aktiv" },
+    { "id": "vg-emmelshausen", "name": "Emmelshausen", "ebene": "Verbandsgemeinde", "landkreis": "Rhein-Hunsrück-Kreis", "url": "https://emmelshausen.gremien.info/oparl/system", "status": "aktiv" },
+    { "id": "stadt-bad-kreuznach", "name": "Stadt Bad Kreuznach", "ebene": "Große kreisangehörige Stadt", "landkreis": "Bad Kreuznach", "url": "https://bad-kreuznach-stadt.gremien.info/oparl/system", "status": "aktiv" },
+    { "id": "stadt-pirmasens", "name": "Stadt Pirmasens", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://oparl.stadt-pirmasens.de/oparl/system", "status": "liste" },
+    { "id": "donnersbergkreis", "name": "Donnersbergkreis", "ebene": "Landkreis", "landkreis": "Donnersbergkreis", "url": "https://donnersbergkreis.gremien.info/oparl/system", "status": "inaktiv" },
+    { "id": "vg-edenkoben", "name": "VG Edenkoben", "ebene": "Verbandsgemeinde", "landkreis": "Südliche Weinstraße", "url": "https://edenkoben.gremien.info/oparl/system", "status": "inaktiv" },
+    { "id": "vg-weilerbach", "name": "VG Weilerbach", "ebene": "Verbandsgemeinde", "landkreis": "Kaiserslautern", "url": "https://weilerbach.gremien.info/oparl/system", "status": "inaktiv" }
+  ]
+}

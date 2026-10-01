@@ -1,0 +1,22 @@
+{
+  "name": "ratsblick",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Einheitlicher Zugang zu kommunalen Ratsinformationssystemen – Datenebene (OParl-Abgleich)",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "probe": "node --disable-warning=ExperimentalWarning --import tsx src/cli.ts probe",
+    "sync": "node --disable-warning=ExperimentalWarning --import tsx src/cli.ts sync",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}
