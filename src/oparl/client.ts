@@ -139,6 +139,38 @@ export class OParlClient {
   }
 
   /**
+   * Holt eine HTML-Seite (für Scraper), mit derselben Drosselung und denselben Wiederholungen wie `get`.
+   * Der Zeichensatz kommt aus dem Content-Type (Standard UTF-8; ISO-8859-1 wird als Windows-1252 gelesen).
+   */
+  async getText(url: string): Promise<string> {
+    let lastError: OParlHttpError | undefined;
+    for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
+      if (attempt > 0) await this.sleep(1000 * 2 ** (attempt - 1));
+      await this.throttle(url);
+      this.requestCount++;
+      let res: Response;
+      try {
+        res = await this.fetchImpl(url, {
+          headers: { Accept: 'text/html,*/*', 'User-Agent': this.userAgent },
+          signal: AbortSignal.timeout(this.timeoutMs),
+        });
+      } catch (err) {
+        lastError = new OParlHttpError(url, null, `Netzwerkfehler: ${(err as Error).message}`);
+        continue;
+      }
+      if (res.status === 429 || res.status >= 500) {
+        lastError = new OParlHttpError(url, res.status, `HTTP ${res.status}`);
+        continue;
+      }
+      if (!res.ok) throw new OParlHttpError(url, res.status, `HTTP ${res.status}`);
+      const cs = (/charset=["']?([\w-]+)/i.exec(res.headers.get('content-type') ?? '')?.[1] ?? 'utf-8').toLowerCase();
+      const buf = await res.arrayBuffer();
+      return new TextDecoder(cs === 'iso-8859-1' || cs === 'latin1' ? 'windows-1252' : cs).decode(buf);
+    }
+    throw lastError ?? new OParlHttpError(url, null, 'Unbekannter Fehler');
+  }
+
+  /**
    * Durchläuft eine paginierte OParl-Liste über `links.next`.
    * `modifiedSince` nutzt den Standardfilter `modified_since` für inkrementelle Abgleiche.
    * `onTruncated` meldet, dass die Liste wegen `maxPages` nicht vollständig gelesen wurde.

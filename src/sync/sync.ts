@@ -19,6 +19,8 @@ export interface SourceRecord {
   status?: string | null;
   /** Amtlicher Schlüssel des Gebiets der Quelle (data/gebiete-rlp.json). */
   gebiet?: string;
+  /** Zugang: OParl (Standard) oder ein Scraper für Systeme ohne OParl. */
+  typ?: 'oparl' | 'sessionnet';
 }
 
 export interface SyncOptions {

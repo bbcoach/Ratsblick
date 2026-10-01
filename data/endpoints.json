@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Quellen: RIS-Verzeichnis RLP, OParl-Endpunktliste (github.com/OParl/resources) und npm run discover (gremien.info), Stand 01.10.2026. status: aktiv | liste | inaktiv (OParl nicht freigeschaltet) | robots (automatischer Abruf laut robots.txt untersagt). gebiet: amtlicher Schlüssel aus data/gebiete-rlp.json.",
+  "_hinweis": "Quellen: RIS-Verzeichnis RLP, OParl-Endpunktliste (github.com/OParl/resources) und npm run discover (gremien.info), Stand 01.10.2026. status: aktiv | liste | inaktiv (OParl nicht freigeschaltet) | robots (automatischer Abruf laut robots.txt untersagt). typ: oparl (Standard) | sessionnet (Scraper, Seiten statt Schnittstelle). gebiet: amtlicher Schlüssel aus data/gebiete-rlp.json.",
   "endpoints": [
     { "id": "vg-montabaur", "name": "VG Montabaur", "ebene": "Verbandsgemeinde", "landkreis": "Westerwaldkreis", "url": "https://montabaur.gremien.info/oparl/system", "status": "aktiv", "gebiet": "071435004" },
     { "id": "vg-westerburg", "name": "VG Westerburg", "ebene": "Verbandsgemeinde", "landkreis": "Westerwaldkreis", "url": "https://westerburg.gremien.info/oparl/system", "status": "aktiv", "gebiet": "071435009" },
@@ -72,6 +72,7 @@
     { "id": "gemeinde-mutterstadt", "name": "Gemeinde Mutterstadt", "ebene": "Verbandsfreie Gemeinde", "landkreis": "Rhein-Pfalz-Kreis", "url": "https://mutterstadt.gremien.info/oparl/system", "status": "inaktiv", "gebiet": "07338019" },
     { "id": "stadt-schifferstadt", "name": "Stadt Schifferstadt", "ebene": "Verbandsfreie Stadt", "landkreis": "Rhein-Pfalz-Kreis", "url": "https://schifferstadt.gremien.info/oparl/system", "status": "inaktiv", "gebiet": "07338025" },
     { "id": "vg-hagenbach", "name": "VG Hagenbach", "ebene": "Verbandsgemeinde", "landkreis": "Germersheim", "url": "https://www.hagenbach.sitzung-online.de/bi/oparl/1.0/system.asp", "status": "robots", "gebiet": "073345002" },
-    { "id": "stadt-boppard", "name": "Stadt Boppard", "ebene": "Verbandsfreie Stadt", "landkreis": "Rhein-Hunsrück-Kreis", "url": "http://www.boppard.sitzung-online.de/bi/oparl/1.0/system.asp", "status": "robots", "gebiet": "07140501" }
+    { "id": "stadt-boppard", "name": "Stadt Boppard", "ebene": "Verbandsfreie Stadt", "landkreis": "Rhein-Hunsrück-Kreis", "url": "http://www.boppard.sitzung-online.de/bi/oparl/1.0/system.asp", "status": "robots", "gebiet": "07140501" },
+    { "id": "stadt-kaiserslautern", "name": "Stadt Kaiserslautern", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://ris.kaiserslautern.de/buergerinfo/", "status": "aktiv", "gebiet": "07312000", "typ": "sessionnet" }
   ]
 }

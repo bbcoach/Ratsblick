@@ -41,6 +41,18 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
   nach Fusion 2020) – maßgeblich ist die mit den jüngsten Sitzungen.
 - Quellenliste: `data/endpoints.json` (aus dem RIS-Verzeichnis RLP).
 
+## Scraper und Weiterleiter
+- `typ: "sessionnet"` in `endpoints.json` → `src/scrape/sessionnet.ts` statt OParl. Liest Kalender (`si0040`),
+  Tagesordnung (`si0057`) und Vorlage (`vo0050`) und schreibt OParl-förmige Objekte über die upsert-Funktionen.
+  IDs = Seitenadressen. Vorlagen haben keinen Text (nur PDF), Datum = erste Sitzung, Beratungsfolge aus den
+  Tagesordnungen. Fenster: 2 Monate zurück, 3 voraus; ältere, bereits gespeicherte Sitzungen werden nicht neu geladen.
+  Testseiten in `test/fixtures/sessionnet/` (echte Seiten aus Kaiserslautern, SessionNet 5.4.6).
+- Kaiserslautern (`ris.kaiserslautern.de`) sperrt Zugriffe außerhalb Europas (GitHub Actions läuft in den USA) und
+  schickt sein Zwischenzertifikat nicht mit. Lösung: Weiterleiter `relay/` bei Vercel in Frankfurt
+  (`ratsblick-relay.vercel.app`), lädt fehlende Zwischenzertifikate per AIA nach. Nutzung über
+  `RATSBLICK_RELAY_URL`/`_SCHLUESSEL`/`_HOSTS` (siehe `relay/README.md`); in Actions als Variable/Secret.
+- Prüfen, ob ein Host aus Europa/USA erreichbar ist: check-host.net; Workflow „Erreichbarkeit“ prüft von GitHub aus.
+
 ## Design
 Entwürfe „Ratsblick – Kernansichten“ (Claude Design): Kommune wählen → Startseite der Kommune
 (Ebenen-Umschalter Gemeinde/VG/Landkreis, nächste Sitzungen, neue Vorlagen) → Vorlage im Detail
@@ -60,7 +72,8 @@ Stil: ruhig und behördennah, Akzent #1F4E79, Schrift Public Sans, Vorlagennumme
 2. Volltext aus `mainFile.text` in `file.text_extracted` übernehmen, Suche darüber.
 3. „Kurz erklärt“ automatisch erzeugen (statt von Hand).
 4. Benachrichtigungen fürs Themen-Abo (braucht kleinen Server für Web Push/E-Mail).
-5. Weitere Systeme: andere Anbieter (ALLRIS, SessionNet, Somacos) mit OParl suchen; bei „nicht freigeschaltet“
+5. Weitere SessionNet-Kommunen mit dem Scraper anbinden (robots.txt beachten; sitzung-online.de verbietet es).
+6. Weitere Systeme: andere Anbieter (ALLRIS, SessionNet, Somacos) mit OParl suchen; bei „nicht freigeschaltet“
    ggf. Verwaltungen ansprechen; robots.txt-Frage bei sitzung-online.de klären.
 
 ## Konventionen

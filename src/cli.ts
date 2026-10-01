@@ -7,6 +7,7 @@ import { writeSnapshot } from './export/snapshot.js';
 import { buildWeb } from './export/web.js';
 import { kandidaten, pruefe, type Gebiete } from './sync/discover.js';
 import { probeSource, saveProbe } from './sync/probe.js';
+import { syncSessionNet } from './scrape/sessionnet.js';
 import { syncSource, type SourceRecord } from './sync/sync.js';
 
 const USAGE = `Ratsblick – Datenebene
@@ -104,7 +105,7 @@ async function main(): Promise<void> {
 
   if (cmd === 'probe') {
     const rows = [];
-    for (const s of sources) {
+    for (const s of sources.filter((x) => x.typ !== 'sessionnet')) {
       const r = await probeSource(client, s);
       saveProbe(db, s, r);
       rows.push({ id: r.id, status: r.status, version: r.oparlVersion ?? '', detail: r.detail });
@@ -122,7 +123,10 @@ async function main(): Promise<void> {
       log(`▶ ${s.name}`);
       const t0 = Date.now();
       try {
-        const st = await syncSource(db, client, s, { full: values.full, log });
+        const st =
+          s.typ === 'sessionnet'
+            ? await syncSessionNet(db, client, s, { log })
+            : await syncSource(db, client, s, { full: values.full, log });
         log(
           `✓ ${st.bodies} Körperschaften, ${st.organizations} Gremien, ${st.meetings} Sitzungen, ` +
             `${st.agendaItems} TOPs, ${st.papers} Vorlagen, ${st.consultations} Beratungen, ${st.files} Dateien ` +

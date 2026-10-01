@@ -30,6 +30,8 @@ kostenlosen „DB Browser for SQLite“.
 |---|---|
 | `data/endpoints.json` | Ratsinformationssysteme mit Status und amtlichem Gebietsschlüssel |
 | `data/gebiete-rlp.json` | Alle Gebietskörperschaften in RLP (Destatis-Gemeindeverzeichnis, `scripts/gemeindeverzeichnis.py`) |
+| `src/scrape/sessionnet.ts` | Scraper für SessionNet-Systeme ohne OParl (z. B. Kaiserslautern) |
+| `relay/` | Weiterleiter bei Vercel in Frankfurt für Server, die nur aus Europa erreichbar sind |
 | `src/sync/discover.ts` | Suche nach gremien.info-Systemen für alle Kommunen (`npm run discover`) |
 | `src/oparl/client.ts` | OParl-Client: Seitenweises Lesen, Wiederholung bei Serverfehlern, Drosselung je Server |
 | `src/db/schema.sql` | Datenmodell |
@@ -85,4 +87,5 @@ Einmalig einrichten: im Repository unter **Settings → Pages → Build and depl
 - [ ] Volltext für die Suche (more!rubin liefert ihn bereits in `mainFile.text`)
 - [ ] Benachrichtigungen für das Themen-Abo
 - [x] Alle 2 300 Gemeinden, VGs und Kreise in der Suche; 30 Systeme mit Daten
+- [x] Scraper für SessionNet (Kaiserslautern) über Weiterleiter in Frankfurt
 - [ ] Weitere Anbieter mit OParl (ALLRIS, SessionNet, Somacos)
