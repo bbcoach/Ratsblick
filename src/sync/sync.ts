@@ -23,6 +23,8 @@ export interface SourceRecord {
   typ?: 'oparl' | 'sessionnet' | 'rubin-api';
   /** Nur SessionNet: Dateiendung der Seiten (asp oder php). */
   endung?: 'asp' | 'php';
+  /** Größerer Mindestabstand zwischen Anfragen an diesen Server (ms). */
+  intervallMs?: number;
 }
 
 export interface SyncOptions {

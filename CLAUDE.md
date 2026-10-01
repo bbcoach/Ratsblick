@@ -14,6 +14,9 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
 - Rücksicht auf kommunale Server: höchstens 1 Anfrage/Sekunde je Server, inkrementell über `modified_since`,
   User-Agent mit Kontaktadresse.
 - Hosts mit robots.txt-Verbot (z. B. `*.sitzung-online.de`) nicht automatisiert abrufen, bevor das geklärt ist.
+  Ausnahme auf ausdrückliche Entscheidung des Projektinhabers (01.10.2026): Kreis Kaiserslautern auf
+  `sessionnet.owl-it.de` – nur dieser Pfad, 2 s Abstand (`intervallMs`), Grund im Feld `hinweis` der Quelle.
+  Bei Einwänden des Betreibers sofort abschalten. Andere owl-it-Kunden bleiben gesperrt.
 - Technik: TypeScript, Node ≥ 22.13, eingebautes `node:sqlite`, `tsx`, `vitest`. Keine schweren Abhängigkeiten
   ohne Grund.
 
@@ -50,7 +53,7 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Neustadt (ASP, `buergerinfo.neustadt.eu`; `ratsinfo.` ist der Mandatsträger-Zugang), Koblenz, Mainz,
   Kreis Ahrweiler, Trier-Saarburg, Kusel (PHP). Alle außer Kaiserslautern auch aus den USA erreichbar.
 - robots.txt „Disallow: /“: alle `*.sitzung-online.de` (ALLRIS: Kreis Bad Kreuznach, Germersheim; Bitburg-Prüm),
-  `sessionnet.owl-it.de` (Westerwaldkreis, Neuwied, Südliche Weinstraße, Kreis Kaiserslautern; erlaubt nur `/stadt-weingarten/bi/`), Vulkaneifel (SD.NET RIM), Trier (ALLRIS 4).
+  `sessionnet.owl-it.de` (Westerwaldkreis, Neuwied, Südliche Weinstraße; erlaubt nur `/stadt-weingarten/bi/`; Kreis Kaiserslautern läuft trotzdem, s. o.), Vulkaneifel (SD.NET RIM), Trier (ALLRIS 4).
 - Bot-Schutz (MyraCloud): Ludwigshafen. Pirmasens: OParl-Adresse antwortet 403.
 - Unklar (nicht gefunden oder nicht erreichbar): Frankenthal, Landau, Speyer, Worms, Zweibrücken, Birkenfeld,
   Cochem-Zell, Mayen-Koblenz, Bad Dürkheim, Rhein-Pfalz-Kreis, Mainz-Bingen, Südwestpfalz.

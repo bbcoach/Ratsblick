@@ -117,6 +117,7 @@ async function main(): Promise<void> {
   }
 
   const targets = values.id?.length ? sources : sources.filter((s) => s.status === 'aktiv');
+  for (const s of targets) if (s.intervallMs) client.setzeIntervall(s.url, s.intervallMs);
   // Quellen liegen auf verschiedenen Servern; die Drosselung gilt je Server, daher parallel abgleichen.
   await Promise.all(
     targets.map(async (s) => {

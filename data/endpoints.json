@@ -92,6 +92,6 @@
     { "id": "kreis-trier-saarburg", "name": "Landkreis Trier-Saarburg", "ebene": "Landkreis", "landkreis": "Trier-Saarburg", "url": "https://buergerinfo.trier-saarburg.de/", "status": "aktiv", "gebiet": "07235", "typ": "sessionnet", "endung": "php" },
     { "id": "kreis-kusel", "name": "Landkreis Kusel", "ebene": "Landkreis", "landkreis": "Kusel", "url": "https://sitzungsmanagement.landkreis-kusel.de/bi/", "status": "aktiv", "gebiet": "07336", "typ": "sessionnet", "endung": "php" },
     { "id": "vg-nordpfaelzer-land", "name": "VG Nordpfälzer Land (Rockenhausen)", "ebene": "Verbandsgemeinde", "landkreis": "Donnersbergkreis", "url": "https://rockenhausen.gremien.info/", "status": "aktiv", "gebiet": "073335007", "typ": "rubin-api" },
-    { "id": "kreis-kaiserslautern", "name": "Landkreis Kaiserslautern", "ebene": "Landkreis", "landkreis": "Kaiserslautern", "url": "https://sessionnet.owl-it.de/kaiserslautern-kreis/BI/info.asp", "status": "robots", "gebiet": "07335" }
+    { "id": "kreis-kaiserslautern", "name": "Landkreis Kaiserslautern", "ebene": "Landkreis", "landkreis": "Kaiserslautern", "url": "https://sessionnet.owl-it.de/kaiserslautern-kreis/BI/", "status": "aktiv", "gebiet": "07335", "typ": "sessionnet", "endung": "asp", "intervallMs": 2000, "hinweis": "robots.txt von sessionnet.owl-it.de verbietet automatische Abrufe; auf ausdrückliche Entscheidung des Projektinhabers (01.10.2026) trotzdem abgerufen, mit 2 s Abstand" }
   ]
 }

@@ -69,6 +69,8 @@ export class OParlClient {
   private readonly sleep: (ms: number) => Promise<void>;
   /** Nächster freier Zeitpunkt je Server. */
   private readonly nextSlot = new Map<string, number>();
+  /** Abweichende Mindestabstände je Server (nur größer als der Standard). */
+  private readonly intervalle = new Map<string, number>();
   requestCount = 0;
 
   constructor(opts: ClientOptions = {}) {
@@ -89,8 +91,13 @@ export class OParlClient {
     const key = serverKey(url);
     const now = Date.now();
     const slot = Math.max(now, this.nextSlot.get(key) ?? 0);
-    this.nextSlot.set(key, slot + this.minIntervalMs);
+    this.nextSlot.set(key, slot + Math.max(this.minIntervalMs, this.intervalle.get(key) ?? 0));
     if (slot > now) await this.sleep(slot - now);
+  }
+
+  /** Setzt für einen Server einen größeren Mindestabstand (z. B. wenn der Betreiber um Zurückhaltung bittet). */
+  setzeIntervall(url: string, ms: number): void {
+    this.intervalle.set(serverKey(url), ms);
   }
 
   /** Holt ein OParl-Objekt. Wiederholt bei 429/5xx und Netzfehlern mit wachsender Pause. */

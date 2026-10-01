@@ -88,4 +88,14 @@ describe('OParlClient', () => {
     expect(serverKey('https://montabaur.gremien.info/oparl/system')).toBe('gremien.info');
     expect(serverKey('https://oparl.stadt-pirmasens.de/oparl/system')).toBe('stadt-pirmasens.de');
   });
+
+  it('hält einen größeren Abstand für einzelne Server ein', async () => {
+    const waits: number[] = [];
+    const { fetchImpl } = fakeServer({ [`${U}/a`]: { id: 'a' }, [`${U}/b`]: { id: 'b' } });
+    const client = new OParlClient({ fetchImpl, minIntervalMs: 1000, sleep: async (ms) => void waits.push(ms) });
+    client.setzeIntervall(`${U}/a`, 2000);
+    await client.get(`${U}/a`);
+    await client.get(`${U}/b`);
+    expect(waits[0]).toBeGreaterThan(1900);
+  });
 });
