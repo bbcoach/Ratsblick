@@ -43,7 +43,10 @@ export async function abruf(request, env = process.env, fetchImpl = fetch) {
       signal: AbortSignal.timeout(25_000),
     });
   } catch (err) {
-    return antwort(502, `Abruf fehlgeschlagen: ${err.message}`);
+    // Node meldet nur „fetch failed“; die eigentliche Ursache (TLS, DNS, Zeitüberschreitung) steckt in err.cause
+    const c = err.cause;
+    const ursache = c ? ` (${[c.code, c.message].filter(Boolean).join(': ')})` : '';
+    return antwort(502, `Abruf fehlgeschlagen: ${err.message}${ursache}`);
   }
   const headers = new Headers({ 'x-ratsblick-relay': 'ok' });
   for (const h of ['content-type', 'last-modified', 'etag']) {
