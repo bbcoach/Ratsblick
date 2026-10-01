@@ -11,6 +11,7 @@ import https from 'node:https';
 import { X509Certificate } from 'node:crypto';
 import { Readable } from 'node:stream';
 import tls from 'node:tls';
+import { ERLAUBT } from '../lib/erlaubt.js';
 
 const UA = 'Ratsblick/0.1 (OParl-Abgleich; Kontakt: https://github.com/bbcoach/Ratsblick)';
 const STANDARD_HOSTS = 'ris.kaiserslautern.de';
@@ -101,7 +102,7 @@ export async function abruf(request, env = process.env, fetchImpl = fetch) {
   const ziel = new URL(request.url).searchParams.get('url');
   let url;
   try { url = new URL(ziel); } catch { return antwort(400, 'Parameter url fehlt oder ist ungültig'); }
-  const erlaubt = (env.RELAY_HOSTS || STANDARD_HOSTS).split(',').map((h) => h.trim().toLowerCase()).filter(Boolean);
+  const erlaubt = [...ERLAUBT, ...(env.RELAY_HOSTS || STANDARD_HOSTS).split(',')].map((h) => h.trim().toLowerCase()).filter(Boolean);
   if (!['http:', 'https:'].includes(url.protocol) || !erlaubt.includes(url.hostname.toLowerCase())) {
     return antwort(403, `Host nicht freigegeben: ${url.hostname}`);
   }
