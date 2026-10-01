@@ -18,7 +18,8 @@ export interface RelayConfig {
 export function relayConfigAusUmgebung(env: NodeJS.ProcessEnv = process.env): RelayConfig | null {
   if (!env.RATSBLICK_RELAY_URL || !env.RATSBLICK_RELAY_SCHLUESSEL) return null;
   return {
-    url: env.RATSBLICK_RELAY_URL.replace(/\/+$/, ''),
+    // „ratsblick-relay.vercel.app“ ohne Schema wird ebenfalls akzeptiert
+    url: (/^https?:\/\//i.test(env.RATSBLICK_RELAY_URL.trim()) ? '' : 'https://') + env.RATSBLICK_RELAY_URL.trim().replace(/\/+$/, ''),
     schluessel: env.RATSBLICK_RELAY_SCHLUESSEL,
     // Standard wie relay/lib/erlaubt.js
     hosts: (env.RATSBLICK_RELAY_HOSTS || 'ris.kaiserslautern.de')

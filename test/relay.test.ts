@@ -64,6 +64,11 @@ describe('relayFetch', () => {
     expect(aufrufe[1]).toEqual({ url: 'https://montabaur.gremien.info/oparl/system', auth: null });
   });
 
+  it('ergänzt https:// bei einer Adresse ohne Schema', () => {
+    const cfg = relayConfigAusUmgebung({ RATSBLICK_RELAY_URL: 'ratsblick-relay.vercel.app ', RATSBLICK_RELAY_SCHLUESSEL: SCHLUESSEL });
+    expect(cfg?.url).toBe('https://ratsblick-relay.vercel.app');
+  });
+
   it('geht ohne Konfiguration direkt', () => {
     expect(relayConfigAusUmgebung({})).toBeNull();
   });
