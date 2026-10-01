@@ -151,7 +151,7 @@ export function parseSitzung(html: string): Sitzung {
     const zusatz = [...zelle.matchAll(/<p class="smc_field_smcdv0_box2_\w+[^"]*">([\s\S]*?)<\/p>/g)].map((m) => text(m[1]));
     const beschluss = zusatz.length ? zusatz.join('; ').replace(/^Beschluss:\s*/, '') : null;
     if (!nr && !betreff) continue;
-    const vo = /href="vo0050\.(?:asp|php)\?__kvonr=(\d+)"[^>]*>([\s\S]*?)<\/a>/.exec(zeile!);
+    const vo = /href="vo0050\.(?:asp|php)\?__kvonr=(\d+)(?:&[^"]*)?"[^>]*>([\s\S]*?)<\/a>/.exec(zeile!);
     tops.push({
       nr,
       oeffentlich: /^Ö/.test(nr) ? true : /^N/.test(nr) ? false : null,

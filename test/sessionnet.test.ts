@@ -110,4 +110,11 @@ describe('SessionNet: PHP-Variante (echte Seiten aus Koblenz, SessionNet 5.4.7)'
     const html = '<div id="smcy1"><i class="smc smc-doc-dakurz x">VO</i><a  href="getfile.php?id=95880&type=do" class="smce-a-u smc-link-normal" >Informationsvorlage</a></div>';
     expect(parseDokumente(html)).toEqual([{ id: '95880', name: 'Informationsvorlage', kuerzel: 'VO' }]);
   });
+
+  it('liest Vorlagenlinks mit Zusatzparametern (Speyer)', () => {
+    const s = parseSitzung(seite('speyer-si0057-4730.php.html'));
+    const mitVorlage = s.tops.filter((t) => t.vorlage);
+    expect(mitVorlage.length).toBeGreaterThan(5);
+    expect(mitVorlage.every((t) => /^\d+$/.test(t.vorlage!.kvonr))).toBe(true);
+  });
 });

@@ -22,7 +22,7 @@ export function relayConfigAusUmgebung(env: NodeJS.ProcessEnv = process.env): Re
     url: (/^https?:\/\//i.test(env.RATSBLICK_RELAY_URL.trim()) ? '' : 'https://') + env.RATSBLICK_RELAY_URL.trim().replace(/\/+$/, ''),
     schluessel: env.RATSBLICK_RELAY_SCHLUESSEL,
     // Standard wie relay/lib/erlaubt.js
-    hosts: (env.RATSBLICK_RELAY_HOSTS || 'ris.kaiserslautern.de,gremieninfo.trier.de')
+    hosts: (env.RATSBLICK_RELAY_HOSTS || 'ris.kaiserslautern.de,gremieninfo.trier.de,www.buergerinfo-kreis-duew.de')
       .split(',')
       .map((h) => h.trim().toLowerCase())
       .filter(Boolean),

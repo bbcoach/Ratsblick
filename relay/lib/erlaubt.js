@@ -6,4 +6,5 @@
 export const ERLAUBT = [
   'ris.kaiserslautern.de', // SessionNet, Ländersperre, unvollständige Zertifikatskette
   'gremieninfo.trier.de', // ALLRIS 4, Ländersperre
+  'www.buergerinfo-kreis-duew.de', // SessionNet Kreis Bad Dürkheim, unvollständige Zertifikatskette
 ];
