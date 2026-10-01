@@ -73,7 +73,7 @@
     { "id": "stadt-schifferstadt", "name": "Stadt Schifferstadt", "ebene": "Verbandsfreie Stadt", "landkreis": "Rhein-Pfalz-Kreis", "url": "https://schifferstadt.gremien.info/oparl/system", "status": "inaktiv", "gebiet": "07338025" },
     { "id": "vg-hagenbach", "name": "VG Hagenbach", "ebene": "Verbandsgemeinde", "landkreis": "Germersheim", "url": "https://www.hagenbach.sitzung-online.de/bi/oparl/1.0/system.asp", "status": "robots", "gebiet": "073345002" },
     { "id": "stadt-boppard", "name": "Stadt Boppard", "ebene": "Verbandsfreie Stadt", "landkreis": "Rhein-Hunsrück-Kreis", "url": "http://www.boppard.sitzung-online.de/bi/oparl/1.0/system.asp", "status": "robots", "gebiet": "07140501" },
-    { "id": "stadt-kaiserslautern", "name": "Stadt Kaiserslautern", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://ris.kaiserslautern.de/buergerinfo/", "status": "aktiv", "gebiet": "07312000", "typ": "sessionnet" },
+    { "id": "stadt-kaiserslautern", "name": "Stadt Kaiserslautern", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://ris.kaiserslautern.de/buergerinfo/", "status": "aktiv", "gebiet": "07312000", "typ": "sessionnet", "endung": "asp" },
     { "id": "stadt-trier", "name": "Stadt Trier", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://gremieninfo.trier.de/public/oparl/system", "status": "robots", "gebiet": "07211000" },
     { "id": "kreis-rhein-hunsrueck", "name": "Rhein-Hunsrück-Kreis", "ebene": "Landkreis", "landkreis": "Rhein-Hunsrück-Kreis", "url": "https://rheinhunsrueck.gremien.info/oparl/system", "status": "aktiv", "gebiet": "07140" },
     { "id": "kreis-rhein-lahn", "name": "Rhein-Lahn-Kreis", "ebene": "Landkreis", "landkreis": "Rhein-Lahn-Kreis", "url": "https://rheinlahnkreis.gremien.info/oparl/system", "status": "aktiv", "gebiet": "07141" },
@@ -85,11 +85,11 @@
     { "id": "kreis-suedliche-weinstrasse", "name": "Landkreis Südliche Weinstraße", "ebene": "Landkreis", "landkreis": "Südliche Weinstraße", "url": "https://sessionnet.owl-it.de/suedliche-weinstrasse/BI/", "status": "robots", "gebiet": "07337" },
     { "id": "kreis-vulkaneifel", "name": "Landkreis Vulkaneifel", "ebene": "Landkreis", "landkreis": "Vulkaneifel", "url": "https://ratsinfo.vulkaneifel.de/", "status": "robots", "gebiet": "07233" },
     { "id": "stadt-ludwigshafen", "name": "Stadt Ludwigshafen am Rhein", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://www.ludwigshafen.de/ratsinformationssystem/bi/", "status": "blockiert", "gebiet": "07314000" },
-    { "id": "stadt-koblenz", "name": "Stadt Koblenz", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://buergerinfo.koblenz.de/", "status": "geplant", "gebiet": "07111000", "typ": "sessionnet" },
-    { "id": "stadt-mainz", "name": "Stadt Mainz", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://bi.mainz.de/", "status": "geplant", "gebiet": "07315000", "typ": "sessionnet" },
-    { "id": "stadt-neustadt", "name": "Stadt Neustadt an der Weinstraße", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://ratsinfo.neustadt.eu/", "status": "geplant", "gebiet": "07316000", "typ": "sessionnet" },
-    { "id": "kreis-ahrweiler", "name": "Landkreis Ahrweiler", "ebene": "Landkreis", "landkreis": "Ahrweiler", "url": "https://session.kreis-ahrweiler.de/biaw/", "status": "geplant", "gebiet": "07131", "typ": "sessionnet" },
-    { "id": "kreis-trier-saarburg", "name": "Landkreis Trier-Saarburg", "ebene": "Landkreis", "landkreis": "Trier-Saarburg", "url": "https://buergerinfo.trier-saarburg.de/", "status": "geplant", "gebiet": "07235", "typ": "sessionnet" },
-    { "id": "kreis-kusel", "name": "Landkreis Kusel", "ebene": "Landkreis", "landkreis": "Kusel", "url": "https://sitzungsmanagement.landkreis-kusel.de/bi/", "status": "geplant", "gebiet": "07336", "typ": "sessionnet" }
+    { "id": "stadt-koblenz", "name": "Stadt Koblenz", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://buergerinfo.koblenz.de/", "status": "aktiv", "gebiet": "07111000", "typ": "sessionnet", "endung": "php" },
+    { "id": "stadt-mainz", "name": "Stadt Mainz", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://bi.mainz.de/", "status": "aktiv", "gebiet": "07315000", "typ": "sessionnet", "endung": "php" },
+    { "id": "stadt-neustadt", "name": "Stadt Neustadt an der Weinstraße", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://buergerinfo.neustadt.eu/", "status": "aktiv", "gebiet": "07316000", "typ": "sessionnet", "endung": "asp" },
+    { "id": "kreis-ahrweiler", "name": "Landkreis Ahrweiler", "ebene": "Landkreis", "landkreis": "Ahrweiler", "url": "https://session.kreis-ahrweiler.de/biaw/", "status": "aktiv", "gebiet": "07131", "typ": "sessionnet", "endung": "php" },
+    { "id": "kreis-trier-saarburg", "name": "Landkreis Trier-Saarburg", "ebene": "Landkreis", "landkreis": "Trier-Saarburg", "url": "https://buergerinfo.trier-saarburg.de/", "status": "aktiv", "gebiet": "07235", "typ": "sessionnet", "endung": "php" },
+    { "id": "kreis-kusel", "name": "Landkreis Kusel", "ebene": "Landkreis", "landkreis": "Kusel", "url": "https://sitzungsmanagement.landkreis-kusel.de/bi/", "status": "aktiv", "gebiet": "07336", "typ": "sessionnet", "endung": "php" }
   ]
 }

@@ -125,7 +125,7 @@ async function main(): Promise<void> {
       try {
         const st =
           s.typ === 'sessionnet'
-            ? await syncSessionNet(db, client, s, { log })
+            ? await syncSessionNet(db, client, s, { log, alles: values.full })
             : await syncSource(db, client, s, { full: values.full, log });
         log(
           `✓ ${st.bodies} Körperschaften, ${st.organizations} Gremien, ${st.meetings} Sitzungen, ` +

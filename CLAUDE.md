@@ -46,9 +46,9 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 `*.more-rubin1.de`, `*.worms.de`, `*.mainz-bingen.de` lösen jeden Namen auf) und je robots.txt + Startseite.
 - OParl aktiv (more!rubin): Bernkastel-Wittlich, Rhein-Hunsrück (`rheinhunsrueck.gremien.info`),
   Rhein-Lahn (`rheinlahnkreis.gremien.info`). Nicht freigeschaltet: Altenkirchen, Alzey-Worms, Donnersberg.
-- SessionNet, Abruf erlaubt (keine robots.txt) → `status: geplant`: Koblenz, Mainz, Ahrweiler,
-  Trier-Saarburg, Kusel (PHP-Variante: `si0040.php` usw.), Neustadt (ASP wie Kaiserslautern).
-  Kaiserslautern läuft bereits (Scraper + Weiterleiter).
+- SessionNet per Scraper (keine robots.txt bzw. nur für Nebenpfade): Kaiserslautern (ASP, über Weiterleiter),
+  Neustadt (ASP, `buergerinfo.neustadt.eu`; `ratsinfo.` ist der Mandatsträger-Zugang), Koblenz, Mainz,
+  Kreis Ahrweiler, Trier-Saarburg, Kusel (PHP). Alle außer Kaiserslautern auch aus den USA erreichbar.
 - robots.txt „Disallow: /“: alle `*.sitzung-online.de` (ALLRIS: Kreis Bad Kreuznach, Germersheim; Bitburg-Prüm),
   `sessionnet.owl-it.de` (Westerwaldkreis, Neuwied, Südliche Weinstraße), Vulkaneifel (SD.NET RIM), Trier (ALLRIS 4).
 - Bot-Schutz (MyraCloud): Ludwigshafen. Pirmasens: OParl-Adresse antwortet 403.
@@ -60,7 +60,11 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Tagesordnung (`si0057`) und Vorlage (`vo0050`) und schreibt OParl-förmige Objekte über die upsert-Funktionen.
   IDs = Seitenadressen. Vorlagen haben keinen Text (nur PDF), Datum = erste Sitzung, Beratungsfolge aus den
   Tagesordnungen. Fenster: 2 Monate zurück, 3 voraus; ältere, bereits gespeicherte Sitzungen werden nicht neu geladen.
-  Testseiten in `test/fixtures/sessionnet/` (echte Seiten aus Kaiserslautern, SessionNet 5.4.6).
+  Testseiten in `test/fixtures/sessionnet/` (echte Seiten aus Kaiserslautern 5.4.6 ASP und Koblenz 5.4.7 PHP).
+  Varianten: `endung` asp|php; Sitzungslinks im Kalender auf `si0056` oder `si0057`; Kopf der Sitzung teils nur in
+  der Überschrift; Beschluss/Abstimmung teils direkt am TOP (`smc_field_smcdv0_box2_*`) → `agenda_item.result`;
+  Einladung teils nur in der Kalenderzeile; Links teils mit doppeltem Leerzeichen (`<a  href`).
+  `npm run sync -- --full --id …` lädt bei Scrapern alle Sitzungen im Fenster neu.
 - Kaiserslautern (`ris.kaiserslautern.de`) sperrt Zugriffe außerhalb Europas (GitHub Actions läuft in den USA) und
   schickt sein Zwischenzertifikat nicht mit. Lösung: Weiterleiter `relay/` bei Vercel in Frankfurt
   (`ratsblick-relay.vercel.app`), lädt fehlende Zwischenzertifikate per AIA nach. Nutzung über
@@ -86,8 +90,7 @@ Stil: ruhig und behördennah, Akzent #1F4E79, Schrift Public Sans, Vorlagennumme
 2. Volltext aus `mainFile.text` in `file.text_extracted` übernehmen, Suche darüber.
 3. „Kurz erklärt“ automatisch erzeugen (statt von Hand).
 4. Benachrichtigungen fürs Themen-Abo (braucht kleinen Server für Web Push/E-Mail).
-5. SessionNet-Scraper um die PHP-Variante erweitern und die sechs „geplant“-Quellen anbinden
-   (Koblenz, Mainz, Neustadt, Ahrweiler, Trier-Saarburg, Kusel); robots.txt vorher erneut prüfen.
+5. Vorlagentexte für Scraper-Quellen aus den PDFs gewinnen (für Suche und „Kurz erklärt“).
 6. Weitere Systeme: andere Anbieter (ALLRIS, SessionNet, Somacos) mit OParl suchen; bei „nicht freigeschaltet“
    ggf. Verwaltungen ansprechen; robots.txt-Frage bei sitzung-online.de klären.
 

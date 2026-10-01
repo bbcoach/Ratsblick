@@ -66,7 +66,7 @@ export function parseDokumente(html: string): Dokument[] {
   const out: Dokument[] = [];
   // Jedes Dokument steht in einem eigenen Block <div id="smcy…">
   for (const block of html.split(/<div id="smcy\d+"/).slice(1)) {
-    const link = /<a href="getfile\.asp\?id=(\d+)&(?:amp;)?type=do"[^>]*class="smce-a-u[^"]*"[^>]*>([\s\S]*?)<\/a>/.exec(block);
+    const link = /<a\s+href="getfile\.(?:asp|php)\?id=(\d+)&(?:amp;)?type=do"[^>]*class="smce-a-u[^"]*"[^>]*>([\s\S]*?)<\/a>/.exec(block);
     if (!link || out.some((d) => d.id === link[1])) continue;
     const kuerzel = /<i class="smc smc-doc-dakurz[^"]*"[^>]*>([^<]*)<\/i>/.exec(block)?.[1];
     out.push({ id: link[1]!, name: text(link[2]), kuerzel: kuerzel ? text(kuerzel) : null });
@@ -83,6 +83,8 @@ export interface KalenderEintrag {
   gremium: string;
   ort: string | null;
   verlinkt: boolean;
+  /** Dokumente in der Kalenderzeile (z. B. Einladung in Koblenz) */
+  dokumente: Dokument[];
 }
 
 export function parseKalender(html: string, jahr: number, monat: number): KalenderEintrag[] {
@@ -93,8 +95,8 @@ export function parseKalender(html: string, jahr: number, monat: number): Kalend
     if (t) tag = Number(t[1]);
     const zelle = /<td data-label="Sitzung"[^>]*>([\s\S]*?)<\/td>/.exec(zeile!)?.[1] ?? '';
     if (!text(zelle) || tag === null) continue;
-    const link = /href="si0057\.asp\?__ksinr=(\d+)"/.exec(zelle);
-    const termin = /yvcs\.asp\?key=(\d+)/.exec(zeile!);
+    const link = /href="si005[67]\.(?:asp|php)\?__ksinr=(\d+)"/.exec(zelle);
+    const termin = /yvcs\.(?:asp|php)\?key=(\d+)/.exec(zeile!);
     const ksinr = link?.[1] ?? termin?.[1] ?? null;
     const gremium = text(/<div class="smc-el-h[^"]*">([\s\S]*?)<\/div>/.exec(zelle)?.[1]);
     const li = [...zelle.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((x) => text(x[1]));
@@ -107,6 +109,7 @@ export function parseKalender(html: string, jahr: number, monat: number): Kalend
       gremium,
       ort: li[1]?.replace(/,\s*$/, '') || null,
       verlinkt: !!link,
+      dokumente: parseDokumente(/<td data-label="Dokumente"[^>]*>([\s\S]*?)<\/td>/.exec(zeile!)?.[1] ?? ''),
     });
   }
   return out;
@@ -116,6 +119,8 @@ export interface Top {
   nr: string;
   oeffentlich: boolean | null;
   betreff: string;
+  /** Beschluss und Abstimmung, wenn am TOP angegeben (z. B. Koblenz): „ungeändert beschlossen; Ja: 20, Nein: 4 …“ */
+  beschluss: string | null;
   vorlage: { kvonr: string; nr: string } | null;
   dokumente: Dokument[];
 }
@@ -140,24 +145,31 @@ export function parseSitzung(html: string): Sitzung {
   const tab = tabelle > 0 ? html.slice(tabelle, html.indexOf('</table>', tabelle)) : '';
   for (const [, zeile] of tab.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g)) {
     const nr = text(/<td class="tofnum"[^>]*>([\s\S]*?)<\/td>/.exec(zeile!)?.[1]);
-    const betreff = text(/<td class="tobetr"[^>]*>([\s\S]*?)<\/td>/.exec(zeile!)?.[1]);
+    const zelle = /<td class="tobetr"[^>]*>([\s\S]*?)<\/td>/.exec(zeile!)?.[1] ?? '';
+    const titel = /<div class="[^"]*smc-card-header-title-simple[^"]*">([\s\S]*?)<\/div>/.exec(zelle)?.[1];
+    const betreff = text(titel ?? zelle);
+    const zusatz = [...zelle.matchAll(/<p class="smc_field_smcdv0_box2_\w+[^"]*">([\s\S]*?)<\/p>/g)].map((m) => text(m[1]));
+    const beschluss = zusatz.length ? zusatz.join('; ').replace(/^Beschluss:\s*/, '') : null;
     if (!nr && !betreff) continue;
-    const vo = /href="vo0050\.asp\?__kvonr=(\d+)"[^>]*>([\s\S]*?)<\/a>/.exec(zeile!);
+    const vo = /href="vo0050\.(?:asp|php)\?__kvonr=(\d+)"[^>]*>([\s\S]*?)<\/a>/.exec(zeile!);
     tops.push({
       nr,
       oeffentlich: /^Ö/.test(nr) ? true : /^N/.test(nr) ? false : null,
       betreff,
+      beschluss,
       vorlage: vo ? { kvonr: vo[1]!, nr: text(vo[2]) } : null,
       dokumente: parseDokumente(zeile!),
     });
   }
+  // Überschrift „Gremium - TT.MM.JJJJ - HH:MM Uhr“ (in beiden Varianten vorhanden)
+  const h1 = /^(.*?)\s+-\s+(\d{2}\.\d{2}\.\d{4})(?:\s+-\s+(\d{1,2}:\d{2}))?/.exec(text(/<h1[^>]*>([\s\S]*?)<\/h1>/.exec(kopf)?.[1]));
   const zeit = feld(kopf, 'yytime');
   return {
     name: feld(kopf, 'siname'),
-    gremium: feld(kopf, 'sigrname'),
+    gremium: feld(kopf, 'sigrname') ?? h1?.[1] ?? null,
     ort: feld(kopf, 'siort'),
-    datum: feld(kopf, 'sidat'),
-    zeit: zeit ? (/(\d{1,2}:\d{2})/.exec(zeit)?.[1] ?? null) : null,
+    datum: feld(kopf, 'sidat') ?? h1?.[2] ?? null,
+    zeit: zeit ? (/(\d{1,2}:\d{2})/.exec(zeit)?.[1] ?? null) : (h1?.[3] ?? null),
     dokumente: parseDokumente(kopf),
     tops,
   };
@@ -175,7 +187,7 @@ export function parseVorlage(html: string): Vorlage {
   return {
     betreff: feld(html, 'vobetr'),
     nr: feld(html, 'voname'),
-    art: feld(html, 'vovaname'),
+    art: feld(html, 'vovaname')?.replace(/^\d+_/, '') ?? null, // Koblenz: „02_Unterrichtungsvorlage“
     aktenzeichen: feld(html, 'voakz'),
     dokumente: parseDokumente(html),
   };
@@ -188,12 +200,14 @@ export interface SessionNetOptionen {
   monateVoraus?: number;
   /** Sitzungen, die länger als so viele Tage zurückliegen und schon gespeichert sind, nicht erneut laden. */
   festNachTagen?: number;
+  /** Alle Sitzungen im Fenster neu laden (z. B. nach Änderungen am Scraper; CLI: --full). */
+  alles?: boolean;
   log?: (msg: string) => void;
   now?: Date;
 }
 
-function dokumentZuFile(base: string, d: Dokument): OParlFile {
-  const url = `${base}getfile.asp?id=${d.id}&type=do`;
+function dokumentZuFile(base: string, d: Dokument, ext: string): OParlFile {
+  const url = `${base}getfile.${ext}?id=${d.id}&type=do`;
   return { id: url, name: d.name, accessUrl: url, downloadUrl: url, mimeType: 'application/pdf' } as OParlFile;
 }
 
@@ -205,6 +219,8 @@ export async function syncSessionNet(
 ): Promise<SyncStats> {
   const log = opts.log ?? (() => {});
   const base = source.url.endsWith('/') ? source.url : `${source.url}/`;
+  // SessionNet gibt es als ASP- (älter) und PHP-Variante; die Seitennamen sind gleich
+  const ext = source.endung ?? 'asp';
   const jetzt = opts.now ?? new Date();
   const stats: SyncStats = { bodies: 0, organizations: 0, meetings: 0, agendaItems: 0, papers: 0, consultations: 0, files: 0 };
 
@@ -223,7 +239,7 @@ export async function syncSessionNet(
     const d = new Date(Date.UTC(jetzt.getUTCFullYear(), jetzt.getUTCMonth() + i, 1));
     const jahr = d.getUTCFullYear();
     const monat = d.getUTCMonth() + 1;
-    const html = await client.getText(`${base}si0040.asp?__cjahr=${jahr}&__cmonat=${monat}&__canz=1&__cselect=0`);
+    const html = await client.getText(`${base}si0040.${ext}?__cjahr=${jahr}&__cmonat=${monat}&__canz=1&__cselect=0`);
     eintraege.push(...parseKalender(html, jahr, monat));
   }
   log(`  Kalender: ${eintraege.length} Sitzungen in ${von + bis + 1} Monaten`);
@@ -244,11 +260,11 @@ export async function syncSessionNet(
   const vorhanden = db.prepare('SELECT COUNT(*) AS n FROM agenda_item WHERE meeting_id = ?');
   for (const e of eintraege) {
     const meetingId = e.ksinr
-      ? `${base}si0057.asp?__ksinr=${e.ksinr}`
-      : `${base}si0040.asp#${e.datum}-${slug(e.gremium)}`;
+      ? `${base}si0057.${ext}?__ksinr=${e.ksinr}`
+      : `${base}si0040.${ext}#${e.datum}-${slug(e.gremium)}`;
     const start = berlinIso(e.datum, e.beginn ?? '00:00');
     const vergangen = start < jetzt.toISOString();
-    if (e.verlinkt && e.datum < festVor && (vorhanden.get(meetingId) as { n: number }).n > 0) continue;
+    if (!opts.alles && e.verlinkt && e.datum < festVor && (vorhanden.get(meetingId) as { n: number }).n > 0) continue;
 
     let s: Sitzung | null = null;
     if (e.verlinkt) {
@@ -260,19 +276,20 @@ export async function syncSessionNet(
     }
     const orgId = gremien.get(e.gremium);
     const agendaItem = (s?.tops ?? []).map((t, i) => {
-      const paperId = t.vorlage ? `${base}vo0050.asp?__kvonr=${t.vorlage.kvonr}` : null;
+      const paperId = t.vorlage ? `${base}vo0050.${ext}?__kvonr=${t.vorlage.kvonr}` : null;
       if (t.vorlage) vorlagenGesehen.add(t.vorlage.kvonr);
       return {
         id: `${meetingId}#top-${i + 1}`,
         number: t.nr.replace(/^[ÖN]\s*/, ''),
         order: i + 1,
         name: t.betreff,
+        result: t.beschluss ?? undefined,
         public: t.oeffentlich ?? undefined,
         consultation: paperId ? `${paperId}#${e.ksinr ?? i}` : undefined,
         vorlage: paperId,
       };
     });
-    const docs = s?.dokumente ?? [];
+    const docs = s?.dokumente.length ? s.dokumente : e.dokumente;
     const einladung = docs.find((d) => d.kuerzel === 'B' || /bekanntmachung|einladung/i.test(d.name));
     const protokoll = docs.find((d) => /^N|^P/.test(d.kuerzel ?? '') || /niederschrift|protokoll/i.test(d.name));
     const meeting = {
@@ -284,9 +301,9 @@ export async function syncSessionNet(
       location: s?.ort ?? e.ort ? { description: s?.ort ?? e.ort ?? undefined } : undefined,
       organization: orgId ? [orgId] : [],
       agendaItem,
-      invitation: einladung ? dokumentZuFile(base, einladung) : undefined,
-      resultsProtocol: protokoll && protokoll !== einladung ? dokumentZuFile(base, protokoll) : undefined,
-      auxiliaryFile: docs.filter((d) => d !== einladung && d !== protokoll).map((d) => dokumentZuFile(base, d)),
+      invitation: einladung ? dokumentZuFile(base, einladung, ext) : undefined,
+      resultsProtocol: protokoll && protokoll !== einladung ? dokumentZuFile(base, protokoll, ext) : undefined,
+      auxiliaryFile: docs.filter((d) => d !== einladung && d !== protokoll).map((d) => dokumentZuFile(base, d, ext)),
       quelle: 'sessionnet',
     } as unknown as OParlMeeting;
     tx(db, () => upsertMeeting(db, bodyId, meeting, stats));
@@ -303,11 +320,13 @@ export async function syncSessionNet(
      WHERE a.consultation_id LIKE ? ORDER BY m.start`,
   );
   for (const kvonr of vorlagenGesehen) {
-    const paperId = `${base}vo0050.asp?__kvonr=${kvonr}`;
+    const paperId = `${base}vo0050.${ext}?__kvonr=${kvonr}`;
     const alt = bekannt.get(paperId) as { raw: string } | undefined;
     let v: Vorlage;
-    if (alt) {
-      v = JSON.parse(alt.raw).vorlage as Vorlage;
+    const gespeichert = alt ? (JSON.parse(alt.raw).vorlage as Vorlage | undefined) : undefined;
+    // Gespeicherte Vorlagen nicht erneut laden – außer sie hatten noch keine Dokumente
+    if (gespeichert?.dokumente?.length) {
+      v = gespeichert;
     } else {
       try {
         v = parseVorlage(await client.getText(paperId));
@@ -324,8 +343,8 @@ export async function syncSessionNet(
       reference: v.nr ?? undefined,
       date: rows[0]?.start?.slice(0, 10),
       paperType: v.art ?? undefined,
-      mainFile: haupt ? dokumentZuFile(base, haupt) : undefined,
-      auxiliaryFile: v.dokumente.filter((d) => d !== haupt).map((d) => dokumentZuFile(base, d)),
+      mainFile: haupt ? dokumentZuFile(base, haupt, ext) : undefined,
+      auxiliaryFile: v.dokumente.filter((d) => d !== haupt).map((d) => dokumentZuFile(base, d, ext)),
       consultation: rows.map((r) => ({
         id: `${paperId}#${new URL(r.mid).searchParams.get('__ksinr') ?? r.ai}`,
         agendaItem: r.ai,

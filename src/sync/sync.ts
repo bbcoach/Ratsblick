@@ -21,6 +21,8 @@ export interface SourceRecord {
   gebiet?: string;
   /** Zugang: OParl (Standard) oder ein Scraper für Systeme ohne OParl. */
   typ?: 'oparl' | 'sessionnet';
+  /** Nur SessionNet: Dateiendung der Seiten (asp oder php). */
+  endung?: 'asp' | 'php';
 }
 
 export interface SyncOptions {

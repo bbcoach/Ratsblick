@@ -118,14 +118,14 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
        WHERE a.meeting_id = ? ORDER BY a.ord`,
       mid,
     ).map((a) => {
-      const raw = JSON.parse(String(a.raw)) as { resolutionFile?: { text?: string; accessUrl?: string } };
+      const raw = JSON.parse(String(a.raw)) as { resolutionFile?: { text?: string; accessUrl?: string }; result?: string };
       if (a.paper_id) paperIds.add(String(a.paper_id));
       return {
         nr: s(a.number),
         name: cleanText(s(a.name), 300),
         oeffentlich: a.public === null ? null : a.public === 1,
         vorlage: s(a.paper_id),
-        beschluss: cleanText(raw.resolutionFile?.text, 700),
+        beschluss: cleanText(raw.resolutionFile?.text ?? raw.result, 700),
       };
     });
     return {

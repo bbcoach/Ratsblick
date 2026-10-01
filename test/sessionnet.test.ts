@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { openDb } from '../src/db/index.js';
 import { OParlClient } from '../src/oparl/client.js';
-import { berlinIso, parseKalender, parseSitzung, parseVorlage, syncSessionNet, text } from '../src/scrape/sessionnet.js';
+import { berlinIso, parseDokumente, parseKalender, parseSitzung, parseVorlage, syncSessionNet, text } from '../src/scrape/sessionnet.js';
 
 const seite = (f: string) => readFileSync(new URL(`./fixtures/sessionnet/${f}`, import.meta.url), 'utf8');
 const BASE = 'https://ris.kaiserslautern.de/buergerinfo/';
@@ -78,5 +78,36 @@ describe('SessionNet: Abgleich', () => {
     const datei = db.prepare(`SELECT access_url FROM file f JOIN file_link l ON l.file_id = f.id WHERE l.owner_id = ? AND l.role = 'main'`)
       .get(`${BASE}vo0050.asp?__kvonr=19902`);
     expect(datei).toEqual({ access_url: `${BASE}getfile.asp?id=128429&type=do` });
+  });
+});
+
+describe('SessionNet: PHP-Variante (echte Seiten aus Koblenz, SessionNet 5.4.7)', () => {
+  it('liest Kalender mit Links auf si0056 und Einladung in der Kalenderzeile', () => {
+    const k = parseKalender(seite('koblenz-si0040-2026-09.php.html'), 2026, 9);
+    const rat = k.find((e) => e.ksinr === '9693')!;
+    expect(rat).toMatchObject({ datum: '2026-09-03', beginn: '15:00', ende: '22:00', gremium: 'Stadtrat', verlinkt: true });
+    expect(k.find((e) => e.gremium === 'Kulturausschuss')?.dokumente[0]?.name).toBe('Einladung');
+  });
+
+  it('liest Kopf aus der Überschrift und Beschlüsse am TOP', () => {
+    const s = parseSitzung(seite('koblenz-si0057-9693.php.html'));
+    expect(s).toMatchObject({ gremium: 'Stadtrat', datum: '03.09.2026', zeit: '15:00' });
+    expect(s.tops.length).toBeGreaterThan(30);
+    expect(s.tops[2]).toMatchObject({
+      betreff: 'Bürgerbegehren betreffend „Koblenzer Baumschutzsatzung“ – Zulässigkeitsentscheidung',
+      beschluss: 'ungeändert beschlossen; Abstimmung: Ja: 20, Nein: 4, Enthaltung: 22, Befangen: 0',
+      vorlage: { kvonr: '43287', nr: 'BV/0494/2026/2' },
+    });
+  });
+
+  it('liest eine Vorlage ohne Nummernpräfix in der Art', () => {
+    const v = parseVorlage(seite('koblenz-vo0050-43205.php.html'));
+    expect(v).toMatchObject({ nr: 'UV/0190/2026', art: 'Unterrichtungsvorlage' });
+    expect(v.dokumente).toEqual([{ id: '386541', name: 'Unterrichtungsvorlage', kuerzel: null }]);
+  });
+
+  it('verträgt doppelte Leerzeichen in Links (Trier-Saarburg)', () => {
+    const html = '<div id="smcy1"><i class="smc smc-doc-dakurz x">VO</i><a  href="getfile.php?id=95880&type=do" class="smce-a-u smc-link-normal" >Informationsvorlage</a></div>';
+    expect(parseDokumente(html)).toEqual([{ id: '95880', name: 'Informationsvorlage', kuerzel: 'VO' }]);
   });
 });
