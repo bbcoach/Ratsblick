@@ -50,10 +50,10 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Neustadt (ASP, `buergerinfo.neustadt.eu`; `ratsinfo.` ist der Mandatsträger-Zugang), Koblenz, Mainz,
   Kreis Ahrweiler, Trier-Saarburg, Kusel (PHP). Alle außer Kaiserslautern auch aus den USA erreichbar.
 - robots.txt „Disallow: /“: alle `*.sitzung-online.de` (ALLRIS: Kreis Bad Kreuznach, Germersheim; Bitburg-Prüm),
-  `sessionnet.owl-it.de` (Westerwaldkreis, Neuwied, Südliche Weinstraße), Vulkaneifel (SD.NET RIM), Trier (ALLRIS 4).
+  `sessionnet.owl-it.de` (Westerwaldkreis, Neuwied, Südliche Weinstraße, Kreis Kaiserslautern; erlaubt nur `/stadt-weingarten/bi/`), Vulkaneifel (SD.NET RIM), Trier (ALLRIS 4).
 - Bot-Schutz (MyraCloud): Ludwigshafen. Pirmasens: OParl-Adresse antwortet 403.
 - Unklar (nicht gefunden oder nicht erreichbar): Frankenthal, Landau, Speyer, Worms, Zweibrücken, Birkenfeld,
-  Cochem-Zell, Mayen-Koblenz, Bad Dürkheim, Kreis Kaiserslautern, Rhein-Pfalz-Kreis, Mainz-Bingen, Südwestpfalz.
+  Cochem-Zell, Mayen-Koblenz, Bad Dürkheim, Rhein-Pfalz-Kreis, Mainz-Bingen, Südwestpfalz.
 
 ## more!rubin ohne OParl (geprüft an rockenhausen.gremien.info, 01.10.2026)
 - Neuere more!rubin-Oberfläche ist eine JavaScript-App; Daten über eine interne JSON-Schnittstelle, ohne Anmeldung:
