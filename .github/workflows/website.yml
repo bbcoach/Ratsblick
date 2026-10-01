@@ -13,6 +13,9 @@ on:
         description: 'Daten neu abgleichen'
         type: boolean
         default: true
+      quellen:
+        description: 'Nur diese Quellen abgleichen (IDs aus data/endpoints.json, durch Leerzeichen getrennt; leer = alle aktiven)'
+        default: ''
 
 permissions:
   contents: read
@@ -59,7 +62,11 @@ jobs:
           # Weiterleiter in Frankfurt für Server, die nur aus Europa erreichbar sind (relay/README.md)
           RATSBLICK_RELAY_URL: ${{ vars.RATSBLICK_RELAY_URL }}
           RATSBLICK_RELAY_SCHLUESSEL: ${{ secrets.RATSBLICK_RELAY_SCHLUESSEL }}
-        run: npm run sync
+          QUELLEN: ${{ inputs.quellen }}
+        run: |
+          args=()
+          for q in $QUELLEN; do args+=(--id "$q"); done
+          npm run sync -- "${args[@]}"
 
       - name: Datenstand sichern
         if: steps.sync.outcome != 'skipped'
