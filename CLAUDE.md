@@ -55,6 +55,14 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - Unklar (nicht gefunden oder nicht erreichbar): Frankenthal, Landau, Speyer, Worms, Zweibrücken, Birkenfeld,
   Cochem-Zell, Mayen-Koblenz, Bad Dürkheim, Kreis Kaiserslautern, Rhein-Pfalz-Kreis, Mainz-Bingen, Südwestpfalz.
 
+## more!rubin ohne OParl (geprüft an rockenhausen.gremien.info, 01.10.2026)
+- Neuere more!rubin-Oberfläche ist eine JavaScript-App; Daten über eine interne JSON-Schnittstelle, ohne Anmeldung:
+  `/api.php?id=organizations&action=bodies`, `/api.php?id=calendar&action=get&from=JJJJ-MM&to=JJJJ-MM&view=list`,
+  `/api.php?id=meetings&action=get&meeting_id=<nummer>&with_agenda_item_documents=1` (TOPs mit Vorlagennummer,
+  Dokumenten, Abstimmungen). robots.txt sperrt nur `/config/` und `/documents.php`; Seiten tragen
+  `meta robots NOINDEX,NOFOLLOW` (gilt Suchmaschinen). Nicht dokumentiert → vor Nutzung entscheiden.
+- Subdomains folgen teils alten VG-Namen (Rockenhausen = VG Nordpfälzer Land) – `discover` findet die nicht.
+
 ## Scraper und Weiterleiter
 - `typ: "sessionnet"` in `endpoints.json` → `src/scrape/sessionnet.ts` statt OParl. Liest Kalender (`si0040`),
   Tagesordnung (`si0057`) und Vorlage (`vo0050`) und schreibt OParl-förmige Objekte über die upsert-Funktionen.
