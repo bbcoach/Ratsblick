@@ -19,6 +19,7 @@ export function tokens(name: string): string[] {
     .toLowerCase()
     .replace(/ß/g, 'ss')
     .replace(PRAEFIX, '')
+    .replace(/\bst\.\s*/g, 'sankt ') // „St. Alban“ ↔ „Sankt Alban“
     .split(/[^a-z0-9äöü]+/)
     .filter(Boolean);
 }
@@ -33,7 +34,16 @@ export function vergleiche(oparl: string, amtlich: string): number {
   if (!a.length || !b.length) return 0;
   if (a.join(' ') === b.join(' ')) return 2;
   if (a.length > b.length) return 0;
-  return a[0] === b[0] && a.every((t, i) => b[i]!.startsWith(t)) ? 1 : 0;
+  if (a[0] !== b[0]) return 0;
+  // Weitere Wörter der Reihe nach als Anfänge amtlicher Wörter; amtliche Füllwörter dürfen fehlen
+  // („Niederhausen/Appel“ ↔ „Niederhausen an der Appel“, „Auw b. Prüm“ ↔ „Auw bei Prüm“)
+  let j = 1;
+  for (const t of a.slice(1)) {
+    while (j < b.length && !b[j]!.startsWith(t)) j++;
+    if (j >= b.length) return 0;
+    j++;
+  }
+  return 1;
 }
 
 /** Gebiets-IDs, in denen die Körperschaften einer Quelle liegen können. */

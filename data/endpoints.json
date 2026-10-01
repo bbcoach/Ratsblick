@@ -91,6 +91,6 @@
     { "id": "kreis-ahrweiler", "name": "Landkreis Ahrweiler", "ebene": "Landkreis", "landkreis": "Ahrweiler", "url": "https://session.kreis-ahrweiler.de/biaw/", "status": "aktiv", "gebiet": "07131", "typ": "sessionnet", "endung": "php" },
     { "id": "kreis-trier-saarburg", "name": "Landkreis Trier-Saarburg", "ebene": "Landkreis", "landkreis": "Trier-Saarburg", "url": "https://buergerinfo.trier-saarburg.de/", "status": "aktiv", "gebiet": "07235", "typ": "sessionnet", "endung": "php" },
     { "id": "kreis-kusel", "name": "Landkreis Kusel", "ebene": "Landkreis", "landkreis": "Kusel", "url": "https://sitzungsmanagement.landkreis-kusel.de/bi/", "status": "aktiv", "gebiet": "07336", "typ": "sessionnet", "endung": "php" },
-    { "id": "vg-nordpfaelzer-land", "name": "VG Nordpfälzer Land (Rockenhausen)", "ebene": "Verbandsgemeinde", "landkreis": "Donnersbergkreis", "url": "https://rockenhausen.gremien.info/oparl/system", "status": "inaktiv", "gebiet": "073335007" }
+    { "id": "vg-nordpfaelzer-land", "name": "VG Nordpfälzer Land (Rockenhausen)", "ebene": "Verbandsgemeinde", "landkreis": "Donnersbergkreis", "url": "https://rockenhausen.gremien.info/", "status": "aktiv", "gebiet": "073335007", "typ": "rubin-api" }
   ]
 }

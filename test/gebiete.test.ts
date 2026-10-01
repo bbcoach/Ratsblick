@@ -23,6 +23,9 @@ describe('Zuordnung zu Gebietskörperschaften', () => {
     expect(vergleiche('Ortsgemeinde Herxheimweyher', 'Herxheim bei Landau/ Pfalz')).toBe(0);
     expect(vergleiche('Ortsgemeinde Herxheim', 'Herxheimweyher')).toBe(0);
     expect(vergleiche('Ortsgemeinde Auw b. Prüm', 'Auw bei Prüm')).toBe(1);
+    expect(vergleiche('Ortsgemeinde St. Alban', 'Sankt Alban')).toBe(2);
+    expect(vergleiche('Ortsgemeinde Niederhausen/Appel', 'Niederhausen an der Appel')).toBe(1);
+    expect(vergleiche('Ortsgemeinde Niederhausen/Appel', 'Oberhausen an der Appel')).toBe(0);
   });
 
   it('ordnet nur innerhalb der Verbandsgemeinde der Quelle zu', () => {

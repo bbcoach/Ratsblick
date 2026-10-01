@@ -20,7 +20,7 @@ export interface SourceRecord {
   /** Amtlicher Schlüssel des Gebiets der Quelle (data/gebiete-rlp.json). */
   gebiet?: string;
   /** Zugang: OParl (Standard) oder ein Scraper für Systeme ohne OParl. */
-  typ?: 'oparl' | 'sessionnet';
+  typ?: 'oparl' | 'sessionnet' | 'rubin-api';
   /** Nur SessionNet: Dateiendung der Seiten (asp oder php). */
   endung?: 'asp' | 'php';
 }

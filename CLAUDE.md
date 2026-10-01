@@ -60,7 +60,12 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   `/api.php?id=organizations&action=bodies`, `/api.php?id=calendar&action=get&from=JJJJ-MM&to=JJJJ-MM&view=list`,
   `/api.php?id=meetings&action=get&meeting_id=<nummer>&with_agenda_item_documents=1` (TOPs mit Vorlagennummer,
   Dokumenten, Abstimmungen). robots.txt sperrt nur `/config/` und `/documents.php`; Seiten tragen
-  `meta robots NOINDEX,NOFOLLOW` (gilt Suchmaschinen). Nicht dokumentiert → vor Nutzung entscheiden.
+  `meta robots NOINDEX,NOFOLLOW` (gilt Suchmaschinen). Nicht dokumentiert.
+- Entscheidung (Nutzer, 01.10.2026): zunächst nur für die VG Nordpfälzer Land nutzen → `typ: "rubin-api"`,
+  `src/scrape/rubin.ts`. Kalender in einem Abruf für das ganze Fenster, je Sitzung ein Abruf (TOPs enthalten die
+  Vorlage samt Drucksachennummer und Dokumenten; TOP-Status 1 = öffentlich, 2 = nicht öffentlich).
+  PDF-Links = `documentUrl` ohne `json=1`. Erster Lauf: 38 Körperschaften, 55 Sitzungen, 124 Vorlagen in 63 s.
+  Weitere more!rubin-Systeme ohne OParl nur nach Rücksprache freischalten.
 - Subdomains folgen teils alten VG-Namen (Rockenhausen = VG Nordpfälzer Land) – `discover` findet die nicht.
 
 ## Scraper und Weiterleiter
