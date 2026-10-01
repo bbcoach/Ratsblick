@@ -49,5 +49,6 @@ describe('Links zu Ratsinformationssystemen', () => {
     const { risStartseite } = await import('../src/export/web.js');
     expect(risStartseite('https://adenau.gremien.info/oparl/system')).toBe('https://adenau.gremien.info/');
     expect(risStartseite('https://www.hagenbach.sitzung-online.de/bi/oparl/1.0/system.asp')).toBe('https://www.hagenbach.sitzung-online.de/bi/');
+    expect(risStartseite('https://gremieninfo.trier.de/public/oparl/system')).toBe('https://gremieninfo.trier.de/public/');
   });
 });

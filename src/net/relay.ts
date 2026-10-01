@@ -21,7 +21,7 @@ export function relayConfigAusUmgebung(env: NodeJS.ProcessEnv = process.env): Re
     url: env.RATSBLICK_RELAY_URL.replace(/\/+$/, ''),
     schluessel: env.RATSBLICK_RELAY_SCHLUESSEL,
     // Standard wie relay/lib/erlaubt.js
-    hosts: (env.RATSBLICK_RELAY_HOSTS || 'ris.kaiserslautern.de,gremieninfo.trier.de')
+    hosts: (env.RATSBLICK_RELAY_HOSTS || 'ris.kaiserslautern.de')
       .split(',')
       .map((h) => h.trim().toLowerCase())
       .filter(Boolean),

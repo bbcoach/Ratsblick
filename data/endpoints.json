@@ -73,6 +73,7 @@
     { "id": "stadt-schifferstadt", "name": "Stadt Schifferstadt", "ebene": "Verbandsfreie Stadt", "landkreis": "Rhein-Pfalz-Kreis", "url": "https://schifferstadt.gremien.info/oparl/system", "status": "inaktiv", "gebiet": "07338025" },
     { "id": "vg-hagenbach", "name": "VG Hagenbach", "ebene": "Verbandsgemeinde", "landkreis": "Germersheim", "url": "https://www.hagenbach.sitzung-online.de/bi/oparl/1.0/system.asp", "status": "robots", "gebiet": "073345002" },
     { "id": "stadt-boppard", "name": "Stadt Boppard", "ebene": "Verbandsfreie Stadt", "landkreis": "Rhein-Hunsrück-Kreis", "url": "http://www.boppard.sitzung-online.de/bi/oparl/1.0/system.asp", "status": "robots", "gebiet": "07140501" },
-    { "id": "stadt-kaiserslautern", "name": "Stadt Kaiserslautern", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://ris.kaiserslautern.de/buergerinfo/", "status": "aktiv", "gebiet": "07312000", "typ": "sessionnet" }
+    { "id": "stadt-kaiserslautern", "name": "Stadt Kaiserslautern", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://ris.kaiserslautern.de/buergerinfo/", "status": "aktiv", "gebiet": "07312000", "typ": "sessionnet" },
+    { "id": "stadt-trier", "name": "Stadt Trier", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://gremieninfo.trier.de/public/oparl/system", "status": "robots", "gebiet": "07211000" }
   ]
 }

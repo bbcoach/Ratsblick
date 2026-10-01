@@ -29,8 +29,8 @@ interface Kurz {
 /** Startseite eines Ratsinformationssystems aus der OParl-Adresse ableiten (nur als Link für Menschen). */
 export function risStartseite(oparlUrl: string): string {
   const u = new URL(oparlUrl);
-  const bi = u.pathname.match(/^\/bi\//) ? '/bi/' : '/';
-  return `${u.protocol}//${u.host}${bi}`;
+  const pfad = /^\/(bi|public|buergerinfo)\//.exec(u.pathname)?.[0] ?? '/';
+  return `${u.protocol}//${u.host}${pfad}`;
 }
 
 export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions = {}) {
