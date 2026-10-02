@@ -20,8 +20,8 @@ import { berlinIso, text } from './sessionnet.js';
  * - Sitzung `to010.asp?SILFDNR=…` (Kopf, Tagesordnung, Ergebnis im Titel des NA-Knopfs, Vorlagennummer am TOP)
  * - Vorlage `vo020.asp?VOLFDNR=…` mit Beschlussvorschlag/Sachverhalt als HTML
  * - Dokumente `do027.asp?DOLFDNR=…&options=64` (leitet auf eine kurzlebige PDF-Adresse weiter)
- * - Ist die Monatsansicht gesperrt („Zugriff verweigert“), zuerst der einfache Kalender `si010.asp?MM=…&YY=…`
- *   (Eifelkreis Bitburg-Prüm); ist auch der gesperrt (Kirchen, Betzdorf-Gebhardshain), gibt es den Kalender nur je Rat: Räteliste `pa000.asp`, Kalender `si010_a.asp?MM=…&YY=…&PALFDNR=…` (Ausschüsse erscheinen beim Rat)
+ * - Ist die Monatsansicht gesperrt („Zugriff verweigert“), die anderen Kalender `si010_e.asp` (Mainz-Bingen) bzw. `si010.asp`
+ *   (Eifelkreis Bitburg-Prüm); sind alle gesperrt (Kirchen, Betzdorf-Gebhardshain), gibt es den Kalender nur je Rat: Räteliste `pa000.asp`, Kalender `si010_a.asp?MM=…&YY=…&PALFDNR=…` (Ausschüsse erscheinen beim Rat)
  * Seiten sind ISO-8859-1 ohne Angabe im Content-Type (getText liest den Zeichensatz aus der Seite).
  */
 
@@ -212,6 +212,9 @@ export interface AllrisNetOptionen {
   now?: Date;
 }
 
+/** Kalenderansichten in der Reihenfolge, in der sie versucht werden; je nach Einrichtung ist nur eine freigegeben. */
+const KALENDER = ['si010_j.asp', 'si010_e.asp', 'si010.asp'];
+
 export async function syncAllrisNet(
   db: DatabaseSync,
   client: OParlClient,
@@ -234,7 +237,7 @@ export async function syncAllrisNet(
   const termine = new Map<string, AllrisNetTermin>();
   let gremien: AllrisNetGremium[] = [];
   let jeRat = false;
-  let kalender = 'si010_j.asp';
+  let kalender = KALENDER[0]!;
   const von = opts.monateZurueck ?? 2;
   const bis = opts.monateVoraus ?? 3;
   for (let i = -von; i <= bis; i++) {
@@ -250,10 +253,11 @@ export async function syncAllrisNet(
         continue;
       }
       const html = await client.getText(`${base}${kalender}?MM=${monat}&YY=${jahr}`);
-      if (i === -von && /Zugriff verweigert/i.test(html) && kalender === 'si010_j.asp') {
-        // Monatsansicht gesperrt: zuerst den einfachen Kalender versuchen (Eifelkreis Bitburg-Prüm)
-        kalender = 'si010.asp';
-        log('  Monatsansicht gesperrt – versuche si010.asp');
+      const naechster = KALENDER[KALENDER.indexOf(kalender) + 1];
+      if (i === -von && /Zugriff verweigert/i.test(html) && naechster) {
+        // Kalenderansicht gesperrt: die nächste versuchen (Mainz-Bingen: si010_e, Bitburg-Prüm: si010)
+        log(`  ${kalender} gesperrt – versuche ${naechster}`);
+        kalender = naechster;
         i--;
         continue;
       }

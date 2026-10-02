@@ -76,5 +76,9 @@ describe('ALLRIS.net einfacher Kalender (Eifelkreis Bitburg-Prüm)', () => {
     expect(t).toHaveLength(6);
     expect(t[1]).toMatchObject({ silfdnr: '1649', datum: '07.09.2026', zeit: '14:30' });
   });
+  it('liest auch si010_e.asp (Landkreis Mainz-Bingen)', () => {
+    const t = parseKalender(readFileSync(new URL('./fixtures/allrisnet/mainz-bingen-si010_e.html', import.meta.url), 'latin1'), 9, 2026);
+    expect(t).toHaveLength(7);
+    expect(t[0]).toMatchObject({ silfdnr: '5564', datum: '07.09.2026', zeit: '16:00', raum: 'Kreistagssaal (Raum 023, EG)' });
+  });
 });
-

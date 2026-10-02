@@ -94,7 +94,7 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - Kreis Mayen-Koblenz: SessionNet PHP auf `ris.kvmyk.de/bi/` (keine robots.txt; die Kreis-Website bettet es nur ein).
 - Stadt Landau: SessionNet ASP auf `info.landau.de/0001_bi/` (keine robots.txt, außerhalb Europas 403 → Weiterleiter). Sitzungen
   ohne freigegebene Tagesordnung leiten von `si0057` auf `si0050` um (HTTP 302) – sie bleiben als Kalendertermin.
-- Unklar: Birkenfeld (kein RIS-Link gefunden), Mainz-Bingen (Verweis auf cc-egov, ohne Treffer).
+- Unklar: Birkenfeld (kein RIS-Link gefunden). Mainz-Bingen: `www.landkreis-mainz-bingen.sitzung-online.de/bi/` (seit 02.10.2026).
 - Trier (ALLRIS 4, `typ: "allris"`, `src/scrape/allris.ts`, seit 02.10.2026): Kalender `si010?MM=&YY=` lädt die
   Tabelle per Wicket-Ajax (`si010?0-1.0-&MM=…`) mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch,
   meldet `x-ratsblick-set-cookie`); Sitzungen `to010?SILFDNR=`, Vorlagen `vo020?VOLFDNR=` ohne Sitzung abrufbar.
@@ -108,7 +108,9 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Ergebnis im Titel des NA-Knopfs, Vorlage `vo020.asp?VOLFDNR=` mit Beschlussvorschlag/Sachverhalt, PDFs `do027.asp?DOLFDNR=&options=64`.
 - Gremium der Sitzung: Link auf `pa020` (PALFDNR) oder `au020` (AULFDNR, andere Nummern); vergangene Wahlperioden haben andere
   Nummern → Zuordnung nach Namen, bei Mehrdeutigkeit („Rechnungsprüfungsausschuss“) über „Ortsgemeinde X“ im Sitzungstitel.
-- Eifelkreis Bitburg-Prüm: `si010_j` gesperrt, aber der einfache Kalender `si010.asp?MM=&YY=` geht (gleiches Format, ohne Gremienliste;
+- Kalender der Reihe nach `si010_j` → `si010_e` → `si010` → je Rat (je Einrichtung ist nur eine Ansicht freigegeben).
+  Landkreis Mainz-Bingen (Link vom Projektinhaber, sitzung-online, robots.txt): nur `si010_e.asp` frei.
+  Eifelkreis Bitburg-Prüm: `si010_j` gesperrt, aber der einfache Kalender `si010.asp?MM=&YY=` geht (gleiches Format, ohne Gremienliste;
   Gremien dann aus der Sitzung). Kirchen und Betzdorf-Gebhardshain: auch `si010` gesperrt („Zugriff verweigert“). Dann Räteliste `pa000.asp` (Namen fett hinter
   dem Link, „Ortsgemeinderat der Ortsgemeinde X“) und Kalender je Rat `si010_a.asp?MM=&YY=&PALFDNR=` (Ausschüsse beim Rat), ohne Cookie.
 - SessionNet mit Mandanten: der aktuell gewählte Mandant (`aria-label="Mandant auswählen"`) ist der Name der Standard-Körperschaft
