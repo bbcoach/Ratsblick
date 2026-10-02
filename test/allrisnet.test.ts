@@ -69,3 +69,12 @@ describe('ALLRIS.net mit Kalender je Rat (VG Kirchen)', () => {
     expect(koerperschaftsName('Verbandsgemeinderat der Verbandsgemeinde Kirchen (Sieg)')).toBe('Verbandsgemeinde Kirchen (Sieg)');
   });
 });
+
+describe('ALLRIS.net einfacher Kalender (Eifelkreis Bitburg-Prüm)', () => {
+  it('liest si010.asp mit dem Monatsparser', () => {
+    const t = parseKalender(readFileSync(new URL('./fixtures/allrisnet/bitburg-pruem-si010.html', import.meta.url), 'latin1'), 9, 2026);
+    expect(t).toHaveLength(6);
+    expect(t[1]).toMatchObject({ silfdnr: '1649', datum: '07.09.2026', zeit: '14:30' });
+  });
+});
+

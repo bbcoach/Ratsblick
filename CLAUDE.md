@@ -108,7 +108,8 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Ergebnis im Titel des NA-Knopfs, Vorlage `vo020.asp?VOLFDNR=` mit Beschlussvorschlag/Sachverhalt, PDFs `do027.asp?DOLFDNR=&options=64`.
 - Gremium der Sitzung: Link auf `pa020` (PALFDNR) oder `au020` (AULFDNR, andere Nummern); vergangene Wahlperioden haben andere
   Nummern → Zuordnung nach Namen, bei Mehrdeutigkeit („Rechnungsprüfungsausschuss“) über „Ortsgemeinde X“ im Sitzungstitel.
-- Kirchen und Betzdorf-Gebhardshain: `si010_j` meldet „Zugriff verweigert“. Dann Räteliste `pa000.asp` (Namen fett hinter
+- Eifelkreis Bitburg-Prüm: `si010_j` gesperrt, aber der einfache Kalender `si010.asp?MM=&YY=` geht (gleiches Format, ohne Gremienliste;
+  Gremien dann aus der Sitzung). Kirchen und Betzdorf-Gebhardshain: auch `si010` gesperrt („Zugriff verweigert“). Dann Räteliste `pa000.asp` (Namen fett hinter
   dem Link, „Ortsgemeinderat der Ortsgemeinde X“) und Kalender je Rat `si010_a.asp?MM=&YY=&PALFDNR=` (Ausschüsse beim Rat), ohne Cookie.
 - SessionNet mit Mandanten: der aktuell gewählte Mandant (`aria-label="Mandant auswählen"`) ist der Name der Standard-Körperschaft
   und wird nicht doppelt angelegt (Bodenheim); bloße Ortsnamen in der Mandantenliste werden zu „Ortsgemeinde X“.

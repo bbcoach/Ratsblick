@@ -20,8 +20,8 @@ import { berlinIso, text } from './sessionnet.js';
  * - Sitzung `to010.asp?SILFDNR=…` (Kopf, Tagesordnung, Ergebnis im Titel des NA-Knopfs, Vorlagennummer am TOP)
  * - Vorlage `vo020.asp?VOLFDNR=…` mit Beschlussvorschlag/Sachverhalt als HTML
  * - Dokumente `do027.asp?DOLFDNR=…&options=64` (leitet auf eine kurzlebige PDF-Adresse weiter)
- * - Ist die Monatsansicht gesperrt („Zugriff verweigert“, z. B. Kirchen, Betzdorf-Gebhardshain), gibt es den Kalender
- *   nur je Rat: Räteliste `pa000.asp`, Kalender `si010_a.asp?MM=…&YY=…&PALFDNR=…` (Ausschüsse erscheinen beim Rat)
+ * - Ist die Monatsansicht gesperrt („Zugriff verweigert“), zuerst der einfache Kalender `si010.asp?MM=…&YY=…`
+ *   (Eifelkreis Bitburg-Prüm); ist auch der gesperrt (Kirchen, Betzdorf-Gebhardshain), gibt es den Kalender nur je Rat: Räteliste `pa000.asp`, Kalender `si010_a.asp?MM=…&YY=…&PALFDNR=…` (Ausschüsse erscheinen beim Rat)
  * Seiten sind ISO-8859-1 ohne Angabe im Content-Type (getText liest den Zeichensatz aus der Seite).
  */
 
@@ -234,6 +234,7 @@ export async function syncAllrisNet(
   const termine = new Map<string, AllrisNetTermin>();
   let gremien: AllrisNetGremium[] = [];
   let jeRat = false;
+  let kalender = 'si010_j.asp';
   const von = opts.monateZurueck ?? 2;
   const bis = opts.monateVoraus ?? 3;
   for (let i = -von; i <= bis; i++) {
@@ -248,9 +249,16 @@ export async function syncAllrisNet(
         }
         continue;
       }
-      const html = await client.getText(`${base}si010_j.asp?MM=${monat}&YY=${jahr}`);
+      const html = await client.getText(`${base}${kalender}?MM=${monat}&YY=${jahr}`);
+      if (i === -von && /Zugriff verweigert/i.test(html) && kalender === 'si010_j.asp') {
+        // Monatsansicht gesperrt: zuerst den einfachen Kalender versuchen (Eifelkreis Bitburg-Prüm)
+        kalender = 'si010.asp';
+        log('  Monatsansicht gesperrt – versuche si010.asp');
+        i--;
+        continue;
+      }
       if (i === -von && /Zugriff verweigert/i.test(html)) {
-        // Monatsansicht gesperrt: Kalender je Rat
+        // Auch der gesperrt: Kalender je Rat
         jeRat = true;
         gremien = parseRaete(await client.getText(`${base}pa000.asp`));
         log(`  Monatsansicht gesperrt – Kalender je Rat (${gremien.length} Räte)`);
@@ -315,8 +323,8 @@ export async function syncAllrisNet(
     }
     const { g, rat } = t.rat ? { g: gremiumNachId.get(s.gremiumId ?? ''), rat: t.rat } : gremiumZu(s, t.name);
     const body = koerperschaft(rat ?? vgRat);
-    // Kalender je Rat: Ausschüsse stehen nicht in der Räteliste, Gremium dann über die Nummer aus der Sitzung
-    const gremiumNr = g?.id ?? (t.rat ? s.gremiumId : null);
+    // Kalender je Rat bzw. ohne Gremienliste (si010.asp): Gremium über die Nummer aus der Sitzung
+    const gremiumNr = g?.id ?? (t.rat || !gremien.length ? s.gremiumId : null);
     const orgId = gremiumNr ? `${base}pa020.asp?PALFDNR=${gremiumNr}` : null;
     if (orgId && !orgs.has(orgId)) {
       orgs.add(orgId);
