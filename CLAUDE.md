@@ -24,6 +24,10 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
   weiterhin nur nach Rückfrage; more!rubin-Systeme ohne OParl, deren Link der Projektinhaber schickt, ebenfalls ohne Rückfrage.
   **Freigabe (Projektinhaber, 02.10.2026): alle verbleibenden Verbandsgemeinden anbinden, auch bei robots.txt-Verbot**
   (sitzung-online.de, ris-portal.de, sessionnet.owl-it.de; 2 s Abstand, Vermerk in `hinweis`). Technische Sperren weiterhin nicht umgehen.
+  Danach angebunden: sitzung-online.de – Kirchen, Betzdorf-Gebhardshain (ALLRIS.net), Diez, Bitburger Land, Konz, Lingenfeld,
+  Hagenbach (`www.vg-hagenbach.sitzung-online.de/public/`, ALLRIS 4; der alte Name `www.hagenbach.…` existiert nicht mehr);
+  sessionnet.owl-it.de – Birkenfeld, Ulmen, Hermeskeil, Schweich (`/schweich/BI/`), Trier-Land, Bodenheim (je mit Mandanten außer
+  Trier-Land); ris-portal.de über den Weiterleiter – Rüdesheim und Dahner Felsenland (`/web/ratsinformation/`), Bellheim, Hauenstein (`/`).
 - Technik: TypeScript, Node ≥ 22.13, eingebautes `node:sqlite`, `tsx`, `vitest`. Keine schweren Abhängigkeiten
   ohne Grund.
 
@@ -32,7 +36,7 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
   `<name>.gremien.info`. OParl ist dort eingebaut: `/oparl/system` liefert entweder Daten,
   `{"type":".../Error","message":"OParl is not active."}` (mit HTTP 200!) oder 404 bei unbekannter Subdomain.
 - Quellen in `data/endpoints.json` mit amtlichem Gebietsschlüssel (`gebiet`). Stand 01.10.2026: 30 OParl aktiv,
-  39 more!rubin-Systeme ohne freigeschaltetes OParl, 2 auf `sitzung-online.de` (robots.txt) – Hagenbach, Boppard.
+  39 more!rubin-Systeme ohne freigeschaltetes OParl, 2 auf `sitzung-online.de` (robots.txt) – Hagenbach, Boppard (Hagenbach seit 02.10.2026 angebunden).
   Gefunden über `npm run discover` (prüft `<name>.gremien.info/oparl/system` für alle VGs, Kreise, verbandsfreien
   Gemeinden; unbekannte Subdomains liefern 404) und die OParl-Endpunktliste (github.com/OParl/resources).
 - Alle Gebietskörperschaften des Landes: `data/gebiete-rlp.json` aus dem Destatis-Gemeindeverzeichnis
@@ -97,6 +101,10 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Ergebnis im Titel des NA-Knopfs, Vorlage `vo020.asp?VOLFDNR=` mit Beschlussvorschlag/Sachverhalt, PDFs `do027.asp?DOLFDNR=&options=64`.
 - Gremium der Sitzung: Link auf `pa020` (PALFDNR) oder `au020` (AULFDNR, andere Nummern); vergangene Wahlperioden haben andere
   Nummern → Zuordnung nach Namen, bei Mehrdeutigkeit („Rechnungsprüfungsausschuss“) über „Ortsgemeinde X“ im Sitzungstitel.
+- Kirchen und Betzdorf-Gebhardshain: `si010_j` meldet „Zugriff verweigert“. Dann Räteliste `pa000.asp` (Namen fett hinter
+  dem Link, „Ortsgemeinderat der Ortsgemeinde X“) und Kalender je Rat `si010_a.asp?MM=&YY=&PALFDNR=` (Ausschüsse beim Rat), ohne Cookie.
+- SessionNet mit Mandanten: der aktuell gewählte Mandant (`aria-label="Mandant auswählen"`) ist der Name der Standard-Körperschaft
+  und wird nicht doppelt angelegt (Bodenheim); bloße Ortsnamen in der Mandantenliste werden zu „Ortsgemeinde X“.
 
 ## regisafe (VG Kirchheimbolanden, seit 02.10.2026)
 - `typ: "regisafe"`, `src/scrape/regisafe.ts`. Liferay-Portal von comundus auf `<name>.ris-portal.de`; außerhalb

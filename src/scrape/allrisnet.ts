@@ -98,7 +98,8 @@ export function parseGremien(html: string): AllrisNetGremium[] {
 /** Räte aus der Auswahlseite pa000.asp (Links auf den Kalender je Rat). */
 export function parseRaete(html: string): AllrisNetGremium[] {
   const out: AllrisNetGremium[] = [];
-  for (const m of html.matchAll(/si010_a\.asp\?[^"]*PALFDNR=(\d+)"[^>]*>(?:<b>)?([^<]+)/g)) {
+  // Namen stehen fett hinter dem Link (je nach Aufruf auf si010_a.asp oder nur „?PALFDNR=…“)
+  for (const m of html.matchAll(/PALFDNR=(\d+)"[^>]*><b>([^<]+)/g)) {
     if (!out.some((g) => g.id === m[1])) out.push({ id: m[1]!, name: text(m[2]), rat: m[1]! });
   }
   return out;

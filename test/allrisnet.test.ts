@@ -63,6 +63,9 @@ describe('ALLRIS.net mit Kalender je Rat (VG Kirchen)', () => {
     expect(raete[0]).toEqual({ id: '1', name: 'Verbandsgemeinderat der Verbandsgemeinde Kirchen (Sieg)', rat: '1' });
     expect(raete.map((r) => koerperschaftsName(r.name))).toContain('Stadt Kirchen (Sieg)');
     expect(koerperschaftsName('Ortsgemeinderat der Ortsgemeinde Brachbach')).toBe('Ortsgemeinde Brachbach');
+    const betzdorf = parseRaete(readFileSync(new URL('./fixtures/allrisnet/betzdorf-pa000.html', import.meta.url), 'latin1'));
+    expect(betzdorf).toHaveLength(18);
+    expect(betzdorf[0]!.name).toBe('Verbandsgemeinderat der Verbandsgemeinde Betzdorf-Gebhardshain');
     expect(koerperschaftsName('Verbandsgemeinderat der Verbandsgemeinde Kirchen (Sieg)')).toBe('Verbandsgemeinde Kirchen (Sieg)');
   });
 });

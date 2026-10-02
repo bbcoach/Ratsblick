@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
+<head>
+	<link rel="stylesheet" href="conf/styles/defaults/styles.css" />
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<title>Räte</title>
+	<meta name="description" content="ALLRIS net Version 3.9.5 (221117m)" />
+	<meta name="language" content="de" />
+	<meta name="keywords" content="Ratsinformationssystem, Ratsinfo, Sitzungsdienst, ALLRIS" />
+	<meta name="classification" content="Government" />
+	<meta name="rating" content="Safe For Kids" />
+	<link rel="shortcut icon" type="image/x-icon" href="images/ALLRIS.ico" />
+	<link rel="stylesheet" href="conf/_styles.css" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+<script type="text/javascript" src="1ddaccordion.js"></script>
+<script type="text/javascript">
+ddaccordion.init({ 
+	headerclass: "expandable",
+	contentclass: "categoryitems", 
+	revealtype: "clickgo", 
+	mouseoverdelay: 10, 
+	collapseprev: true, 
+	defaultexpanded: [0],
+	onemustopen: false, 
+	animatedefault: false,
+	persiststate: true, 
+	toggleclass: ["", "openheader"], 
+	togglehtml: ["prefix", "", ""],
+	animatespeed: "fast", 
+	oninit:function(headers, expandedindices){ 
+	},
+	onopenclose:function(header, index, state, isuseractivated){ 
+	}
+})
+ddaccordion.init({ 
+	headerclass: "subexpandable", 
+	contentclass: "subcategoryitems",
+	revealtype: "clickgo", 
+	mouseoverdelay: 20, 
+	collapseprev: true, 
+	defaultexpanded: [], 
+	onemustopen: false, 
+	animatedefault: false, 
+	persiststate: true, 
+	toggleclass: ["opensubheader", "closedsubheader"], 
+	togglehtml: ["none", "", ""], 
+	animatespeed: "fast", 
+	oninit:function(headers, expandedindices){ 
+	},
+	onopenclose:function(header, index, state, isuseractivated){ 
+	}
+})
+</script>	<link rel="stylesheet" href="conf/opt/alert/_styles.css" />
+	<script type="text/javascript" src="opt/scripting/alert.js"></script>
+	<meta name="infoID" content="2049.3950002.0" />
+</head><body>
+<div id="allriscontainer" class="pa000">
+<div id="wrap"><div id="risleft"><div id="rislogo"></div>
+<div id="risvari"><p class="topLeft"><a class="topLeft" href="http://www.vg-bg.de" target="_blank" title="ALLRIS&reg;net - derzeit 18 Besucher">www.vg-bg.de</a></p></div>
+<div id="riswrap"><div id="rismenu">
+
+<div class="arrowlistmenu">
+
+
+<h3 class="menuheader"><a href="home.asp">Startseite</a></h3>
+
+
+<h3 class="menuheader expandable"><a href="1start_vgbg.asp">VG Betzdorf-Gebhardshain</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_vgbg.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=21">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=21&amp;SORTVON=1&amp;SORTBIS=14">Ausschüsse</a></li>
+	<li><a href="1sonstige_vg.asp">Sonstige Gremien</a></li>
+	<li><a href="fr010.asp?SELECT=1&amp;PALFDNR=21">Fraktionen</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_vgbg.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=21">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=197">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=21">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=197">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_alsdorf.asp">Ortsgemeinde Alsdorf</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_alsdorf.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=4">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=4">Ausschüsse</a></li>
+	<li><a href="fr010.asp?SELECT=1&amp;PALFDNR=4">Fraktionen</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_alsdorf.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=4">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=4">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=4">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=4">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_betzdorf.asp">Stadt Betzdorf</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_betzdorf.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=2">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=2&amp;SORTVON=61&amp;SORTBIS=68">Ausschüsse</a></li>
+	<li><a href="au020.asp?T1=Ortsbeirat&amp;AU=Ortsbeirat&amp;AULFDNR=12">Ortsbeirat Dauersberg</a></li>
+	<li><a href="1sonstige_stadt.asp">Sonstige Gremien</a></li>
+	<li><a href="fr010.asp?SELECT=1&amp;PALFDNR=2">Fraktionen</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_betzdorf.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=2">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=2">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=2">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=2">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_dickendorf.asp">Ortsgemeinde Dickendorf</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_dickendorf.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=9">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=9">Ausschüsse</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_dickendorf.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=9">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=178">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=9">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=178">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_elben.asp">Ortsgemeinde Elben</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_elben.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=10">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=10">Ausschuss</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_elben.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=10">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=181">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=10">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=181">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_elkenroth.asp">Ortsgemeinde Elkenroth</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_elkenroth.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=11">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=11">Ausschüsse</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_elkenroth.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=11">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=183">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=11">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=183">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_fensdorf.asp">Ortsgemeinde Fensdorf</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_fensdorf.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=12">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=12">Ausschuss</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_fensdorf.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=12">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=188">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=12">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=188">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_gebhardshain.asp">Ortsgemeinde Gebhardshain</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_gebhardshain.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=13">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=13">Ausschüsse</a></li>
+	<li><a href="fr010.asp?SELECT=1&amp;PALFDNR=13">Fraktionen</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_gebhardshain.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=13">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=189">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=13">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=189">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_gruenebach.asp">Ortsgemeinde Grünebach</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_gruenebach.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=3">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=3">Ausschüsse</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_gruenebach.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=3">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=3">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=3">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=3">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+
+<h3 class="menuheader expandable"><a href="1start_kausen.asp">Ortsgemeinde Kausen</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_kausen.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=14">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=14">Ausschüsse</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_kausen.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=14">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=190">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=14">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=190">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_malberg.asp">Ortsgemeinde Malberg</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_malberg.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=15">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=15">Ausschüsse</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_malberg.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=15">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=191">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=15">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=191">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_molzhain.asp">Ortsgemeinde Molzhain</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_molzhain.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=16">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=16">Ausschüsse</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_molzhain.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=16">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=192">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=16">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=192">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_nauroth.asp">Ortsgemeinde Nauroth</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_nauroth.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=17">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=17">Ausschüsse</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_nauroth.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=17">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=193">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=17">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=193">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_rosenheim.asp">Ortsgemeinde Rosenheim</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_rosenheim.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=18">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=18">Ausschuss</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_rosenheim.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=18">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=194">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=18">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=194">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_scheuerfeld.asp">Ortsgemeinde Scheuerfeld</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_scheuerfeld.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=5">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=5">Ausschüsse</a></li>
+	<li><a href="fr010.asp?SELECT=1&amp;PALFDNR=5">Fraktionen</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_scheuerfeld.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=5">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=7">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=5">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=7">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+
+<h3 class="menuheader expandable"><a href="1start_steinebach.asp">Ortsgemeinde Steinebach</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_steinebach.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=19">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=19">Ausschüsse</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_steinebach.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=19">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=195">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=19">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=195">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_steineroth.asp">Ortsgemeinde Steineroth</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_steineroth.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=20">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=20">Ausschüsse</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_steineroth.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=20">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=196">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=20">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=196">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader expandable"><a href="1start_wallmenroth.asp">Ortsgemeinde Wallmenroth</a></h3>
+<ul class="categoryitems">
+<li><a href="1gremien_wallmenroth.asp" class="subexpandable">Gremien</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="pa020.asp?PALFDNR=6">Rat</a></li>
+	<li><a href="au010.asp?T1=Aussch%FCsse&amp;AU=Ausschuss&amp;PALFDNR=6">Ausschüsse</a></li>
+	<li><a href="fr010.asp?SELECT=1&amp;PALFDNR=6">Fraktionen</a></li>
+	</ul>
+</li>
+<li><a href="1sitzungsdienst_wallmenroth.asp" class="subexpandable">Sitzungsdienst</a>
+	<ul class="subcategoryitems" style="margin-left: 15px">
+	<li><a href="si010_a.asp?PALFDNR=6">Ratskalender</a></li>
+	<li><a href="si018.asp?GRA=8">Sitzungsübersicht</a></li>
+	<li><a href="vo040.asp?PALFDNRM=6">Sitzungsunterlagen</a></li>
+	<li><a href="si016.asp?GRA=8">Niederschriften</a></li>
+	</ul>
+</li>
+</ul>
+
+<h3 class="menuheader" style="cursor: default"><a href="1start_allgemeines.asp">Allgemeine Recherche</a></h3>
+<ul style="margin-left: 15px">
+<li><a href="si018.asp">Sitzungsübersichten</a></li>
+<li><a href="yw040.asp">Textrecherche</a></li>
+<li><a href="1kontakt.asp">Kontakt</a></li>
+<li><a href="1impressum.asp">Impressum</a></li>
+
+</ul>
+
+</div>
+
+
+</div></div>
+</div>
+<div id="risright"><div id="rishead"></div>
+<div id="risnavi"></div>
+<div id="risname"><h1>Räte - Auswahl&nbsp;&nbsp;</h1></div>
+<div id="risprop"></div>
+<div id="rismain"><div id="posOuterLocator"></div><table align="center" border="1" cellspacing="0" cellpadding="8">
+	<tr>
+		<td align="center" class="titlebar">Räte - Auswahl</td>
+	</tr>
+	<tr>
+		<td>
+			<table cellspacing="0" cellpadding="5" border="0">
+				<tr>
+					<td class="text8" colspan="5">Bitte aus der folgenden Liste Räte auswählen:</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=21"><b>Verbandsgemeinderat der Verbandsgemeinde Betzdorf-Gebhardshain</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=4"><b>Ortsgemeinderat der Ortsgemeinde Alsdorf</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=2"><b>Stadtrat der Stadt Betzdorf</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=3"><b>Ortsgemeinderat der Ortsgemeinde Grünebach</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=5"><b>Ortsgemeinderat der Ortsgemeinde Scheuerfeld</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=6"><b>Ortsgemeinderat der Ortsgemeinde Wallmenroth</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=9"><b>Ortsgemeinderat der Ortsgemeinde Dickendorf</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=10"><b>Ortsgemeinderat der Ortsgemeinde Elben</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=11"><b>Ortsgemeinderat der Ortsgemeinde Elkenroth</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=12"><b>Ortsgemeinderat der Ortsgemeinde Fensdorf</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=13"><b>Ortsgemeinderat der Ortsgemeinde Gebhardshain</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=14"><b>Ortsgemeinderat der Ortsgemeinde Kausen</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=15"><b>Ortsgemeinderat der Ortsgemeinde Malberg</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=16"><b>Ortsgemeinderat der Ortsgemeinde Molzhain</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=17"><b>Ortsgemeinderat der Ortsgemeinde Nauroth</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=18"><b>Ortsgemeinderat der Ortsgemeinde Rosenheim</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=19"><b>Ortsgemeinderat der Ortsgemeinde Steinebach</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td  colspan="3"><a href="?PALFDNR=20"><b>Ortsgemeinderat der Ortsgemeinde Steineroth</b></a></td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td colspan="5"><img src="images/einpix.gif" alt="" width="500" height="1"  /></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+<br  /><br  /><br  />
+</div>
+<div id="risfoot"></div>
+</div>
+</div>
+</div>
+</body>
+</html>
