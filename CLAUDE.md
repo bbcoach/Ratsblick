@@ -117,7 +117,11 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Vorlage samt Drucksachennummer und Dokumenten; TOP-Status 1 = öffentlich, 2 = nicht öffentlich).
   PDF-Links = `documentUrl` ohne `json=1`. Erster Lauf: 38 Körperschaften, 55 Sitzungen, 124 Vorlagen in 63 s.
   Ebenso freigegeben (Nutzer, 01.10.2026): Donnersbergkreis; (02.10.2026): Rhein-Pfalz-Kreis, Südwestpfalz, Alzey-Worms, VG Lambrecht (VG, Stadt und 6 Ortsgemeinden), VG Deidesheim, VG Leiningerland (enthält auch die
-  Vorgänger-VGs Grünstadt-Land und Hettenleidelheim ohne Sitzungen), VG Simmern-Rheinböllen (`simmern.gremien.info`, 56 Körperschaften). Weitere more!rubin-Systeme ohne OParl nur nach
+  Vorgänger-VGs Grünstadt-Land und Hettenleidelheim ohne Sitzungen), VG Simmern-Rheinböllen (`simmern.gremien.info`, 56 Körperschaften).
+  Auf Wunsch „alle verbleibenden VGs anbinden“ (Nutzer, 02.10.2026) zusätzlich alle 24 bisher inaktiven more!rubin-VGs
+  (Adenau, Altenahr, Brohltal, Bad Kreuznach, Kirner Land, Herrstein-Rhaunen, Kaisersesch, Zell, Bad Hönningen, Linz, Puderbach,
+  Kastellaun, Bad Marienberg, Monsheim, Göllheim, Kandel, Rülzheim, Bruchmühlbach-Miesau, Weilerbach, Edenkoben, Landau-Land,
+  Dannstadt-Schauernheim, Nieder-Olm, Rodalben). Weitere more!rubin-Systeme ohne OParl nur nach
   Rücksprache freischalten.
 - Subdomains folgen teils alten VG-Namen (Rockenhausen = VG Nordpfälzer Land, Lauterecken = VG Lauterecken-Wolfstein mit
   OParl aktiv; `vgloreley` = VG Loreley, OParl aktiv, aber ohne Vorlagen – auch die interne Schnittstelle liefert keine) – `discover` findet die nicht. Links stehen meist auf der VG-Website unter „Bürgerinformation“.
