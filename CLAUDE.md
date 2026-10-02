@@ -96,6 +96,8 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - Kreis Mayen-Koblenz: SessionNet PHP auf `ris.kvmyk.de/bi/` (keine robots.txt; die Kreis-Website bettet es nur ein).
 - Stadt Landau: SessionNet ASP auf `info.landau.de/0001_bi/` (keine robots.txt, außerhalb Europas 403 → Weiterleiter). Sitzungen
   ohne freigegebene Tagesordnung leiten von `si0057` auf `si0050` um (HTTP 302) – sie bleiben als Kalendertermin.
+- VG Baumholder (Link vom Projektinhaber, 02.10.2026): Website `vgv-baumholder.de` zeigt Sitzungstermine über ein eingebautes RIS-Modul,
+  Daten kommen aus `vgv-baumholder.gremien.info` (more!rubin, OParl aktiv, 17 Körperschaften, kaum Tagesordnungen) → OParl-Quelle.
 - Unklar: Birkenfeld (kein RIS-Link gefunden). Mainz-Bingen: `www.landkreis-mainz-bingen.sitzung-online.de/bi/` (seit 02.10.2026).
 - Trier (ALLRIS 4, `typ: "allris"`, `src/scrape/allris.ts`, seit 02.10.2026): Kalender `si010?MM=&YY=` lädt die
   Tabelle per Wicket-Ajax (`si010?0-1.0-&MM=…`) mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch,
