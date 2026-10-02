@@ -37,5 +37,6 @@ describe('Kalenderexport (iCalendar)', () => {
     expect(z.ort('Gemeinderat Nanzdietschweiler/Niedermohr')).toBe('Niedermohr');
     expect(z.name('Ramstein-Miesenbach')).toBe('Stadt Ramstein-Miesenbach');
     expect(z.name('Niedermohr')).toBe('Ortsgemeinde Niedermohr');
+    expect(orteAusTiteln(['Ortsgemeinderat Berod b. W.']).ort('Rechnungsprüfungsausschuss Berod b. W.')).toBe('Berod b. W.');
   });
 });

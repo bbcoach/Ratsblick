@@ -86,6 +86,17 @@ export interface RubinSitzung extends RubinKalenderSitzung {
 }
 
 // ---------- Hilfen ----------
+/**
+ * Körperschaftsnamen vereinheitlichen, damit sie zum Gemeindeverzeichnis passen:
+ * „Ortsgemeinde Kirrweiler c/o Verbandsgemeinde Maikammer“ → „Ortsgemeinde Kirrweiler“,
+ * „Verbandsgemeinde Maxdorf für OG Birkenheide“ → „Ortsgemeinde Birkenheide“.
+ */
+export function koerperschaftsName(name: string): string {
+  const fuer = /^Verbandsgemeinde\s.+?\sfür\s+(?:OG|Ortsgemeinde)\s+(.+)$/.exec(name.trim());
+  if (fuer) return `Ortsgemeinde ${fuer[1]!.trim()}`;
+  return name.replace(/\s+c\/o\s+.*$/i, '').trim();
+}
+
 const zeit = (t: string | null | undefined) => (t && t !== '00:00:00' ? t.slice(0, 5) : null);
 
 export function ort(r: RubinRaum | null | undefined): string | null {
@@ -133,7 +144,7 @@ export async function syncRubinApi(
   const bodies = await client.get<RubinBody[]>(`${api}?id=organizations&action=bodies`);
   const bodyId = (kuerzel: string) => `${base}#koerperschaft-${kuerzel}`;
   for (const b of bodies) {
-    tx(db, () => upsertBody(db, source.id, { id: bodyId(b.id), name: b.name, shortName: b.id } as never));
+    tx(db, () => upsertBody(db, source.id, { id: bodyId(b.id), name: koerperschaftsName(b.name), shortName: b.id } as never));
     stats.bodies++;
   }
   log(`  Körperschaften: ${bodies.length}`);

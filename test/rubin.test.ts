@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { openDb } from '../src/db/index.js';
 import { OParlClient } from '../src/oparl/client.js';
-import { syncRubinApi } from '../src/scrape/rubin.js';
+import { syncRubinApi, koerperschaftsName } from '../src/scrape/rubin.js';
 
 const json = (f: string) => readFileSync(new URL(`./fixtures/rubin/${f}`, import.meta.url), 'utf8');
 const BASE = 'https://rockenhausen.gremien.info/';
@@ -52,5 +52,11 @@ describe('more!rubin-Schnittstelle (echte Antworten aus Rockenhausen)', () => {
       .get(`${BASE}submission?id=202620109100436`) as { access_url: string };
     expect(f.access_url).toMatch(/^https:\/\/rockenhausen\.gremien\.info\/api\.php\?document_type_id=4&/);
     expect(f.access_url).not.toMatch(/json=1/);
+  });
+
+  it('vereinheitlicht Körperschaftsnamen (Maikammer, Maxdorf)', () => {
+    expect(koerperschaftsName('Ortsgemeinde Kirrweiler c/o Verbandsgemeinde Maikammer')).toBe('Ortsgemeinde Kirrweiler');
+    expect(koerperschaftsName('Verbandsgemeinde Maxdorf für OG Birkenheide')).toBe('Ortsgemeinde Birkenheide');
+    expect(koerperschaftsName('Verbandsgemeinde Maxdorf')).toBe('Verbandsgemeinde Maxdorf');
   });
 });

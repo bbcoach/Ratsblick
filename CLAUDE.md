@@ -74,6 +74,8 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - VG Ramstein-Miesenbach: ebenfalls SD.NET RIM hinter rescaled WAF (robots.txt sperrt nur PDFs, OParl nicht aktiviert) →
   `typ: "ics"` mit `"mandanten": true`: Kalenderexport `/termine/ics/vg` enthält alle Gremien (180 Termine); Körperschaft aus
   dem Gremiumsnamen („Gemeinderat X“, „… Stadt X“, „… VG …“ → VG). Ohne Tagesordnungen.
+- VG Wallmerod: SD.NET RIM wie Ramstein-Miesenbach (`wallmerod.ratsinfomanagement.net/termine/ics/vg`, Gremien „Ortsgemeinderat X“).
+  `birkenfeld.ratsinfomanagement.net` zeigt nur „Gemeinderat“ ohne Ort – Zuordnung unklar, nicht angebunden.
 - Zweibrücken läuft auf `sessionnet.owl-it.de` (robots.txt); Cochem-Zell ebenfalls, seit 02.10.2026 trotzdem angebunden (s. o.). Südwestpfalz und Rhein-Pfalz-Kreis:
   more!rubin ohne OParl, laufen seit 02.10.2026 über `rubin-api`. Worms: `worms.gremien.info` ohne OParl.
 - Kreis Mayen-Koblenz: SessionNet PHP auf `ris.kvmyk.de/bi/` (keine robots.txt; die Kreis-Website bettet es nur ein).
@@ -121,7 +123,12 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Auf Wunsch „alle verbleibenden VGs anbinden“ (Nutzer, 02.10.2026) zusätzlich alle 24 bisher inaktiven more!rubin-VGs
   (Adenau, Altenahr, Brohltal, Bad Kreuznach, Kirner Land, Herrstein-Rhaunen, Kaisersesch, Zell, Bad Hönningen, Linz, Puderbach,
   Kastellaun, Bad Marienberg, Monsheim, Göllheim, Kandel, Rülzheim, Bruchmühlbach-Miesau, Weilerbach, Edenkoben, Landau-Land,
-  Dannstadt-Schauernheim, Nieder-Olm, Rodalben). Weitere more!rubin-Systeme ohne OParl nur nach
+  Dannstadt-Schauernheim, Nieder-Olm, Rodalben).
+  Dazu per Suche gefunden (gremien.info unter anderen Namen): OParl aktiv bei Nahe-Glan (`vg-nahe-glan`), Langenlonsheim-Stromberg
+  (`langenlonsheim`), Cochem (`vgcochem`), Nastätten (`vgnastaetten`), Eich (`vgeich`), Otterbach-Otterberg (`otterbach`);
+  rubin-api bei Bad Breisig (`badbreisig`), Aar-Einrich, Arzfeld, Saarburg-Kell (`saarburg`), Wörrstadt (`vgwoerrstadt`),
+  Maikammer, Maxdorf. Namen wie „Ortsgemeinde X c/o Verbandsgemeinde …“ und „Verbandsgemeinde … für OG X“ werden in
+  `koerperschaftsName` (rubin.ts) vereinheitlicht. `altenkirchen.gremien.info` ist der Kreis, nicht die VG. Weitere more!rubin-Systeme ohne OParl nur nach
   Rücksprache freischalten.
 - Subdomains folgen teils alten VG-Namen (Rockenhausen = VG Nordpfälzer Land, Lauterecken = VG Lauterecken-Wolfstein mit
   OParl aktiv; `vgloreley` = VG Loreley, OParl aktiv, aber ohne Vorlagen – auch die interne Schnittstelle liefert keine) – `discover` findet die nicht. Links stehen meist auf der VG-Website unter „Bürgerinformation“.
