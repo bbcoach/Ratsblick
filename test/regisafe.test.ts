@@ -44,3 +44,13 @@ describe('regisafe (Kirchheimbolanden)', () => {
     expect(vorlagenNummer(s.tops[1]!.dokumente[0]!)).toBe('2026/0029');
   });
 });
+
+describe('regisafe: Ort vor dem Gremium (VG Hauenstein)', () => {
+  it('ordnet „Spirkelbach Ortsgemeinderat“ und „Spirkelbach Kultur- und Sportausschuss“ der Ortsgemeinde zu', () => {
+    const html = ['Verbandsgemeinderat Hauenstein', 'VG Werksausschuss', 'Spirkelbach Ortsgemeinderat', 'Spirkelbach Kultur- und Sportausschuss', 'Hauenstein Ortsgemeinderat', 'Hauenstein Hauptausschuss']
+      .map((n, i) => `<label for="_RisSitzung_Gremium_${i}">${n}</label>`)
+      .join('');
+    expect(parseGremien(html).map((g) => g.ort)).toEqual([null, null, 'Spirkelbach', 'Spirkelbach', 'Hauenstein', 'Hauenstein']);
+  });
+});
+

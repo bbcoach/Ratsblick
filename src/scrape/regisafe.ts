@@ -62,7 +62,7 @@ export interface RegisafeSitzung {
 const ohneZeitraum = (n: string) => n.replace(/\s+bis\s+\d{2}\/\d{4}\s*$/, '').replace(/\s+/g, ' ').trim();
 
 /**
- * Gremien aus der Filterliste. Ort = Gemeinde, auf deren Namen der Gremiumsname endet; Gremien mit „Verbandsgemeinde“
+ * Gremien aus der Filterliste. Ort = Gemeinde, auf deren Namen der Gremiumsname endet (oder mit dem er beginnt); Gremien mit „Verbandsgemeinde“
  * gehören zur VG; Gremien ohne Ortsangabe gehören zur Körperschaft des vorangehenden Eintrags (Liste ist gruppiert).
  */
 export function parseGremien(html: string): RegisafeGremium[] {
@@ -70,13 +70,15 @@ export function parseGremien(html: string): RegisafeGremium[] {
     id: m[1]!,
     name: ohneZeitraum(text(m[2])),
   }));
-  const orte = [...new Set(roh.map((g) => /^(?:Gemeinderat|Stadtrat)\s+(.+)$/.exec(g.name)?.[1]).filter((o): o is string => !!o))]
-    .sort((a, b) => b.length - a.length);
+  // Ort hinter („Gemeinderat Albisheim“) oder vor dem Rat („Spirkelbach Ortsgemeinderat“, VG Hauenstein)
+  const ortVon = (n: string) =>
+    /^(?:Ortsgemeinderat|Gemeinderat|Stadtrat)\s+(.+)$/.exec(n)?.[1] ?? /^(?!VG\s)(.+?)\s+(?:Ortsgemeinderat|Gemeinderat|Stadtrat)$/.exec(n)?.[1];
+  const orte = [...new Set(roh.map((g) => ortVon(g.name)).filter((o): o is string => !!o))].sort((a, b) => b.length - a.length);
   let zuletzt: string | null = null;
   return roh.map((g) => {
     let ort: string | null;
-    if (/verbandsgemeinde/i.test(g.name)) ort = null;
-    else ort = orte.find((o) => g.name === o || g.name.endsWith(` ${o}`)) ?? zuletzt;
+    if (/verbandsgemeinde|^VG\s/i.test(g.name)) ort = null;
+    else ort = orte.find((o) => g.name === o || g.name.endsWith(` ${o}`) || g.name.startsWith(`${o} `)) ?? zuletzt;
     zuletzt = ort;
     return { ...g, ort };
   });
@@ -175,7 +177,7 @@ export async function syncRegisafe(
 
   // 1. Gremien und Körperschaften
   const gremien = parseGremien(await client.getText(`${portal}sitzungen`));
-  const stadtorte = new Set(gremien.filter((g) => g.name.startsWith('Stadtrat ')).map((g) => g.ort));
+  const stadtorte = new Set(gremien.filter((g) => /^Stadtrat\s|\sStadtrat$/.test(g.name)).map((g) => g.ort));
   const vgName = source.name.replace(/^VG /, 'Verbandsgemeinde ');
   const bodyVon = (ort: string | null) => (ort ? `${base}#koerperschaft-${encodeURIComponent(ort)}` : `${base}#koerperschaft`);
   const angelegt = new Set<string>();

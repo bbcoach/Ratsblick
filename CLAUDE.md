@@ -27,7 +27,7 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
   Danach angebunden: sitzung-online.de – Kirchen, Betzdorf-Gebhardshain (ALLRIS.net), Diez, Bitburger Land, Konz, Lingenfeld,
   Hagenbach (`www.vg-hagenbach.sitzung-online.de/public/`, ALLRIS 4; der alte Name `www.hagenbach.…` existiert nicht mehr);
   sessionnet.owl-it.de – Birkenfeld, Ulmen, Hermeskeil, Schweich (`/schweich/BI/`), Trier-Land, Bodenheim (je mit Mandanten außer
-  Trier-Land); ris-portal.de über den Weiterleiter – Rüdesheim und Dahner Felsenland (`/web/ratsinformation/`), Bellheim, Hauenstein (`/`).
+  Trier-Land), danach per Suche Maifeld, Rhein-Mosel, Ruwer, Freinsheim; ris-portal.de über den Weiterleiter – Rüdesheim und Dahner Felsenland (`/web/ratsinformation/`), Bellheim, Hauenstein (`/`).
 - Technik: TypeScript, Node ≥ 22.13, eingebautes `node:sqlite`, `tsx`, `vitest`. Keine schweren Abhängigkeiten
   ohne Grund.
 
@@ -110,7 +110,7 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - `typ: "regisafe"`, `src/scrape/regisafe.ts`. Liferay-Portal von comundus auf `<name>.ris-portal.de`; außerhalb
   Europas HTTP 403 → Weiterleiter. Alles ohne Anmeldung:
   Gremien aus der Filterliste von `/sitzungen` (nach Körperschaft gruppiert; Ort = Endung des Gremiumsnamens, „Verbandsgemeinde“
-  → VG, ohne Ort → Gruppe davor), Kalender als JSON (`…&_RisSitzung_resource=loadSessions&_RisSitzung_year=&_RisSitzung_month=`,
+  → VG, ohne Ort → Gruppe davor; in Hauenstein steht der Ort vorn: „Spirkelbach Ortsgemeinderat“, „VG …“), Kalender als JSON (`…&_RisSitzung_resource=loadSessions&_RisSitzung_year=&_RisSitzung_month=`,
   Monat ab 0), Sitzung `web/guest/sitzungen?sitzungId=` mit TOPs und Dokumenten (`singleDocument&_RisSitzung_schriftgutId=`, PDF).
 - Portalpfad aus der Quell-URL: Kirchheimbolanden unter `/` (Sitzung `web/guest/sitzungen?sitzungId=`), Bernkastel-Kues unter
   `/web/ratsinformation/` (Liste, Kalender und Sitzung dort). Bernkastel-Kues: 24 Körperschaften, 87 Sitzungen, 247 Vorlagen.
