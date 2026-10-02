@@ -109,6 +109,8 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   dem Link, „Ortsgemeinderat der Ortsgemeinde X“) und Kalender je Rat `si010_a.asp?MM=&YY=&PALFDNR=` (Ausschüsse beim Rat), ohne Cookie.
 - SessionNet mit Mandanten: der aktuell gewählte Mandant (`aria-label="Mandant auswählen"`) ist der Name der Standard-Körperschaft
   und wird nicht doppelt angelegt (Bodenheim); bloße Ortsnamen in der Mandantenliste werden zu „Ortsgemeinde X“.
+  Ohne Vorauswahl (VG Gerolstein, `session.gerolstein.de/bi/`: Menü zeigt „Mandant wechseln“, Kalender ohne `__cpanr` leer) wird die
+  Standard-Körperschaft über den gleichnamigen Mandanten gelesen (Gerolstein: 50 Mandanten, VG + 2 Städte + 36 Ortsgemeinden).
 
 ## regisafe (VG Kirchheimbolanden, seit 02.10.2026)
 - `typ: "regisafe"`, `src/scrape/regisafe.ts`. Liferay-Portal von comundus auf `<name>.ris-portal.de`; außerhalb

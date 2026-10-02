@@ -111,7 +111,7 @@ export function mandantName(name: string): string {
     .trim();
   // Bloße Ortsnamen (Schweich: „Bekond“, „Detzem“) sind Ortsgemeinden; Verbände, Räte u. Ä. bleiben, wie sie sind
   // („Kallstadt“ ist ein Ort, „Stadt Kusel“ nicht; Ortsnamen mit Zusatz wie „Bobenheim am Berg“ zählen mit)
-  const keinOrt = /gemeinde\b|\bstadt\b|verband|zweck|rat\b|anstalt|\ba[öo]r\b|forst|kita|kinder|schul|werk|personal|\.\.\./i.test(n);
+  const keinOrt = /gemeinde\b|\bstadt\b|verband|zweck|rat\b|anstalt|\ba[öo]r\b|forst|kita|kinder|schul|werk|personal|meister|besprechung|dienst|\.\.\./i.test(n);
   const ortsform = /^\S+(?:\s+(?:am|an der|an|bei|im|in der|in|ob der|auf der|vor der)\s+\S+(?:\s\S+)?)?$/.test(n);
   if (!keinOrt && ortsform) {
     return `Ortsgemeinde ${n}`;
@@ -122,7 +122,9 @@ export function mandantName(name: string): string {
 /** Der gerade gewählte Mandant (Beschriftung des Filtermenüs), sofern angezeigt. */
 export function aktuellerMandant(html: string): string | null {
   const m = /aria-label="Mandant auswählen"[^>]*>([^<]+)</.exec(html);
-  return m ? text(m[1]) || null : null;
+  const name = m ? text(m[1]) : '';
+  // Ohne Vorauswahl steht dort nur die Beschriftung des Menüs (Gerolstein: „Mandant wechseln“)
+  return name && !/^mandant\b/i.test(name) ? name : null;
 }
 
 export function parseKalender(html: string, jahr: number, monat: number): KalenderEintrag[] {
@@ -276,8 +278,13 @@ export async function syncSessionNet(
 
   const koerper: Array<{ cpanr: string | null; id: string }> = [{ cpanr: null, id: bodyId }];
   if (source.mandanten) {
-    // Der gewählte Mandant steht teils auch in der Liste (Bodenheim) – er ist schon die Standard-Körperschaft
-    const liste = parseMandanten(info).filter((m) => !aktuell || m.name !== aktuell);
+    // Der gewählte Mandant steht teils auch in der Liste (Bodenheim) – er ist schon die Standard-Körperschaft.
+    // Ohne Vorauswahl (Gerolstein) zeigt der Kalender ohne __cpanr nichts: dann die Standard-Körperschaft über
+    // den gleichnamigen Mandanten lesen
+    const alleMandanten = parseMandanten(info);
+    const standard = aktuell ? null : alleMandanten.find((m) => mandantName(m.name) === bodyName);
+    if (standard) koerper[0]!.cpanr = standard.nr;
+    const liste = alleMandanten.filter((m) => (aktuell ? m.name !== aktuell : m !== standard));
     for (const m of liste) {
       const id = `${base}#mandant-${m.nr}`;
       tx(db, () => upsertBody(db, source.id, { id, name: mandantName(m.name), shortName: m.nr } as never));

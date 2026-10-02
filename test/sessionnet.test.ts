@@ -129,6 +129,11 @@ describe('SessionNet: PHP-Variante (echte Seiten aus Koblenz, SessionNet 5.4.7)'
     expect(mitVorlage.every((t) => /^\d+$/.test(t.vorlage!.kvonr))).toBe(true);
   });
 
+  it('erkennt fehlende Vorauswahl des Mandanten (Gerolstein: „Mandant wechseln“)', () => {
+    expect(aktuellerMandant(seite('gerolstein-si0040.html'))).toBeNull();
+    expect(parseMandanten(seite('gerolstein-si0040.html')).map((m) => m.name)).toContain('Verbandsgemeinde Gerolstein');
+  });
+
   it('liest Mandantenlinks mit weiteren Parametern (Trier-Land, Kalenderseite)', () => {
     const m = parseMandanten(seite('trierland-si0040.html'));
     expect(m).toContainEqual({ nr: '15', name: 'Aach' });
@@ -146,6 +151,7 @@ describe('SessionNet: PHP-Variante (echte Seiten aus Koblenz, SessionNet 5.4.7)'
     expect(mandantName('Verbandsgemeindeverwaltung Trier-Land (PV-Rat)')).toBe('Verbandsgemeindeverwaltung Trier-Land (PV-Rat)');
     expect(mandantName('Ortsgemeinde Bann')).toBe('Ortsgemeinde Bann');
     expect(mandantName('Kallstadt')).toBe('Ortsgemeinde Kallstadt');
+    expect(mandantName('Ortsbürgermeisterdienstbesprechung')).toBe('Ortsbürgermeisterdienstbesprechung');
     expect(mandantName('Bobenheim am Berg')).toBe('Ortsgemeinde Bobenheim am Berg');
     expect(mandantName('Forstverband Ganerben')).toBe('Forstverband Ganerben');
     expect(mandantName('Bekond')).toBe('Ortsgemeinde Bekond');
