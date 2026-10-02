@@ -218,6 +218,13 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
 - Darstellung (seit 02.10.2026, kein Umschaltknopf – Projektinhaber): nachts dunkel nach Tageszeit des Geräts (zwischen Ende und
   Beginn der bürgerlichen Dämmerung, berechnet für RLP, `nachtModus` im `<head>`, minütlich geprüft), tagsüber wie im Gerät eingestellt. Breite: Kopfzeile/Reiter über die ganze Breite, Inhaltsspalte `--w` 640/840/1120 px;
   ab 1180 px „Nächste Sitzungen“ und „Neue Vorlagen“ nebeneinander (`section.spalte`). Domain: wahlheimat-rlp.de (GitHub Pages).
+- Sitzverteilung (seit 02.10.2026, Idee des Projektinhabers): Kommunalwahl 2024 je Rat (Gemeinde-, Stadt-, VG-Rat, Kreistag) als
+  Halbkreis mit Liste (Sitze, ggü. 2019, Stimmenanteil) auf der Kommunenseite. Daten: `npm run sitze` (scripts/sitzverteilung.ts)
+  liest die statischen JSON-Dateien der Ergebnis-App des Landeswahlleiters (`rlp-kw24.wahlen.23degrees.eu/assets/`:
+  `wahlen-vec-tree.json` = Gebietsbaum, `json/wahlen/<WAHL>/<geoId>.json`; geoId = KKK VV GGG 00, Gemeinde-Schlüssel = 07+KKK+GGG,
+  VGs über ihre Gemeinden) → `data/sitze-2024.json` (im Repo, Rohdateien in `.cache/kw24/`). „PRESTART_ONE_LIST“ = Mehrheitswahl.
+  Wählergruppen haben 2024 neue IDs → kein Vergleich zu 2019 („–“); die Quelle kürzt Kurznamen auf 20 Zeichen → Langname.
+  Farben: übliche Parteifarben, Wählergruppen #2a9d8f/#a0522d/#6a5acd (mit dem dataviz-Validator geprüft), danach grau.
 - App-Dateien lädt der Service Worker zuerst aus dem Netz (Cache nur offline); neue Version kurz nach dem Start → automatisch neu laden.
 - Links ins Original-RIS (seit 02.10.2026): je Quelle `quelle.ris` (Startseite, `risStartseite`), je Sitzung/Vorlage `web`
   (`webSeite` in `src/export/snapshot.ts`: OParl-`web`, sonst Seitenadresse der Scraper; more!rubin-Sitzungen `/meeting?id=`

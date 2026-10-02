@@ -156,6 +156,9 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
   suche.sort((a, b) => String(b[2]).localeCompare(String(a[2])));
   writeFileSync(join(outDir, 'data', 'suche.json'), JSON.stringify({ erstellt: build, quellen: quellen.map((q) => q.id), eintraege: suche }));
 
+  // Sitzverteilung der Räte (Kommunalwahl 2024, scripts/sitzverteilung.ts) – lädt die App erst auf der Kommunenseite
+  if (existsSync('data/sitze-2024.json')) cpSync('data/sitze-2024.json', join(outDir, 'data', 'sitze.json'));
+
   const mitDaten = gebiete.gemeinden.filter((g) => daten[g.id] || (g.vg && daten[g.vg])).length;
   return { quellen: quellen.length, gebiete: Object.keys(daten).length, gemeindenMitDaten: mitDaten, gemeinden: gebiete.gemeinden.length };
 }

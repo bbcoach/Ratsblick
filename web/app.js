@@ -394,7 +394,8 @@
     const kopf = `<section class="hero"><div class="favkopf"><h3>${esc(anzeigeName(t))}</h3>${sternKnopf({ typ: 'gebiet', id: t.id })}</div><p class="muted small">${esc([t.ew ? fmtZahl(t.ew) + ' Einwohner' : '', sel.key !== 'gemeinde' ? ERKLAERUNG[sel.key] : untertitel(t)].filter(Boolean).join(' · '))}</p></section>`;
 
     if (!t.q) {
-      $view.innerHTML = seg + kopf + ohneDaten(t, eb);
+      $view.innerHTML = seg + kopf + ohneDaten(t, eb) + SITZE_PLATZ;
+      sitzverteilung(t);
       return;
     }
     const x = await quelle(t.q);
@@ -412,11 +413,85 @@
         ${vorl.length ? `<div class="list">${vorl.map(vorlageRow).join('')}</div>` : '<div class="card empty">Keine aktuellen Vorlagen.</div>'}
       </section>`}
       ${vergangen.length ? `<section><h2>Zuletzt getagt</h2><div class="list">${vergangen.map(sitzungRow).join('')}</div></section>` : ''}
+      ${SITZE_PLATZ}
       ${gremien.length ? `<section><details class="gremien"><summary>Gremien (${gremien.length}) – mit dem Stern als Favorit merken</summary>
         <div class="list">${gremien.map((g) => `<div class="row static"><div class="body"><span class="title">${esc(gremiumKurz(g))}</span></div>${sternKnopf({ q: t.q, k: t.b, g, kn: x.k.get(t.b)?.name || '', ort: id })}</div>`).join('')}</div>
       </details></section>` : ''}
       ${risLink(null, x.D.quelle.ris)}
       <p class="stand">Abgleich mit ${esc(x.D.quelle.name)}: ${esc(stand(x.D.quelle.abgleich))}</p>`;
+    sitzverteilung(t);
+  }
+
+  // ---------- Sitzverteilung (Kommunalwahl 2024, data/sitze.json) ----------
+  const SITZE_PLATZ = '<section id="sitze" hidden></section>';
+  let SITZE = null;
+  // Übliche Parteifarben [hell, dunkel]; CDU im Dunkeln grau, damit der Bogen sichtbar bleibt
+  const PARTEIFARBE = {
+    CDU: ['#2b2b2b', '#a3a3a3'], SPD: ['#e3000f', '#ff5a64'], 'GRÜNE': ['#1aa037', '#4cc06a'], FDP: ['#f5d300', '#f5d300'],
+    'FREIE WÄHLER': ['#f29400', '#f5a733'], AfD: ['#009ee0', '#38b6ec'], 'DIE LINKE': ['#be3075', '#dc5f95'],
+    BSW: ['#792351', '#b25586'], Volt: ['#502379', '#9270c4'], 'ÖDP': ['#ff6400', '#ff8a3d'], 'Die PARTEI': ['#870e2f', '#c84a6a'],
+    PIRATEN: ['#e46c0a', '#f08a3a'], Tierschutzpartei: ['#506928', '#86a352'],
+  };
+  // Wählergruppen: feste Reihenfolge (geprüft auf Farbsehschwäche), ab der vierten grau – jede steht mit Namen in der Liste
+  const WG_FARBEN = [['#2a9d8f', '#2a9d8f'], ['#a0522d', '#a0522d'], ['#6a5acd', '#6a5acd']];
+  const WG_REST = ['#9a9a9a', '#6a6a6a'];
+  const RAT_ART = { Gemeinderat: 'Gemeinderat', Stadtrat: 'Stadtrat', Verbandsgemeinderat: 'Verbandsgemeinderat', Kreistag: 'Kreistag' };
+
+  async function sitzverteilung(t) {
+    const el = document.getElementById('sitze');
+    if (!el) return;
+    try { SITZE = SITZE || await getJson('data/sitze.json'); } catch { return; }
+    // Kreisfreie Städte: Stadtrat unter dem Kreisschlüssel
+    const r = SITZE.raete[t.id] || (t.id.length === 8 && t.id.endsWith('000') ? SITZE.raete[t.id.slice(0, 5)] : null);
+    if (!r || !document.body.contains(el)) return;
+    let rat = r.rat;
+    if (rat === 'Gemeinderat' && /Stadt/.test(t.art || '')) rat = 'Stadtrat';
+    if (rat === 'Gemeinderat' && t.art === 'Ortsgemeinde') rat = 'Ortsgemeinderat';
+    el.hidden = false;
+    if (r.mehrheitswahl) {
+      el.innerHTML = `<h2>Sitzverteilung im ${esc(rat)}</h2><div class="card empty">Bei der Kommunalwahl 2024 gab es hier nur eine oder keine Liste. Der ${esc(rat)} wurde deshalb per Mehrheitswahl gewählt – ohne Sitzverteilung nach Parteien.</div>`;
+      return;
+    }
+    let wg = 0;
+    const listen = r.listen.filter((l) => l[1] > 0).map(([name, sitze, prozent, vorher, lang]) => {
+      const p = String(name).startsWith('#') ? SITZE.parteien[String(name).slice(1)] : null;
+      // Die Quelle kürzt Namen auf 20 Zeichen („FWG Trier-Saarburg e“) – dann den vollen Namen zeigen
+      const kurz = p ? p.name : String(name).length >= 20 && lang ? lang : name;
+      const farbe = PARTEIFARBE[kurz] || (wg < WG_FARBEN.length ? WG_FARBEN[wg++] : WG_REST);
+      return { kurz, lang: p ? p.lang : lang, sitze, prozent, vorher, farbe, wg: !p };
+    });
+    const weg = r.listen.filter((l) => l[1] === 0).map(([name]) => (String(name).startsWith('#') ? SITZE.parteien[String(name).slice(1)]?.name : name)).filter(Boolean);
+    const summe = listen.reduce((a, l) => a + l.sitze, 0) || 1;
+    // Halbkreis: von links (180°) nach rechts (0°), Mittelpunkt 100/100, Ring 56–92
+    const R = 92, r0 = 56, pt = (rad, w) => `${(100 + rad * Math.cos(w)).toFixed(2)},${(100 - rad * Math.sin(w)).toFixed(2)}`;
+    let w0 = Math.PI;
+    const boegen = listen.map((l, i) => {
+      const w1 = w0 - Math.PI * (l.sitze / summe);
+      const gross = w0 - w1 > Math.PI ? 1 : 0;
+      const d = `M${pt(R, w0)} A${R},${R} 0 ${gross} 1 ${pt(R, w1)} L${pt(r0, w1)} A${r0},${r0} 0 ${gross} 0 ${pt(r0, w0)} Z`;
+      w0 = w1;
+      return `<path d="${d}" data-i="${i}" style="--c:${l.farbe[0]};--cd:${l.farbe[1]}"><title>${esc(l.kurz)}: ${l.sitze} ${l.sitze === 1 ? 'Sitz' : 'Sitze'}</title></path>`;
+    }).join('');
+    // Wählergruppen haben 2024 neue Kennungen – ohne Vorwert kein Vergleich; bei Parteien heißt das „neu im Rat“
+    const diff = (l) => (l.vorher == null ? (l.wg ? '<span title="Vergleich nicht verfügbar">–</span>' : '<span class="neu">neu</span>') : l.sitze === l.vorher ? '±0' : (l.sitze > l.vorher ? '+' : '−') + Math.abs(l.sitze - l.vorher));
+    el.innerHTML = `<h2>Sitzverteilung im ${esc(rat)}</h2>
+      <div class="card sitz">
+        <svg viewBox="0 0 200 108" role="img" aria-label="Sitzverteilung im ${esc(rat)}: ${esc(listen.map((l) => `${l.kurz} ${l.sitze}`).join(', '))}">${boegen}
+          <text x="100" y="88" class="summe">${summe}</text><text x="100" y="102" class="summe-l">Sitze</text></svg>
+        <div class="sitzliste" role="table" aria-label="Sitze je Liste">
+          <div class="kopf" role="row"><span role="columnheader">Liste</span><span role="columnheader">Sitze</span><span role="columnheader" title="Veränderung gegenüber 2019">ggü. 2019</span><span role="columnheader">Stimmen</span></div>
+          ${listen.map((l, i) => `<div class="zeile" role="row" data-i="${i}"><span role="cell"><i style="--c:${l.farbe[0]};--cd:${l.farbe[1]}"></i><span title="${esc(l.lang || l.kurz)}">${esc(l.kurz)}</span></span><span role="cell" class="zahl">${l.sitze}</span><span role="cell" class="zahl muted">${diff(l)}</span><span role="cell" class="zahl muted">${l.prozent != null ? l.prozent.toLocaleString('de-DE', { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + ' %' : ''}</span></div>`).join('')}
+        </div>
+        ${weg.length ? `<p class="muted small">2024 nicht mehr im Rat: ${esc(weg.join(', '))}</p>` : ''}
+        <p class="muted small">Kommunalwahl 9. Juni 2024 · Quelle: <a href="https://www.wahlen.rlp.de/kommunalwahlen/ergebnisse-1" target="_blank" rel="noopener">Landeswahlleiter Rheinland-Pfalz</a></p>
+      </div>`;
+    // Hover: Bogen und Zeile gemeinsam hervorheben
+    const an = (i) => el.querySelectorAll('[data-i]').forEach((x) => x.classList.toggle('aktiv', i != null && x.dataset.i === i));
+    el.querySelectorAll('[data-i]').forEach((x) => {
+      x.addEventListener('mouseenter', () => an(x.dataset.i));
+      x.addEventListener('mouseleave', () => an(null));
+      x.addEventListener('click', () => an(x.dataset.i));
+    });
   }
 
   // Hinweis für Quellen, die nur Termine liefern (Kalenderexport); freundlich, die Gründe liegen beim Anbieter
