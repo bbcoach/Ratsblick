@@ -110,9 +110,9 @@ export function mandantName(name: string): string {
     .replace(/^Verbandsgemeindeverwaltung\s+([^()]+)$/, 'Verbandsgemeinde $1')
     .trim();
   // Bloße Ortsnamen (Schweich: „Bekond“, „Detzem“) sind Ortsgemeinden; Verbände, Räte u. Ä. bleiben, wie sie sind
-  // („Kallstadt“ ist ein Ort, „Stadt Kusel“ nicht; Ortsnamen mit Zusatz wie „Bobenheim am Berg“ zählen mit)
+  // („Kallstadt“ ist ein Ort, „Stadt Kusel“ nicht; Ortsnamen mit Zusatz wie „Bobenheim am Berg“ oder „St. Johann“ zählen mit)
   const keinOrt = /gemeinde\b|\bstadt\b|verband|zweck|rat\b|anstalt|\ba[öo]r\b|forst|kita|kinder|schul|werk|personal|meister|besprechung|dienst|\.\.\./i.test(n);
-  const ortsform = /^\S+(?:\s+(?:am|an der|an|bei|im|in der|in|ob der|auf der|vor der)\s+\S+(?:\s\S+)?)?$/.test(n);
+  const ortsform = /^(?:St\.\s*|Sankt\s+)?\S+(?:\s+(?:am|an der|an|bei|im|in der|in|ob der|auf der|vor der)\s+\S+(?:\s\S+)?)?$/.test(n);
   if (!keinOrt && ortsform) {
     return `Ortsgemeinde ${n}`;
   }

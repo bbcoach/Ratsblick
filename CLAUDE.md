@@ -101,6 +101,8 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - VG Bad Ems-Nassau (Link vom Projektinhaber, 02.10.2026): SessionNet 5.5 PHP `www.rat-vgben.de/bi/` mit Mandanten (keine robots.txt);
   führt noch die Vorgänger-VGs Bad Ems und Nassau → `zuordnen` (gebiete.ts) lässt einen genauen Namen eine Kurzform verdrängen.
 - VG Annweiler am Trifels (Link vom Projektinhaber, 02.10.2026): SessionNet 5.5 ASP `bi-annweiler.de/bi/` mit Mandanten (keine robots.txt).
+- VG Vordereifel (Link vom Projektinhaber, 02.10.2026): SessionNet 5.4 PHP `sessionnet.vordereifel.de/bi/` mit Mandanten (keine
+  robots.txt); Mandant „St. Johann“ ohne Vorsatz → `mandantName` erkennt „St.“/„Sankt“ als Teil eines Ortsnamens.
 - Unklar: Birkenfeld (kein RIS-Link gefunden). Mainz-Bingen: `www.landkreis-mainz-bingen.sitzung-online.de/bi/` (seit 02.10.2026).
 - Trier (ALLRIS 4, `typ: "allris"`, `src/scrape/allris.ts`, seit 02.10.2026): Kalender `si010?MM=&YY=` lädt die
   Tabelle per Wicket-Ajax (`si010?0-1.0-&MM=…`) mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch,
