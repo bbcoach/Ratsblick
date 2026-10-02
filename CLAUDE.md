@@ -236,6 +236,8 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
   `wahlen-vec-tree.json` = Gebietsbaum, `json/wahlen/<WAHL>/<geoId>.json`; geoId = KKK VV GGG 00, Gemeinde-Schlüssel = 07+KKK+GGG,
   VGs über ihre Gemeinden) → `data/sitze-2024.json` (im Repo, Rohdateien in `.cache/kw24/`). „PRESTART_ONE_LIST“ = Mehrheitswahl.
   Wählergruppen haben 2024 neue IDs → kein Vergleich zu 2019 („–“); die Quelle kürzt Kurznamen auf 20 Zeichen → Langname.
+  Stand 02.10.2026: 2 453 Räte (2 288 Gemeinderäte, davon 1 546 Mehrheitswahl; 129 VG-Räte, 24 Kreistage, 12 Stadträte kreisfreier
+  Städte unter dem Kreisschlüssel). Gemeinden mit neuem Schlüssel nach der Wahl über den Namen (Obergeckler; Niedergeckler entfällt).
   Farben: übliche Parteifarben, Wählergruppen #2a9d8f/#a0522d/#6a5acd (mit dem dataviz-Validator geprüft), danach grau.
 - App-Dateien lädt der Service Worker zuerst aus dem Netz (Cache nur offline); neue Version kurz nach dem Start → automatisch neu laden.
 - Links ins Original-RIS (seit 02.10.2026): je Quelle `quelle.ris` (Startseite, `risStartseite`), je Sitzung/Vorlage `web`

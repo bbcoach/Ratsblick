@@ -95,7 +95,13 @@ async function main() {
       schluessel = kind ? vgVonGemeinde.get(gemeindeSchluessel(kind.slug)) ?? undefined : undefined;
     }
     if (!schluessel) { console.warn(`kein Schlüssel: ${k.name}`); continue; }
-    if ((k.geo_type === 'GD' || k.geo_type === 'VF') && !gemeindeIds.has(schluessel)) console.warn(`unbekannte Gemeinde ${schluessel} ${k.name}`);
+    // Gebietsänderungen nach der Wahl (Obergeckler + Niedergeckler → Obergeckler mit neuem Schlüssel): über den Namen im selben Kreis
+    if ((k.geo_type === 'GD' || k.geo_type === 'VF') && !gemeindeIds.has(schluessel)) {
+      const neu = gebiete.gemeinden.find((g) => g.name === k.name && g.id.slice(0, 5) === schluessel!.slice(0, 5));
+      console.warn(`unbekannte Gemeinde ${schluessel} ${k.name}${neu ? ` → ${neu.id}` : ' (entfällt)'}`);
+      if (!neu) continue;
+      schluessel = neu.id;
+    }
 
     const r = e.results.find((x) => x.geoId === k.slug);
     const eintrag: Record<string, unknown> = { rat: RAT[wahl] };
