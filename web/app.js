@@ -557,7 +557,10 @@
     const hadController = !!navigator.serviceWorker.controller;
     navigator.serviceWorker.register('sw.js').catch(() => {});
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (hadController) toast('Neue Daten oder Funktionen verfügbar.', { label: 'Neu laden', run: () => location.reload() });
+      if (!hadController) return;
+      // Kurz nach dem Start sofort neu laden (sonst läuft bis zum nächsten Start die alte Version), später nur anbieten
+      if (performance.now() < 15000) location.reload();
+      else toast('Neue Daten oder Funktionen verfügbar.', { label: 'Neu laden', run: () => location.reload() });
     });
   }
 

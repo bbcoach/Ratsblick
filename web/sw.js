@@ -58,5 +58,16 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(fetch(req).catch(() => caches.match('index.html', { cacheName: SHELL })));
     return;
   }
-  e.respondWith(caches.match(req, { cacheName: SHELL }).then((hit) => hit || fetch(req)));
+  // App-Dateien zuerst aus dem Netz (neue Versionen sofort), offline aus dem Cache
+  e.respondWith(
+    fetch(req)
+      .then((res) => {
+        if (res.ok) {
+          const kopie = res.clone();
+          caches.open(SHELL).then((c) => c.put(req, kopie));
+        }
+        return res;
+      })
+      .catch(() => caches.match(req, { cacheName: SHELL, ignoreSearch: true }).then((hit) => hit || Response.error())),
+  );
 });
