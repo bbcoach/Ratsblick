@@ -322,6 +322,7 @@
         ${vorl.length ? `<div class="list">${vorl.map(vorlageRow).join('')}</div>` : '<div class="card empty">Keine aktuellen Vorlagen.</div>'}
       </section>
       ${vergangen.length ? `<section><h2>Zuletzt getagt</h2><div class="list">${vergangen.map(sitzungRow).join('')}</div></section>` : ''}
+      ${risLink(null, x.D.quelle.ris)}
       <p class="stand">Abgleich mit ${esc(x.D.quelle.name)}: ${esc(stand(x.D.quelle.abgleich))}</p>`;
   }
 
@@ -347,6 +348,15 @@
     const b = e.target.closest('.seg [data-go], .empty-state ~ section [data-go]');
     if (b) { e.stopImmediatePropagation(); e.preventDefault(); location.replace(b.dataset.go); }
   }, true);
+
+  /** Link ins Original-Ratsinformationssystem: zur Einzelseite, sonst zur Startseite des RIS. */
+  function risLink(seite, startseite, was) {
+    const url = seite || startseite;
+    if (!url) return '';
+    const text = seite ? `${was} im Ratsinformationssystem öffnen` : 'Zum Ratsinformationssystem';
+    return `<section class="ris"><a class="btn ghost" href="${esc(url)}" target="_blank" rel="noopener">${esc(text)} ↗</a>
+      <p class="muted small">Dort finden Sie alle veröffentlichten Unterlagen, auch ältere Sitzungen und Vorlagen.</p></section>`;
+  }
 
   function sitzungRow(m) {
     const n = m.tops.length;
@@ -385,7 +395,8 @@
             ${t.beschluss ? `<details class="beschluss"><summary>Beschluss</summary><p>${esc(t.beschluss)}</p></details>` : ''}
           </div></div>`;
         }).join('')}</div>` : '<div class="card empty">Die Tagesordnung ist noch nicht veröffentlicht.</div>'}
-      </section>`;
+      </section>
+      ${risLink(m.web, x.D.quelle.ris, 'Sitzung')}`;
   }
 
   // ---------- Ansicht: Vorlage ----------
@@ -415,7 +426,8 @@
         return `<li class="${done ? 'done' : ''}"><span class="body"><span style="font-weight:600">${esc(gremiumKurz(b.gremium || 'Gremium'))}</span><span class="meta">${b.datum ? esc(datum(b.datum)) : 'Termin offen'}${b.entscheidend ? '<span class="pill">entscheidet</span>' : b.rolle ? `<span>${esc(b.rolle)}</span>` : ''}${done ? '' : '<span class="pill plain">anstehend</span>'}</span>${m ? `<button class="linkbtn small" type="button" data-go="${esc(link('s', m.id))}">Zur Sitzung</button>` : ''}</span></li>`;
       }).join('')}</ol></section>` : ''}
       ${v.text ? `<section><h2>Aus der Vorlage</h2><div class="card"><div class="excerpt" id="ex">${esc(v.text)}</div><button class="more" type="button" id="exb">Ganzen Auszug zeigen</button></div></section>` : ''}
-      ${docs.length ? `<section><h2>Dokumente</h2><div class="list">${docs.map(docRow).join('')}</div></section>` : ''}`;
+      ${docs.length ? `<section><h2>Dokumente</h2><div class="list">${docs.map(docRow).join('')}</div></section>` : ''}
+      ${risLink(v.web, x.D.quelle.ris, 'Vorlage')}`;
     document.getElementById('exb')?.addEventListener('click', (e) => {
       const open = document.getElementById('ex').classList.toggle('open');
       e.target.textContent = open ? 'Auszug einklappen' : 'Ganzen Auszug zeigen';

@@ -40,6 +40,26 @@ export function ohneKopf(text: string | null | undefined): string | null | undef
   return i > 0 ? text.slice(i) : text;
 }
 
+/**
+ * Seite des Objekts im Original-Ratsinformationssystem (für Menschen), soweit bekannt:
+ * `web` aus OParl; bei Scrapern ist die ID die Seitenadresse; more!rubin-Sitzungen unter `/meeting?id=<Nummer>`.
+ * null, wenn es keine verlässliche Einzelseite gibt (dann verweist die App auf die Startseite des RIS).
+ */
+export function webSeite(id: string, raw: { web?: unknown }, art: 'sitzung' | 'vorlage'): string | null {
+  if (typeof raw.web === 'string' && /^https?:\/\//.test(raw.web)) return raw.web;
+  if (!/^https?:\/\//.test(id) || id.includes('#')) return null;
+  const u = new URL(id);
+  const rubin = u.hostname.endsWith('.gremien.info');
+  if (/\/oparl\//i.test(u.pathname)) {
+    if (rubin && art === 'sitzung') return `${u.origin}/meeting?id=${encodeURIComponent(u.pathname.split('/').pop()!.replace(/^ni_/, ''))}`;
+    return null;
+  }
+  if (rubin && art === 'vorlage') return null; // more!rubin-Vorlagen haben keine verlässliche Einzelseite
+  // ALLRIS 4 (Trier, Bingen): ohne refresh=false leitet die Seite teils auf die Anmeldung um
+  if (/\/(to010|vo020)$/.test(u.pathname) && !u.searchParams.has('refresh')) return `${id}&refresh=false`;
+  return id;
+}
+
 export function art(name: string): string {
   if (name.startsWith('Ortsgemeinde')) return 'Ortsgemeinde';
   if (name.startsWith('Ortsbezirk')) return 'Ortsbezirk';
@@ -131,6 +151,7 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
     return {
       id: mid,
       k: String(m.body_id),
+      web: webSeite(mid, JSON.parse(String(m.raw)) as { web?: unknown }, 'sitzung'),
       name: s(m.name),
       start: s(m.start),
       ende: s(m.end),
@@ -163,6 +184,7 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
     return {
       id: pid,
       k: String(p.body_id),
+      web: webSeite(pid, raw as { web?: unknown }, 'vorlage'),
       nr: s(p.reference),
       name: cleanText(s(p.name), 300),
       datum: s(p.date),

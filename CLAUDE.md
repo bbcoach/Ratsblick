@@ -149,6 +149,9 @@ Icons (PNG) werden aus `web/icons/icon.svg` mit dem vorinstallierten Chromium ge
 - `web/` enthält die App (Vanilla-JS, kein Build-Schritt), `npm run web -- --out dist` erzeugt die statische Seite
   mit `data/index.json` und je Quelle `data/<id>.json` (Momentaufnahme aus `src/export/snapshot.ts`).
 - „Kurz erklärt“-Texte liegen von Hand gepflegt in `data/kurz-erklaert.json` (Schlüssel: Vorlagen-ID).
+- Links ins Original-RIS (seit 02.10.2026): je Quelle `quelle.ris` (Startseite, `risStartseite`), je Sitzung/Vorlage `web`
+  (`webSeite` in `src/export/snapshot.ts`: OParl-`web`, sonst Seitenadresse der Scraper; more!rubin-Sitzungen `/meeting?id=`
+  ohne `ni_`; ALLRIS 4 mit `&refresh=false`; ohne verlässliche Einzelseite → null, die App verlinkt dann die Startseite).
 - `.github/workflows/website.yml`: alle 6 h Abgleich + Veröffentlichung auf GitHub Pages; bei Pushes nur neu bauen.
   Die Datenbank wird zwischen Läufen im Actions-Cache gehalten.
   Abgleich mit Zeitbudget (`--budget-min 50`, Schritt-Zeitgrenze 75 min): je Server nacheinander, älteste zuerst, Rest im

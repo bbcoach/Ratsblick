@@ -29,6 +29,7 @@ interface Kurz {
 /** Startseite eines Ratsinformationssystems aus der OParl-Adresse ableiten (nur als Link für Menschen). */
 export function risStartseite(oparlUrl: string): string {
   const u = new URL(oparlUrl);
+  if (/\/termine\/ics\//i.test(u.pathname)) return `${u.protocol}//${u.host}/`; // Kalenderexport (SD.NET RIM)
   if (!/oparl/i.test(u.pathname)) return oparlUrl; // schon die Startseite (Systeme ohne OParl)
   const pfad = /^\/(bi|public|buergerinfo)\//.exec(u.pathname)?.[0] ?? '/';
   return `${u.protocol}//${u.host}${pfad}`;
@@ -45,6 +46,7 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
   });
   const endpoints = read<{ endpoints: SourceRecord[] }>(opts.endpointsPath ?? 'data/endpoints.json', { endpoints: [] }).endpoints;
   const gebietVon = new Map(endpoints.map((e) => [e.id, e.gebiet]));
+  const urlVon = new Map(endpoints.map((e) => [e.id, e.url]));
 
   rmSync(outDir, { recursive: true, force: true });
   cpSync(webDir, outDir, { recursive: true });
@@ -70,14 +72,18 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
     for (const [g, b] of zu) if (!daten[g]) daten[g] = [id, b];
 
     const koerperschaften = snap.koerperschaften.map((k) => ({ ...k, gebiet: gebietVonBody.get(k.id) ?? null }));
-    writeFileSync(join(outDir, 'data', `${id}.json`), JSON.stringify({ ...snap, koerperschaften, vorlagen }));
+    // Startseite des Original-RIS, damit man dort nach weiteren Daten suchen kann
+    const quelleUrl = urlVon.get(id) ?? snap.quelle.system;
+    const ris = quelleUrl ? risStartseite(quelleUrl) : null;
+    const quelle = { ...snap.quelle, ris };
+    writeFileSync(join(outDir, 'data', `${id}.json`), JSON.stringify({ ...snap, quelle, koerperschaften, vorlagen }));
 
     const kommend = new Map<string, number>();
     for (const m of snap.sitzungen) {
       if (m.start && m.start >= snap.stichtag && !m.abgesagt) kommend.set(m.k, (kommend.get(m.k) ?? 0) + 1);
     }
     return {
-      ...snap.quelle,
+      ...quelle,
       gebiet: gebiet ?? null,
       host: snap.quelle.system ? new URL(snap.quelle.system).hostname : null,
       vg: snap.vg,

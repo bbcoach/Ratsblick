@@ -59,6 +59,7 @@ describe('Links zu Ratsinformationssystemen', () => {
     expect(risStartseite('https://adenau.gremien.info/oparl/system')).toBe('https://adenau.gremien.info/');
     expect(risStartseite('https://www.hagenbach.sitzung-online.de/bi/oparl/1.0/system.asp')).toBe('https://www.hagenbach.sitzung-online.de/bi/');
     expect(risStartseite('https://gremieninfo.trier.de/public/oparl/system')).toBe('https://gremieninfo.trier.de/public/');
+    expect(risStartseite('https://vgog.ratsinfomanagement.net/termine/ics/glm')).toBe('https://vgog.ratsinfomanagement.net/');
     expect(risStartseite('https://session.kreis-ahrweiler.de/biaw/')).toBe('https://session.kreis-ahrweiler.de/biaw/');
   });
 });
