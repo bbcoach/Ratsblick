@@ -149,7 +149,7 @@ export class OParlClient {
    * Holt eine HTML-Seite (für Scraper), mit derselben Drosselung und denselben Wiederholungen wie `get`.
    * Der Zeichensatz kommt aus dem Content-Type (Standard UTF-8; ISO-8859-1 wird als Windows-1252 gelesen).
    */
-  async getText(url: string): Promise<string> {
+  async getText(url: string, zusatz: { headers?: Record<string, string>; kopf?: (h: Headers) => void } = {}): Promise<string> {
     let lastError: OParlHttpError | undefined;
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
       if (attempt > 0) await this.sleep(1000 * 2 ** (attempt - 1));
@@ -158,7 +158,7 @@ export class OParlClient {
       let res: Response;
       try {
         res = await this.fetchImpl(url, {
-          headers: { Accept: 'text/html,*/*', 'User-Agent': this.userAgent },
+          headers: { Accept: 'text/html,*/*', 'User-Agent': this.userAgent, ...zusatz.headers },
           signal: AbortSignal.timeout(this.timeoutMs),
         });
       } catch (err) {
@@ -170,6 +170,7 @@ export class OParlClient {
         continue;
       }
       if (!res.ok) throw new OParlHttpError(url, res.status, `HTTP ${res.status}`);
+      zusatz.kopf?.(res.headers);
       const cs = (/charset=["']?([\w-]+)/i.exec(res.headers.get('content-type') ?? '')?.[1] ?? 'utf-8').toLowerCase();
       const buf = await res.arrayBuffer();
       return new TextDecoder(cs === 'iso-8859-1' || cs === 'latin1' ? 'windows-1252' : cs).decode(buf);

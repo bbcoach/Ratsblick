@@ -16,7 +16,8 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
 - Hosts mit robots.txt-Verbot (z. B. `*.sitzung-online.de`) nicht automatisiert abrufen, bevor das geklärt ist.
   Ausnahme auf ausdrückliche Entscheidung des Projektinhabers (01.10.2026): Kreis Kaiserslautern auf
   `sessionnet.owl-it.de` – nur dieser Pfad, 2 s Abstand (`intervallMs`), Grund im Feld `hinweis` der Quelle.
-  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`). Bei Einwänden des Betreibers sofort abschalten.
+  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`) und Stadt Trier (`gremieninfo.trier.de`, über den
+  Weiterleiter). Bei Einwänden des Betreibers sofort abschalten.
   Andere owl-it-Kunden bleiben gesperrt.
 - Technik: TypeScript, Node ≥ 22.13, eingebautes `node:sqlite`, `tsx`, `vitest`. Keine schweren Abhängigkeiten
   ohne Grund.
@@ -63,9 +64,11 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   more!rubin ohne OParl, laufen seit 02.10.2026 über `rubin-api`. Worms: `worms.gremien.info` ohne OParl.
 - Unklar: Landau, Birkenfeld (kein RIS-Link gefunden), Mayen-Koblenz (Ratsinfo in die Kreis-Website eingebettet,
   Quelle unbekannt), Mainz-Bingen (Verweis auf cc-egov, ohne Treffer).
-- Trier (ALLRIS 4): Kalender per Wicket-Ajax mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch),
-  Sitzungen `to010?SILFDNR=`, Vorlagen `vo020?VOLFDNR=` (mit Beschlussvorschlag/Begründung als HTML) ohne Sitzung
-  abrufbar. Scraper zurückgestellt (Sicherheitsprüfung von Claude Code hat die Abrufe gestoppt, 01.10.2026).
+- Trier (ALLRIS 4, `typ: "allris"`, `src/scrape/allris.ts`, seit 02.10.2026): Kalender `si010?MM=&YY=` lädt die
+  Tabelle per Wicket-Ajax (`si010?0-1.0-&MM=…`) mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch,
+  meldet `x-ratsblick-set-cookie`); Sitzungen `to010?SILFDNR=`, Vorlagen `vo020?VOLFDNR=` ohne Sitzung abrufbar.
+  Vorlagen enthalten Beschlussvorschlag/Begründung als HTML → `mainFile.text`. Nicht veröffentlichte Sitzungen haben
+  im Kalender keinen Link (`to010` ohne `refresh=false` leitet auf `noauth`). Erster Lauf: 65 Sitzungen, 77 Vorlagen.
 
 ## more!rubin ohne OParl (geprüft an rockenhausen.gremien.info, 01.10.2026)
 - Neuere more!rubin-Oberfläche ist eine JavaScript-App; Daten über eine interne JSON-Schnittstelle, ohne Anmeldung:

@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?><ajax-response><component id="id2a" ><![CDATA[<div id="id2a"><div id="id2c">
+<table id="id2d" class="calenderView hoverRow stickyHeader">
+<caption>Kalender</caption>
+<thead>
+
+<tr class="headers">
+
+<th class="dateCol" scope="col"><span>Datum</span></th>
+
+<th class="time" scope="col"><span>Uhrzeit</span></th>
+
+<th class="textCol" scope="col"><span>Sitzung</span></th>
+
+<th class="raum" scope="col"><span>Raum</span></th>
+
+</tr>
+
+</thead>
+<tbody>
+<tr class="thu odd today-sides today-top">
+<td class="nowrapContent"><span class="dow">Thu</span><span class="dom">01</span></td>
+<td class="time">
+<div>17:00</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a href="./to010?SILFDNR=1000686&amp;refresh=false" id="si_1000686" data-simpletooltip-text=" am Do., 01.10.2026 um 17:00 Uhr." class="js-simple-tooltip tooltipProvider">Sitzung des Dezernatsausschusses III  - Haushaltsberatung</a>
+</div>
+</td><td class="raum">
+<div>Rathaus, Großer Rathaussaal</div>
+</td>
+</tr><tr class="fri even today-top emptyRow">
+<td class="nowrapContent"><span class="dow">Fri</span><span class="dom">02</span></td>
+<td colspan="3">
+<div> </div>
+</td>
+</tr><tr class="sat odd freeholiday emptyRow">
+<td class="nowrapContent"><span class="dow">Sat</span><span class="dom">03</span></td>
+<td colspan="3">
+<div>Tag der Deutschen Einheit</div>
+</td>
+</tr><tr class="sun odd emptyRow">
+<td class="nowrapContent"><span class="dow">Sun</span><span class="dom">04</span></td>
+<td colspan="3">
+<div> </div>
+</td>
+</tr><tr class="mon even holiday emptyRow">
+<td class="nowrapContent"><span class="dow">Mon</span><span class="dom">05</span></td>
+<td colspan="3">
+<div>Herbstferien</div>
+</td>
+</tr><tr class="tue odd holiday emptyRow">
+<td class="nowrapContent"><span class="dow">Tue</span><span class="dom">06</span></td>
+<td colspan="3">
+<div>Herbstferien</div>
+</td>
+</tr><tr class="wed even holiday emptyRow">
+<td class="nowrapContent"><span class="dow">Wed</span><span class="dom">07</span></td>
+<td colspan="3">
+<div>Herbstferien</div>
+</td>
+</tr><tr class="thu odd holiday emptyRow">
+<td class="nowrapContent"><span class="dow">Thu</span><span class="dom">08</span></td>
+<td colspan="3">
+<div>Herbstferien</div>
+</td>
+</tr><tr class="sameday thu odd holiday">
+<td class="nowrapContent"></td>
+<td class="time">
+<div>19:30</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a href="./to010?SILFDNR=1000378&amp;refresh=false" id="si_1000378" data-simpletooltip-text=" am Do., 08.10.2026 um 19:30 Uhr." class="js-simple-tooltip tooltipProvider">Sitzung des Ortsbeirates Zewen</a>
+</div>
+</td><td class="raum">
+<div>Grundschule Zewen, Gelber Pavillon</div>
+</td>
+</tr><tr class="fri even holiday emptyRow">
+<td class="nowrapContent"><span class="dow">Fri</span><span class="dom">09</span></td>
+<td colspan="3">
+<div>Herbstferien</div>
+</td>
+</tr><tr class="sat odd emptyRow">
+<td class="nowrapContent"><span class="dow">Sat</span><span class="dom">10</span></td>
+<td colspan="3">
+<div> </div>
+</td>
+</tr><tr class="sun odd emptyRow">
+<td class="nowrapContent"><span class="dow">Sun</span><span class="dom">11</span></td>
+<td colspan="3">
+<div> </div>
+</td>
+</tr><tr class="mon even holiday emptyRow">
+<td class="nowrapContent"><span class="dow">Mon</span><span class="dom">12</span></td>
+<td colspan="3">
+<div>Herbstferien</div>
+</td>
+</tr><tr class="tue odd holiday emptyRow">
+<td class="nowrapContent"><span class="dow">Tue</span><span class="dom">13</span></td>
+<td colspan="3">
+<div>Herbstferien</div>
+</td>
+</tr><tr class="sameday tue odd holiday">
+<td class="nowrapContent"></td>
+<td class="time">
+<div>19:30</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a href="./to010?SILFDNR=1000467&amp;refresh=false" id="si_1000467" data-simpletooltip-text=" am Di., 13.10.2026 um 19:30 Uhr." class="js-simple-tooltip tooltipProvider">Sitzung des Ortsbeirates Kürenz</a>
+</div>
+</td><td class="raum">
+<div>Treffpunkt am Weidengraben</div>
+</td>
+</tr><tr class="wed even holiday emptyRow">
+<td class="nowrapContent"><span class="dow">Wed</span><span class="dom">14</span></td>
+<td colspan="3">
+<div>Herbstferien</div>
+</td>
+</tr><tr class="sameday wed even holiday">
+<td class="nowrapContent"></td>
+<td class="time">
+<div>20:00</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a id="si_1000649">Sitzung des Ortsbeirates Nord</a>
+</div>
+</td><td class="raum">
+<div></div>
+</td>
+</tr><tr class="thu odd holiday emptyRow">
+<td class="nowrapContent"><span class="dow">Thu</span><span class="dom">15</span></td>
+<td colspan="3">
+<div>Herbstferien</div>
+</td>
+</tr><tr class="sameday thu odd holiday">
+<td class="nowrapContent"></td>
+<td class="time">
+<div>19:30</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a id="si_1000455">Sitzung des Ortsbeirates Ehrang/Quint</a>
+</div>
+</td><td class="raum">
+<div>Bürgerhaus Ehrang</div>
+</td>
+</tr><tr class="sameday thu odd holiday">
+<td class="nowrapContent"></td>
+<td class="time">
+<div>19:45</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a href="./to010?SILFDNR=1000390&amp;refresh=false" id="si_1000390" data-simpletooltip-text=" am Do., 15.10.2026 um 19:45 Uhr." class="js-simple-tooltip tooltipProvider">Sitzung des Ortsbeirates Tarforst</a>
+</div>
+</td><td class="raum">
+<div>Funktionsgebäude FSV Trier-Tarforst</div>
+</td>
+</tr><tr class="fri even holiday emptyRow">
+<td class="nowrapContent"><span class="dow">Fri</span><span class="dom">16</span></td>
+<td colspan="3">
+<div>Herbstferien</div>
+</td>
+</tr><tr class="sat odd emptyRow">
+<td class="nowrapContent"><span class="dow">Sat</span><span class="dom">17</span></td>
+<td colspan="3">
+<div> </div>
+</td>
+</tr><tr class="sun odd emptyRow">
+<td class="nowrapContent"><span class="dow">Sun</span><span class="dom">18</span></td>
+<td colspan="3">
+<div> </div>
+</td>
+</tr><tr class="mon even">
+<td class="nowrapContent"><span class="dow">Mon</span><span class="dom">19</span></td>
+<td class="time">
+<div>19:00</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a href="./to010?SILFDNR=1000407&amp;refresh=false" id="si_1000407" data-simpletooltip-text=" am Mo., 19.10.2026 um 19:00 Uhr." class="js-simple-tooltip tooltipProvider">Sitzung des Ortsbeirates Feyen/Weismark</a>
+</div>
+</td><td class="raum">
+<div>EGP GmbH, Seminarraum</div>
+</td>
+</tr><tr class="sameday mon even">
+<td class="nowrapContent"></td>
+<td class="time">
+<div>19:30</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a href="./to010?SILFDNR=1000372&amp;refresh=false" id="si_1000372" data-simpletooltip-text=" am Mo., 19.10.2026 um 19:30 Uhr." class="js-simple-tooltip tooltipProvider">Sitzung des Ortsbeirates Euren</a>
+</div>
+</td><td class="raum">
+<div>Johann-Herrmann-Grundschule Euren</div>
+</td>
+</tr><tr class="tue odd">
+<td class="nowrapContent"><span class="dow">Tue</span><span class="dom">20</span></td>
+<td class="time">
+<div>17:00</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a href="./to010?SILFDNR=1000670&amp;refresh=false" id="si_1000670" data-simpletooltip-text=" am Di., 20.10.2026 um 17:00 Uhr." class="js-simple-tooltip tooltipProvider">Gemeinsame Sitzung des Dezernatsausschusses IV und V</a>
+</div>
+</td><td class="raum">
+<div>Rathaus, Großer Rathaussaal</div>
+</td>
+</tr><tr class="sameday tue odd">
+<td class="nowrapContent"></td>
+<td class="time">
+<div>18:10</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a href="./to010?SILFDNR=1000184&amp;refresh=false" id="si_1000184" data-simpletooltip-text=" am Di., 20.10.2026 um 18:10 Uhr." class="js-simple-tooltip tooltipProvider">Sitzung des Dezernatsausschusses IV</a>
+</div>
+</td><td class="raum">
+<div>Rathaus, Großer Rathaussaal</div>
+</td>
+</tr><tr class="sameday tue odd">
+<td class="nowrapContent"></td>
+<td class="time">
+<div>19:00</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a href="./to010?SILFDNR=1000413&amp;refresh=false" id="si_1000413" data-simpletooltip-text=" am Di., 20.10.2026 um 19:00 Uhr." class="js-simple-tooltip tooltipProvider">Sitzung des Ortsbeirates Heiligkreuz</a>
+</div>
+</td><td class="raum">
+<div>Schönstattzentrum</div>
+</td>
+</tr><tr class="sameday tue odd">
+<td class="nowrapContent"></td>
+<td class="time">
+<div>19:00</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a id="si_1000397">Sitzung des Ortsbeirates Filsch</a>
+</div>
+</td><td class="raum">
+<div>Kindertagesstätte „Im Freschfeld“</div>
+</td>
+</tr><tr class="sameday tue odd">
+<td class="nowrapContent"></td>
+<td class="time">
+<div>19:00</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a id="si_1000333">Sitzung des Ortsbeirates Mitte/Gartenfeld</a>
+</div>
+</td><td class="raum">
+<div>Verwaltungsgebäude III, Fraktionsraum Stadtratsfraktion Bündnis 90/Die Grünen</div>
+</td>
+</tr><tr class="sameday tue odd">
+<td class="nowrapContent"></td>
+<td class="time">
+<div>19:30</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a href="./to010?SILFDNR=1000361&amp;refresh=false" id="si_1000361" data-simpletooltip-text=" am Di., 20.10.2026 um 19:30 Uhr." class="js-simple-tooltip tooltipProvider">Sitzung des Ortsbeirates Ruwer/Eitelsbach</a>
+</div>
+</td><td class="raum">
+<div>Feuerwehrgerätehaus Ruwer</div>
+</td>
+</tr><tr class="sameday tue odd">
+<td class="nowrapContent"></td>
+<td class="time">
+<div>20:00</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a href="./to010?SILFDNR=1000420&amp;refresh=false" id="si_1000420" data-simpletooltip-text=" am Di., 20.10.2026 um 20:00 Uhr." class="js-simple-tooltip tooltipProvider">Sitzung des Ortsbeirates Mariahof</a>
+</div>
+</td><td class="raum">
+<div>Ladenpassage Mariahof, Stadtteiltreff</div>
+</td>
+</tr><tr class="wed even">
+<td class="nowrapContent"><span class="dow">Wed</span><span class="dom">21</span></td>
+<td class="time">
+<div>17:00</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a href="./to010?SILFDNR=1000264&amp;refresh=false" id="si_1000264" data-simpletooltip-text=" am Mi., 21.10.2026 um 17:00 Uhr." class="js-simple-tooltip tooltipProvider">Sitzung des Stadtrates</a>
+</div>
+</td><td class="raum">
+<div>Rathaus, Großer Rathaussaal</div>
+</td>
+</tr><tr class="thu odd">
+<td class="nowrapContent"><span class="dow">Thu</span><span class="dom">22</span></td>
+<td class="time">
+<div></div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a id="si_1000321">Sitzung des Beirates für Migration und Integration</a>
+</div>
+</td><td class="raum">
+<div>Rathaus, Großer Rathaussaal</div>
+</td>
+</tr><tr class="fri even emptyRow">
+<td class="nowrapContent"><span class="dow">Fri</span><span class="dom">23</span></td>
+<td colspan="3">
+<div> </div>
+</td>
+</tr><tr class="sat odd emptyRow">
+<td class="nowrapContent"><span class="dow">Sat</span><span class="dom">24</span></td>
+<td colspan="3">
+<div> </div>
+</td>
+</tr><tr class="sun odd emptyRow">
+<td class="nowrapContent"><span class="dow">Sun</span><span class="dom">25</span></td>
+<td colspan="3">
+<div> </div>
+</td>
+</tr><tr class="mon even">
+<td class="nowrapContent"><span class="dow">Mon</span><span class="dom">26</span></td>
+<td class="time">
+<div>19:30</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a id="si_1000684">Sitzung des Ortsbeirates Irsch</a>
+</div>
+</td><td class="raum">
+<div>Grundschulgebäude Irsch, Proberaum Musikverein Trier-Irsch</div>
+</td>
+</tr><tr class="tue odd">
+<td class="nowrapContent"><span class="dow">Tue</span><span class="dom">27</span></td>
+<td class="time">
+<div></div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a id="si_1000205">Sitzung des Seniorenbeirats</a>
+</div>
+</td><td class="raum">
+<div>Rathaus, Großer Rathaussaal</div>
+</td>
+</tr><tr class="sameday tue odd">
+<td class="nowrapContent"></td>
+<td class="time">
+<div>17:00</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a id="si_1000224">Sitzung des Sportausschusses</a>
+</div>
+</td><td class="raum">
+<div>Rathaus, Großer Rathaussaal</div>
+</td>
+</tr><tr class="sameday tue odd">
+<td class="nowrapContent"></td>
+<td class="time">
+<div>18:00</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a id="si_1000227">Sitzung des Schulträgerausschusses</a>
+</div>
+</td><td class="raum">
+<div>Rathaus, Großer Rathaussaal</div>
+</td>
+</tr><tr class="wed even">
+<td class="nowrapContent"><span class="dow">Wed</span><span class="dom">28</span></td>
+<td class="time">
+<div>17:00</div>
+</td><td class="textCol" data-bordercolor="transparent">
+<div>
+<a id="si_1000280">Sitzung des Haushalts- und Personalausschusses</a>
+</div>
+</td><td class="raum">
+<div>Rathaus, Großer Rathaussaal</div>
+</td>
+</tr><tr class="thu odd emptyRow">
+<td class="nowrapContent"><span class="dow">Thu</span><span class="dom">29</span></td>
+<td colspan="3">
+<div> </div>
+</td>
+</tr><tr class="fri even emptyRow">
+<td class="nowrapContent"><span class="dow">Fri</span><span class="dom">30</span></td>
+<td colspan="3">
+<div> </div>
+</td>
+</tr><tr class="sat odd emptyRow">
+<td class="nowrapContent"><span class="dow">Sat</span><span class="dom">31</span></td>
+<td colspan="3">
+<div> </div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></div>]]></component><header-contribution><![CDATA[<head xmlns:wicket="http://wicket.apache.org"><meta name="description" content="ALLRIS net Version 4.1.7 (4170041) - 08.07.2026" /><script type="text/javascript" src="./wicket/resource/org.apache.wicket.resource.JQueryResourceReference/jquery/jquery-3.7.1-ver-962A4A135B116C30221466C5E4F0E7A1.js"></script>
+<script type="text/javascript" src="./wicket/resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-ajax-jquery-ver-C887AA843619090BF01E0673D9DBA2B9.js"></script>
+</head>]]></header-contribution><evaluate><![CDATA[<head xmlns:wicket="http://wicket.apache.org"><script type="text/javascript">
+/*<![CDATA[*/
+(function(){$('#si_1000686').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000686')}); 
+})();(function(){$('#si_1000378').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000378')}); 
+})();(function(){$('#si_1000467').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000467')}); 
+})();(function(){$('#si_1000649').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000649')}); 
+})();(function(){$('#si_1000455').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000455')}); 
+})();(function(){$('#si_1000390').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000390')}); 
+})();(function(){$('#si_1000407').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000407')}); 
+})();(function(){$('#si_1000372').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000372')}); 
+})();(function(){$('#si_1000670').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000670')}); 
+})();(function(){$('#si_1000184').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000184')}); 
+})();(function(){$('#si_1000413').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000413')}); 
+})();(function(){$('#si_1000397').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000397')}); 
+})();(function(){$('#si_1000333').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000333')}); 
+})();(function(){$('#si_1000361').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000361')}); 
+})();(function(){$('#si_1000420').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000420')}); 
+})();(function(){$('#si_1000264').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000264')}); 
+})();(function(){$('#si_1000321').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000321')}); 
+})();(function(){$('#si_1000684').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000684')}); 
+})();(function(){$('#si_1000205').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000205')}); 
+})();(function(){$('#si_1000224').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000224')}); 
+})();(function(){$('#si_1000227').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000227')}); 
+})();(function(){$('#si_1000280').on('click', function(){ 
+sessionStorage.setItem('customfocused', 'si_1000280')}); 
+})();(function(){var focus = sessionStorage.getItem('customfocused'); 
+if (typeof focus !== 'undefined' && focus !== null && $('#' + focus).length > 0) { 
+		document.getElementById(focus).scrollIntoView({behavior: 'smooth', block: 'start'}); 
+		Wicket.Focus.setFocusOnId(focus); 
+		sessionStorage.removeItem('customfocused'); 
+} 
+else { 
+		var lastfocus = sessionStorage.getItem('focused'); 
+		Wicket.Focus.setFocusOnId(lastfocus); 
+		} 
+})();(function(){$('.js-simple-tooltip').each(function() { $.fn.accessibleSimpleTooltipAria.apply(this); }); $.fn.ajaxFuncs();})();
+/*]]]]><![CDATA[>*/
+</script>
+</head>]]></evaluate></ajax-response>
