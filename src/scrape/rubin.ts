@@ -97,6 +97,8 @@ export function koerperschaftsName(name: string): string {
   if (fuer) return `Ortsgemeinde ${fuer[1]!.trim()}`;
   // „… c/o Verbandsgemeinde …“ und angehängte Amtsträger („… Ortsbürgermeisterin Barbara …“, Lambsheim-Heßheim)
   return name
+    .replace(/^Nationalparkverbandsgemeinde\s+/, 'Verbandsgemeinde ') // Herrstein-Rhaunen
+    .replace(/^Ortgemeinde\s+/, 'Ortsgemeinde ') // Tippfehler im System (Landau-Land)
     .replace(/\s+c\/o\s+.*$/i, '')
     .replace(/\s+(?:Orts|Stadt)?[Bb]ürgermeister(?:in)?\b.*$/, '')
     .trim();
