@@ -81,6 +81,7 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
   const endpoints = read<{ endpoints: SourceRecord[] }>(opts.endpointsPath ?? 'data/endpoints.json', { endpoints: [] }).endpoints;
   const gebietVon = new Map(endpoints.map((e) => [e.id, e.gebiet]));
   const urlVon = new Map(endpoints.map((e) => [e.id, e.url]));
+  const typVon = new Map(endpoints.map((e) => [e.id, e.typ]));
 
   rmSync(outDir, { recursive: true, force: true });
   cpSync(webDir, outDir, { recursive: true });
@@ -111,7 +112,8 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
     // Startseite des Original-RIS, damit man dort nach weiteren Daten suchen kann
     const quelleUrl = urlVon.get(id) ?? snap.quelle.system;
     const ris = quelleUrl ? risStartseite(quelleUrl) : null;
-    const quelle = { ...snap.quelle, ris };
+    // Kalenderexport: der Anbieter stellt nur Termine bereit, Tagesordnungen und Vorlagen nur im eigenen RIS
+    const quelle = { ...snap.quelle, ris, ...(typVon.get(id) === 'ics' ? { nurTermine: true } : {}) };
     writeFileSync(join(outDir, 'data', `${id}.json`), JSON.stringify({ ...snap, quelle, koerperschaften, vorlagen }));
     suche.push(...suchEintraege(qi, gebiet ?? null, gebietVonBody, snap.sitzungen, vorlagen));
 

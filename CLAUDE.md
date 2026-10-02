@@ -195,6 +195,9 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
   ~0,7 MB übertragen, wird erst im Reiter geladen). Themen als Begriffslisten (`THEMEN` in `web/app.js`, Teilwörter mit
   ausgeschriebenen Umlauten, „^“ = Wortanfang), dazu Stichwort und Ort (ganz RLP, Gemeinde/VG/Kreis der gewählten Kommune,
   Favoriten). KI-Zusammenfassungen vom Projektinhaber verworfen (zu teuer).
+- Quellen mit `typ: "ics"` (nur Termine; Ramstein-Miesenbach, Oberes Glantal, Wallmerod, Altenkirchen-Flammersfeld) tragen im Export
+  `quelle.nurTermine`; die App zeigt dann auf Kommunen- und Sitzungsseite einen freundlichen Hinweis, dass Tagesordnungen und
+  Vorlagen technisch nur im RIS des Anbieters bereitstehen (wie bei Ludwigshafen: keine Schuldzuweisung, Link aufs RIS).
 - App-Dateien lädt der Service Worker zuerst aus dem Netz (Cache nur offline); neue Version kurz nach dem Start → automatisch neu laden.
 - Links ins Original-RIS (seit 02.10.2026): je Quelle `quelle.ris` (Startseite, `risStartseite`), je Sitzung/Vorlage `web`
   (`webSeite` in `src/export/snapshot.ts`: OParl-`web`, sonst Seitenadresse der Scraper; more!rubin-Sitzungen `/meeting?id=`

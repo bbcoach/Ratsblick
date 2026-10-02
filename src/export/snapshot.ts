@@ -19,6 +19,7 @@ interface FileRef {
   name: string;
   rolle: string;
   url: string | null;
+  seite?: boolean;
 }
 
 type Row = Record<string, unknown>;
@@ -90,12 +91,18 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
 
   const filesOf = (ownerType: string, ownerId: string): FileRef[] =>
     all(
-      `SELECT f.name, f.access_url, l.role FROM file_link l JOIN file f ON f.id = l.file_id
+      `SELECT f.name, f.access_url, f.mime_type, l.role FROM file_link l JOIN file f ON f.id = l.file_id
        WHERE l.owner_type = ? AND l.owner_id = ?
        ORDER BY CASE l.role WHEN 'main' THEN 0 WHEN 'invitation' THEN 1 WHEN 'resultsProtocol' THEN 2 ELSE 3 END, f.name`,
       ownerType,
       ownerId,
-    ).map((f) => ({ name: String(f.name ?? 'Dokument'), rolle: String(f.role), url: s(f.access_url) }));
+    ).map((f) => ({
+      name: String(f.name ?? 'Dokument'),
+      rolle: String(f.role),
+      url: s(f.access_url),
+      // Verweis auf eine Webseite statt auf ein PDF (Kalenderexport: Tagesordnung im RIS)
+      ...(f.mime_type === 'text/html' ? { seite: true } : {}),
+    }));
 
   const meetingIds = new Set<string>();
   const paperIds = new Set<string>();

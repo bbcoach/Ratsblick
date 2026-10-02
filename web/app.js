@@ -393,19 +393,28 @@
     const vergangen = sitz.filter((m) => m.start < jetzt).reverse().slice(0, 6);
     const vorl = (x.vByK.get(t.b) || []).slice(0, 10);
     const gremien = gremienVon(sitz);
-    $view.innerHTML = `${seg}${kopf}
+    $view.innerHTML = `${seg}${kopf}${nurTermineHinweis(x)}
       <section><h2>Nächste Sitzungen</h2>
         ${kommend.length ? `<div class="list">${kommend.map(sitzungRow).join('')}</div>` : '<div class="card empty">Zurzeit sind keine Sitzungen angekündigt.</div>'}
       </section>
-      <section><h2>Neue Vorlagen</h2>
+      ${x.D.quelle.nurTermine ? '' : `<section><h2>Neue Vorlagen</h2>
         ${vorl.length ? `<div class="list">${vorl.map(vorlageRow).join('')}</div>` : '<div class="card empty">Keine aktuellen Vorlagen.</div>'}
-      </section>
+      </section>`}
       ${vergangen.length ? `<section><h2>Zuletzt getagt</h2><div class="list">${vergangen.map(sitzungRow).join('')}</div></section>` : ''}
       ${gremien.length ? `<section><details class="gremien"><summary>Gremien (${gremien.length}) – mit dem Stern als Favorit merken</summary>
         <div class="list">${gremien.map((g) => `<div class="row static"><div class="body"><span class="title">${esc(gremiumKurz(g))}</span></div>${sternKnopf({ q: t.q, k: t.b, g, kn: x.k.get(t.b)?.name || '', ort: id })}</div>`).join('')}</div>
       </details></section>` : ''}
       ${risLink(null, x.D.quelle.ris)}
       <p class="stand">Abgleich mit ${esc(x.D.quelle.name)}: ${esc(stand(x.D.quelle.abgleich))}</p>`;
+  }
+
+  // Hinweis für Quellen, die nur Termine liefern (Kalenderexport); freundlich, die Gründe liegen beim Anbieter
+  function nurTermineHinweis(x) {
+    if (!x.D.quelle.nurTermine) return '';
+    const name = String(x.D.quelle.name || '').replace(/^VG /, 'Verbandsgemeinde ');
+    return `<div class="card empty-state"><p><strong>Hier sehen Sie die Sitzungstermine</strong></p>
+      <p class="muted">Tagesordnungen, Vorlagen und Beschlüsse stellt die ${esc(name)} technisch bisher nur in ihrem eigenen Ratsinformationssystem bereit – eine vollständige Übernahme in andere Angebote wie Ratsblick ist dort leider noch nicht vorgesehen. Die vollständigen Unterlagen finden Sie direkt im Ratsinformationssystem.</p>
+      ${x.D.quelle.ris ? `<a class="btn ghost" href="${esc(x.D.quelle.ris)}" target="_blank" rel="noopener">Ratsinformationssystem öffnen</a>` : ''}</div>`;
   }
 
   function ohneDaten(t, eb) {
@@ -449,7 +458,7 @@
   }
   function docRow(f) {
     const label = f.rolle !== 'auxiliary' && rolleLabel[f.rolle] ? rolleLabel[f.rolle] : f.name;
-    return `<a class="doc" href="${esc(f.url)}" target="_blank" rel="noopener"><span class="ico">PDF</span><span class="body"><span>${esc(label)}</span><span class="muted small">${esc(f.rolle === 'auxiliary' ? 'Anlage' : f.name)}</span></span>${chev}</a>`;
+    return `<a class="doc" href="${esc(f.url)}" target="_blank" rel="noopener"><span class="ico">${f.seite ? 'WEB' : 'PDF'}</span><span class="body"><span>${esc(label)}</span><span class="muted small">${esc(f.rolle === 'auxiliary' ? 'Anlage' : f.name)}</span></span>${chev}</a>`;
   }
 
   // ---------- Ansicht: Sitzung ----------
@@ -476,7 +485,7 @@
             ${v ? `<button class="linkbtn" type="button" data-go="${esc(link('v', v.id))}">Vorlage <span class="mono">${esc(v.nr)}</span> ansehen${v.kurz ? ' · Kurz erklärt' : ''}</button>` : ''}
             ${t.beschluss ? `<details class="beschluss"><summary>Beschluss</summary><p>${esc(t.beschluss)}</p></details>` : ''}
           </div></div>`;
-        }).join('')}</div>` : '<div class="card empty">Die Tagesordnung ist noch nicht veröffentlicht.</div>'}
+        }).join('')}</div>` : x.D.quelle.nurTermine ? nurTermineHinweis(x) : '<div class="card empty">Die Tagesordnung ist noch nicht veröffentlicht.</div>'}
       </section>
       ${risLink(m.web, x.D.quelle.ris, 'Sitzung')}`;
   }
