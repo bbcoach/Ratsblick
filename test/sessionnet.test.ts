@@ -145,6 +145,9 @@ describe('SessionNet: PHP-Variante (echte Seiten aus Koblenz, SessionNet 5.4.7)'
     expect(mandantName('Verbandsgemeindeverwaltung Trier-Land')).toBe('Verbandsgemeinde Trier-Land');
     expect(mandantName('Verbandsgemeindeverwaltung Trier-Land (PV-Rat)')).toBe('Verbandsgemeindeverwaltung Trier-Land (PV-Rat)');
     expect(mandantName('Ortsgemeinde Bann')).toBe('Ortsgemeinde Bann');
+    expect(mandantName('Kallstadt')).toBe('Ortsgemeinde Kallstadt');
+    expect(mandantName('Bobenheim am Berg')).toBe('Ortsgemeinde Bobenheim am Berg');
+    expect(mandantName('Forstverband Ganerben')).toBe('Forstverband Ganerben');
     expect(mandantName('Bekond')).toBe('Ortsgemeinde Bekond');
     expect(mandantName('Stadt Schweich')).toBe('Stadt Schweich');
     expect(mandantName('Forstzweckverbände')).toBe('Forstzweckverbände');
