@@ -16,7 +16,7 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
 - Hosts mit robots.txt-Verbot (z. B. `*.sitzung-online.de`) nicht automatisiert abrufen, bevor das geklärt ist.
   Ausnahme auf ausdrückliche Entscheidung des Projektinhabers (01.10.2026): Kreis Kaiserslautern auf
   `sessionnet.owl-it.de` – nur dieser Pfad, 2 s Abstand (`intervallMs`), Grund im Feld `hinweis` der Quelle.
-  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`), Stadt Trier (`gremieninfo.trier.de`) und VG Kirchheimbolanden
+  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`), Kreis Cochem-Zell (`/cochem-zell/bi/`), Stadt Trier (`gremieninfo.trier.de`) und VG Kirchheimbolanden
   (`kirchheimbolanden.ris-portal.de`, robots.txt erlaubt nur Suchmaschinen) – Trier und Kirchheimbolanden über den Weiterleiter. Bei Einwänden des Betreibers sofort abschalten.
   Andere owl-it-Kunden bleiben gesperrt.
 - Technik: TypeScript, Node ≥ 22.13, eingebautes `node:sqlite`, `tsx`, `vitest`. Keine schweren Abhängigkeiten
@@ -65,7 +65,7 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - VG Oberes Glantal: SD.NET RIM auf `vgog.ratsinfomanagement.net` hinter Browser-Prüfung (rescaled WAF), robots.txt sperrt alles
   außer `/termine/ics/`, OParl „nicht aktiviert“. Daher `typ: "ics"` (`src/scrape/ics.ts`): nur Termine der VG-Gremien aus
   dem Kalenderexport (`/termine/ics/glm` – mit Pfadteil alle Termine, ohne nur die nächsten), Link zur Tagesordnung als Dokument.
-- Cochem-Zell und Zweibrücken laufen auf `sessionnet.owl-it.de` (robots.txt). Südwestpfalz und Rhein-Pfalz-Kreis:
+- Zweibrücken läuft auf `sessionnet.owl-it.de` (robots.txt); Cochem-Zell ebenfalls, seit 02.10.2026 trotzdem angebunden (s. o.). Südwestpfalz und Rhein-Pfalz-Kreis:
   more!rubin ohne OParl, laufen seit 02.10.2026 über `rubin-api`. Worms: `worms.gremien.info` ohne OParl.
 - Unklar: Landau, Birkenfeld (kein RIS-Link gefunden), Mayen-Koblenz (Ratsinfo in die Kreis-Website eingebettet,
   Quelle unbekannt), Mainz-Bingen (Verweis auf cc-egov, ohne Treffer).
