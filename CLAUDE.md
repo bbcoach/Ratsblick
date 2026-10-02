@@ -73,8 +73,8 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   dem Gremiumsnamen („Gemeinderat X“, „… Stadt X“, „… VG …“ → VG). Ohne Tagesordnungen.
 - Zweibrücken läuft auf `sessionnet.owl-it.de` (robots.txt); Cochem-Zell ebenfalls, seit 02.10.2026 trotzdem angebunden (s. o.). Südwestpfalz und Rhein-Pfalz-Kreis:
   more!rubin ohne OParl, laufen seit 02.10.2026 über `rubin-api`. Worms: `worms.gremien.info` ohne OParl.
-- Unklar: Landau, Birkenfeld (kein RIS-Link gefunden), Mayen-Koblenz (Ratsinfo in die Kreis-Website eingebettet,
-  Quelle unbekannt), Mainz-Bingen (Verweis auf cc-egov, ohne Treffer).
+- Kreis Mayen-Koblenz: SessionNet PHP auf `ris.kvmyk.de/bi/` (keine robots.txt; die Kreis-Website bettet es nur ein).
+- Unklar: Landau, Birkenfeld (kein RIS-Link gefunden), Mainz-Bingen (Verweis auf cc-egov, ohne Treffer).
 - Trier (ALLRIS 4, `typ: "allris"`, `src/scrape/allris.ts`, seit 02.10.2026): Kalender `si010?MM=&YY=` lädt die
   Tabelle per Wicket-Ajax (`si010?0-1.0-&MM=…`) mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch,
   meldet `x-ratsblick-set-cookie`); Sitzungen `to010?SILFDNR=`, Vorlagen `vo020?VOLFDNR=` ohne Sitzung abrufbar.
