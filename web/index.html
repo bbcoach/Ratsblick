@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ratsblick RLP</title>
-<meta name="description" content="Sitzungen, Tagesordnungen und Vorlagen aus den Ratsinformationssystemen in Rheinland-Pfalz">
+<title>Wahlheimat – Guter Rat ist nicht mehr teuer</title>
+<meta name="description" content="Wahlheimat – Guter Rat ist nicht mehr teuer. Sitzungen, Tagesordnungen und Vorlagen aus den Ratsinformationssystemen in Rheinland-Pfalz">
 <meta name="theme-color" content="#7b2736">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Ratsblick RLP">
+<meta name="apple-mobile-web-app-title" content="Wahlheimat">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -80,6 +80,7 @@ button { font: inherit; color: inherit; }
 .home { display: grid; gap: 22px; padding-top: 6vh; }
 .home h3 { font-size: 28px; line-height: 1.2; }
 .home .lead { color: var(--muted); font-size: 16px; }
+.home .slogan { margin: 0; color: var(--accent); font-weight: 700; font-size: 15px; letter-spacing: .01em; }
 .searchbox { position: relative; }
 .searchbox svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--muted); pointer-events: none; }
 .searchbox input { width: 100%; padding: 16px 16px 16px 46px; font: inherit; font-size: 17px; border: 2px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--fg); }
@@ -223,9 +224,9 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
 <body>
 <div class="app">
   <header class="bar">
-    <a class="logo" href="#/" id="home" aria-label="Ratsblick RLP – zur Startseite">
+    <a class="logo" href="#/" id="home" aria-label="Wahlheimat – zur Startseite">
       <img src="icons/icon.svg" alt="" width="32" height="32">
-      <span>Ratsblick <span class="rlp">RLP</span></span>
+      <span>Wahlheimat <span class="rlp">RLP</span></span>
     </a>
     <p class="ctx" id="title"></p>
   </header>

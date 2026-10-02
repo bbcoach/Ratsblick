@@ -1,4 +1,4 @@
-// Ratsblick – Service Worker. App-Hülle aus dem Cache, Daten zuerst aus dem Netz (offline: letzter Stand).
+// Wahlheimat – Service Worker. App-Hülle aus dem Cache, Daten zuerst aus dem Netz (offline: letzter Stand).
 const VERSION = '__BUILD__';
 const SHELL = `ratsblick-app-${VERSION}`;
 const DATA = 'ratsblick-daten';

@@ -1,4 +1,4 @@
-// Ratsblick – Web-App. Liest die statischen Datendateien aus data/ (erzeugt mit `npm run web`).
+// Wahlheimat (vormals Ratsblick) – Web-App. Liest die statischen Datendateien aus data/ (erzeugt mit `npm run web`).
 (() => {
   'use strict';
   const TZ = 'Europe/Berlin';
@@ -164,7 +164,7 @@
   const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
   function installCard() {
     if (standalone() || store.get('installHidden', false)) return '';
-    if (installEvent) return `<div class="card install"><p>Ratsblick RLP als App auf dem Startbildschirm ablegen.</p><button class="btn" type="button" id="inst">Installieren</button><button class="x" type="button" id="instx" aria-label="Hinweis ausblenden">×</button></div>`;
+    if (installEvent) return `<div class="card install"><p>Wahlheimat als App auf dem Startbildschirm ablegen.</p><button class="btn" type="button" id="inst">Installieren</button><button class="x" type="button" id="instx" aria-label="Hinweis ausblenden">×</button></div>`;
     if (isIos()) return `<div class="card install"><p>Als App nutzen: in Safari auf <strong>Teilen</strong> tippen, dann <strong>Zum Home-Bildschirm</strong>.</p><button class="x" type="button" id="instx" aria-label="Hinweis ausblenden">×</button></div>`;
     return '';
   }
@@ -248,6 +248,7 @@
       <div class="home">
         ${installCard()}
         <section class="hero">
+          <p class="slogan">Guter Rat ist nicht mehr teuer.</p>
           <h3>Was beschließt Ihr Gemeinderat?</h3>
           <p class="lead">Sitzungen, Tagesordnungen und Vorlagen Ihrer Kommune – verständlich an einem Ort.</p>
         </section>
@@ -413,7 +414,7 @@
     if (!x.D.quelle.nurTermine) return '';
     const name = String(x.D.quelle.name || '').replace(/^VG /, 'Verbandsgemeinde ');
     return `<div class="card empty-state"><p><strong>Hier sehen Sie die Sitzungstermine</strong></p>
-      <p class="muted">Tagesordnungen, Vorlagen und Beschlüsse stellt die ${esc(name)} technisch bisher nur in ihrem eigenen Ratsinformationssystem bereit – eine vollständige Übernahme in andere Angebote wie Ratsblick ist dort leider noch nicht vorgesehen. Die vollständigen Unterlagen finden Sie direkt im Ratsinformationssystem.</p>
+      <p class="muted">Tagesordnungen, Vorlagen und Beschlüsse stellt die ${esc(name)} technisch bisher nur in ihrem eigenen Ratsinformationssystem bereit – eine vollständige Übernahme in andere Angebote wie Wahlheimat ist dort leider noch nicht vorgesehen. Die vollständigen Unterlagen finden Sie direkt im Ratsinformationssystem.</p>
       ${x.D.quelle.ris ? `<a class="btn ghost" href="${esc(x.D.quelle.ris)}" target="_blank" rel="noopener">Ratsinformationssystem öffnen</a>` : ''}</div>`;
   }
 
@@ -422,7 +423,7 @@
     let grund;
     if (ris?.status === 'inaktiv') grund = 'Das Ratsinformationssystem hat eine Standardschnittstelle (OParl), sie ist aber nicht freigeschaltet. Sobald die Verwaltung sie freischaltet, können wir die Daten hier zeigen.';
     else if (ris?.status === 'robots') grund = 'Der Anbieter des Ratsinformationssystems untersagt automatische Abrufe. Wir zeigen die Daten erst, wenn das geklärt ist.';
-    else if (ris?.status === 'blockiert') grund = `${anzeigeName(t)} stellt die Ratsinformationen bisher nur zum Lesen im eigenen Ratsinformationssystem bereit – eine Übernahme in andere Angebote wie Ratsblick ist dort leider noch nicht vorgesehen. Sobald die Stadt das ermöglicht, zeigen wir die Sitzungen gern auch hier. Bis dahin finden Sie alle Unterlagen direkt beim Ratsinformationssystem der Stadt.`;
+    else if (ris?.status === 'blockiert') grund = `${anzeigeName(t)} stellt die Ratsinformationen bisher nur zum Lesen im eigenen Ratsinformationssystem bereit – eine Übernahme in andere Angebote wie Wahlheimat ist dort leider noch nicht vorgesehen. Sobald die Stadt das ermöglicht, zeigen wir die Sitzungen gern auch hier. Bis dahin finden Sie alle Unterlagen direkt beim Ratsinformationssystem der Stadt.`;
     else if (ris?.status === 'geplant') grund = 'Das Ratsinformationssystem erlaubt automatische Abrufe. Die Anbindung ist geplant.';
     else if (t.art === 'Ortsgemeinde') grund = 'Ortsgemeinden veröffentlichen ihre Sitzungen meist im Ratsinformationssystem der Verbandsgemeinde. Für diese ist noch keine offene Schnittstelle bekannt.';
     else grund = 'Für dieses Ratsinformationssystem ist noch keine offene Schnittstelle bekannt.';

@@ -1,6 +1,8 @@
-# Ratsblick – Datenebene
+# Wahlheimat (vormals Ratsblick) – Datenebene
 
-Ratsblick soll die öffentlichen Inhalte kommunaler Ratsinformationssysteme an einem Ort zugänglich machen.
+*Guter Rat ist nicht mehr teuer.*
+
+Wahlheimat soll die öffentlichen Inhalte kommunaler Ratsinformationssysteme an einem Ort zugänglich machen.
 Dieses Repository enthält den ersten Baustein: Es liest Daten über die Standardschnittstelle **OParl**
 und schreibt sie in eine einheitliche Datenbank. Website und App setzen später darauf auf.
 

@@ -24,7 +24,7 @@ describe('Weiterleiter (relay/api/abruf.js)', () => {
     expect(r.status).toBe(200);
     expect(await r.text()).toBe('<html>Kalender</html>');
     expect(gesehen?.url).toBe(ziel);
-    expect(gesehen?.ua).toMatch(/^Ratsblick/);
+    expect(gesehen?.ua).toMatch(/^Wahlheimat/);
   });
 
   it('reicht Sitzungs-Cookie und Wicket-Kennzeichen durch und meldet neue Cookies zurück', async () => {

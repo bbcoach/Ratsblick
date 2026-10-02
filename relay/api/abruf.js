@@ -13,7 +13,7 @@ import { Readable } from 'node:stream';
 import tls from 'node:tls';
 import { ERLAUBT } from '../lib/erlaubt.js';
 
-const UA = 'Ratsblick/0.1 (OParl-Abgleich; Kontakt: https://github.com/bbcoach/Ratsblick)';
+const UA = 'Wahlheimat/0.1 (vormals Ratsblick; Abgleich oeffentlicher Ratsinformationen; Kontakt: https://github.com/bbcoach/Ratsblick)';
 const STANDARD_HOSTS = 'ris.kaiserslautern.de';
 
 function antwort(status, text) {

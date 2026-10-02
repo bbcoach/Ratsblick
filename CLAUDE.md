@@ -1,9 +1,11 @@
-# Ratsblick – Projektkontext für Claude Code
+# Wahlheimat (vormals Ratsblick) – Projektkontext für Claude Code
 
 ## Ziel
 Ein einheitliches Portal (Website und später App), das nach Eingabe der eigenen Kommune die öffentlichen
 Inhalte der Ratsinformationssysteme (RIS) zeigt: Sitzungen, Tagesordnungen, Vorlagen, Beschlüsse.
-Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
+Start mit Rheinland-Pfalz. Name seit 02.10.2026: **„Wahlheimat“**, Slogan „Guter Rat ist nicht mehr teuer“ (vorher Arbeitstitel
+„Ratsblick“ – Name ist durch ein Projekt unter ratsblick.de belegt). Interne Bezeichner (Repo, `localStorage`-Schlüssel
+`ratsblick:*`, Cache-Namen, Weiterleiter-Header `x-ratsblick-*`, Quell-IDs) bleiben unverändert, damit nichts verloren geht.
 
 ## Wichtige Entscheidungen
 - Datenquelle zuerst **OParl** (Standardschnittstelle für RIS). Scraper für Systeme ohne OParl kommen später
@@ -185,10 +187,10 @@ Entwürfe „Ratsblick – Kernansichten“ (Claude Design): Kommune wählen →
 (Ebenen-Umschalter Gemeinde/VG/Landkreis, nächste Sitzungen, neue Vorlagen) → Vorlage im Detail
 („Kurz erklärt“ in einfacher Sprache, als automatisch erstellt gekennzeichnet, Beratungsfolge, Dokumente)
 → Themen-Abo (Themen, Stichwort, eigene Straße, Push/E-Mail).
-Name in der App: „Ratsblick RLP“ (seit 02.10.2026).
+Name in der App: „Wahlheimat RLP“ (Kopfzeile, „RLP“ in Gold), Slogan „Guter Rat ist nicht mehr teuer.“ auf der Startseite; vorher „Ratsblick RLP“.
 Stil: ruhig und behördennah, Akzent Weinrot #7B2736 (vorher Blau #1F4E79), Schrift Public Sans, Vorlagennummern in IBM Plex Mono.
 Logo (seit 02.10.2026): Umriss von Rheinland-Pfalz in Schwarz-Rot-Gold (diagonale Bänder, versetzte Füllung, weißer Umriss)
-mit Lupe auf Weinrot; Kopfzeile „Ratsblick **RLP**“ mit „RLP“ in Gold #F2C230. Eigene Zeichnung aus offenen Grenzdaten
+mit Lupe auf Weinrot; Kopfzeile „Wahlheimat **RLP**“ mit „RLP“ in Gold #F2C230. Eigene Zeichnung aus offenen Grenzdaten
 (`scripts/logo.py` → `web/icons/icon.svg`, `icon-maskable.svg`), keine Vorlage aus Bilddiensten (Vecteezy verlangt Namensnennung).
 Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromium rendern (ImageMagick hat keinen SVG-Renderer).
 

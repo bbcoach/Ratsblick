@@ -78,7 +78,7 @@ export class OParlClient {
     this.minIntervalMs = opts.minIntervalMs ?? 1000;
     this.maxRetries = opts.maxRetries ?? 3;
     this.timeoutMs = opts.timeoutMs ?? 30_000;
-    this.userAgent = opts.userAgent ?? 'Ratsblick/0.1 (OParl-Abgleich; Kontakt: https://github.com/bbcoach/Ratsblick)';
+    this.userAgent = opts.userAgent ?? 'Wahlheimat/0.1 (vormals Ratsblick; Abgleich oeffentlicher Ratsinformationen; Kontakt: https://github.com/bbcoach/Ratsblick)';
     this.maxPages = opts.maxPages ?? 10_000;
     this.sleep = opts.sleep ?? defaultSleep;
   }
