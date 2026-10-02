@@ -210,8 +210,8 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
 - Quellen mit `typ: "ics"` (nur Termine; Ramstein-Miesenbach, Oberes Glantal, Wallmerod, Altenkirchen-Flammersfeld) tragen im Export
   `quelle.nurTermine`; die App zeigt dann auf Kommunen- und Sitzungsseite einen freundlichen Hinweis, dass Tagesordnungen und
   Vorlagen technisch nur im RIS des Anbieters bereitstehen (wie bei Ludwigshafen: keine Schuldzuweisung, Link aufs RIS).
-- Darstellung (seit 02.10.2026): Knopf in der Kopfzeile wechselt Gerät → Hell → Dunkel (`localStorage` `ratsblick:theme`, frühes
-  Skript im `<head>` gegen Aufblitzen). Breite: Kopfzeile/Reiter über die ganze Breite, Inhaltsspalte `--w` 640/840/1120 px;
+- Darstellung (seit 02.10.2026, kein Umschaltknopf – Projektinhaber): nachts dunkel nach Tageszeit des Geräts (zwischen Ende und
+  Beginn der bürgerlichen Dämmerung, berechnet für RLP, `nachtModus` im `<head>`, minütlich geprüft), tagsüber wie im Gerät eingestellt. Breite: Kopfzeile/Reiter über die ganze Breite, Inhaltsspalte `--w` 640/840/1120 px;
   ab 1180 px „Nächste Sitzungen“ und „Neue Vorlagen“ nebeneinander (`section.spalte`). Domain: wahlheimat-rlp.de (GitHub Pages).
 - App-Dateien lädt der Service Worker zuerst aus dem Netz (Cache nur offline); neue Version kurz nach dem Start → automatisch neu laden.
 - Links ins Original-RIS (seit 02.10.2026): je Quelle `quelle.ris` (Startseite, `risStartseite`), je Sitzung/Vorlage `web`

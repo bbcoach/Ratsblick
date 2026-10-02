@@ -52,30 +52,15 @@
     else setTimeout(() => ($toast.hidden = true), 3500);
   }
 
-  // ---------- Darstellung: Gerät folgen, hell oder dunkel ----------
-  const THEMA = {
-    system: { label: 'Darstellung wie Gerät', icon: '<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>' },
-    hell: { label: 'Helle Darstellung', icon: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>' },
-    dunkel: { label: 'Dunkle Darstellung', icon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>' },
-  };
-  const $thema = document.getElementById('thema');
-  function thema(t) {
-    if (!THEMA[t]) t = 'system';
-    const root = document.documentElement;
-    if (t === 'system') delete root.dataset.theme; else root.dataset.theme = t === 'hell' ? 'light' : 'dark';
-    const dunkel = t === 'dunkel' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+  // ---------- Darstellung: nachts dunkel (window.nachtModus in index.html), sonst wie im Gerät ----------
+  function darstellung() {
+    const dunkel = window.nachtModus?.() || matchMedia('(prefers-color-scheme: dark)').matches;
     document.querySelector('meta[name="theme-color"]').content = dunkel ? '#5c1d29' : '#7b2736';
-    $thema.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${THEMA[t].icon}</svg>`;
-    $thema.title = $thema.ariaLabel = THEMA[t].label + ' (antippen zum Wechseln)';
-    return t;
   }
-  let themaJetzt = thema(store.get('theme', 'system'));
-  $thema.onclick = () => {
-    themaJetzt = thema({ system: 'hell', hell: 'dunkel', dunkel: 'system' }[themaJetzt]);
-    store.set('theme', themaJetzt);
-    toast(THEMA[themaJetzt].label);
-  };
-  matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => thema(themaJetzt));
+  darstellung();
+  setInterval(darstellung, 60_000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) darstellung(); });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', darstellung);
 
   // ---------- Daten ----------
   async function getJson(url) {

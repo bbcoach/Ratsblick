@@ -10,7 +10,23 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Wahlheimat">
-<script>try { const t = JSON.parse(localStorage.getItem('ratsblick:theme')); if (t === 'hell' || t === 'dunkel') document.documentElement.dataset.theme = t === 'hell' ? 'light' : 'dark'; } catch {}</script>
+<script>
+// Darstellung nach Tageszeit: zwischen Ende und Beginn der bürgerlichen Dämmerung (Sonne 6° unter dem Horizont,
+// berechnet für die Mitte von Rheinland-Pfalz) dunkel, tagsüber wie im Gerät eingestellt.
+window.nachtModus = () => {
+  const jetzt = new Date(), rad = Math.PI / 180, breite = 49.9, laenge = 7.4;
+  const n = Math.floor((jetzt - Date.UTC(jetzt.getUTCFullYear(), 0, 0)) / 864e5);
+  const dekl = -23.44 * Math.cos(2 * Math.PI / 365 * (n + 10)) * rad;
+  const B = 2 * Math.PI * (n - 81) / 364, zeitgl = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+  const mittag = 12 - laenge / 15 - zeitgl / 60;
+  const h0 = Math.acos((Math.sin(-6 * rad) - Math.sin(breite * rad) * Math.sin(dekl)) / (Math.cos(breite * rad) * Math.cos(dekl))) / rad / 15;
+  const t = jetzt.getUTCHours() + jetzt.getUTCMinutes() / 60;
+  const nacht = t < mittag - h0 || t > mittag + h0;
+  if (nacht) document.documentElement.dataset.theme = 'dark'; else delete document.documentElement.dataset.theme;
+  return nacht;
+};
+nachtModus();
+</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -79,8 +95,6 @@ button { font: inherit; color: inherit; }
 .logo .rlp { color: #f2c230; }
 .logo:active { opacity: .75; }
 .ctx { flex: 1; min-width: 0; text-align: right; font-size: 14px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; font-weight: 500; }
-.themaknopf { flex: none; background: none; border: 0; color: inherit; padding: 6px; margin-right: -6px; border-radius: 8px; cursor: pointer; display: grid; place-items: center; opacity: .9; }
-.themaknopf svg { width: 22px; height: 22px; }
 .backlink { justify-self: start; display: inline-flex; align-items: center; gap: 2px; background: none; border: 0; padding: 4px 8px 4px 0; color: var(--accent); font-weight: 600; cursor: pointer; font-size: 15px; }
 
 /* Startseite: nur Suche */
@@ -243,7 +257,6 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
       <span>Wahlheimat <span class="rlp">RLP</span></span>
     </a>
     <p class="ctx" id="title"></p>
-    <button type="button" class="themaknopf" id="thema" aria-label="Darstellung wechseln"></button>
   </header>
   <div id="offline" class="offline" hidden>Offline – Sie sehen den zuletzt geladenen Stand.</div>
   <main id="view"><div class="loading">Lade Daten …</div></main>
