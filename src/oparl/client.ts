@@ -171,8 +171,14 @@ export class OParlClient {
       }
       if (!res.ok) throw new OParlHttpError(url, res.status, `HTTP ${res.status}`);
       zusatz.kopf?.(res.headers);
-      const cs = (/charset=["']?([\w-]+)/i.exec(res.headers.get('content-type') ?? '')?.[1] ?? 'utf-8').toLowerCase();
       const buf = await res.arrayBuffer();
+      // Zeichensatz aus dem Content-Type, sonst aus der Seite selbst (<meta … charset=…>, z. B. ALLRIS.net)
+      const anfang = new TextDecoder('latin1').decode(buf.slice(0, 2048));
+      const cs = (
+        /charset=["']?([\w-]+)/i.exec(res.headers.get('content-type') ?? '')?.[1] ??
+        /<meta[^>]+charset=["']?([\w-]+)/i.exec(anfang)?.[1] ??
+        'utf-8'
+      ).toLowerCase();
       return new TextDecoder(cs === 'iso-8859-1' || cs === 'latin1' ? 'windows-1252' : cs).decode(buf);
     }
     throw lastError ?? new OParlHttpError(url, null, 'Unbekannter Fehler');

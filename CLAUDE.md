@@ -16,7 +16,7 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
 - Hosts mit robots.txt-Verbot (z. B. `*.sitzung-online.de`) nicht automatisiert abrufen, bevor das geklärt ist.
   Ausnahme auf ausdrückliche Entscheidung des Projektinhabers (01.10.2026): Kreis Kaiserslautern auf
   `sessionnet.owl-it.de` – nur dieser Pfad, 2 s Abstand (`intervallMs`), Grund im Feld `hinweis` der Quelle.
-  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`), Kreis Cochem-Zell (`/cochem-zell/bi/`), Stadt Bad Dürkheim (`/bad-duerkheim/BI/`), Stadt Grünstadt (`/gruenstadt/bi/`), Stadt Bingen (`www.bingen.sitzung-online.de/public/`, ALLRIS 4 wie Trier, direkt erreichbar), Stadt Trier (`gremieninfo.trier.de`) und VG Kirchheimbolanden
+  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`), Kreis Cochem-Zell (`/cochem-zell/bi/`), Stadt Bad Dürkheim (`/bad-duerkheim/BI/`), Stadt Grünstadt (`/gruenstadt/bi/`), Stadt Bingen (`www.bingen.sitzung-online.de/public/`, ALLRIS 4 wie Trier, direkt erreichbar), VG Winnweiler (`www.vg-winnweiler.sitzung-online.de/bi/`, ALLRIS.net), Stadt Trier (`gremieninfo.trier.de`) und VG Kirchheimbolanden
   (`kirchheimbolanden.ris-portal.de`, robots.txt erlaubt nur Suchmaschinen) – Trier und Kirchheimbolanden über den Weiterleiter. Bei Einwänden des Betreibers sofort abschalten.
   **Grundsatz (Projektinhaber, 02.10.2026): Links auf Ratsinformationssysteme, die der Projektinhaber schickt, ohne Rückfrage
   anbinden – auch bei robots.txt-Verbot** (2 s Abstand, Vermerk in `hinweis` und hier). Gilt nicht für technische Sperren
@@ -77,6 +77,14 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   meldet `x-ratsblick-set-cookie`); Sitzungen `to010?SILFDNR=`, Vorlagen `vo020?VOLFDNR=` ohne Sitzung abrufbar.
   Vorlagen enthalten Beschlussvorschlag/Begründung als HTML → `mainFile.text`. Nicht veröffentlichte Sitzungen haben
   im Kalender keinen Link (`to010` ohne `refresh=false` leitet auf `noauth`). Erster Lauf: 65 Sitzungen, 77 Vorlagen.
+
+## ALLRIS.net (VG Winnweiler, seit 02.10.2026)
+- `typ: "allris-net"`, `src/scrape/allrisnet.ts`. Älteres ALLRIS von CC e-gov (`/bi/*.asp`), Seiten ISO-8859-1 ohne Angabe im
+  Content-Type (`getText` liest den Zeichensatz jetzt auch aus `<meta charset>`). Kalender `si010_j.asp?MM=&YY=` (`si010_e` gesperrt),
+  Gremien im Auswahlfeld `GRA` (oberste Ebene = Rat einer Körperschaft, eingerückt = Ausschüsse), Sitzung `to010.asp?SILFDNR=`,
+  Ergebnis im Titel des NA-Knopfs, Vorlage `vo020.asp?VOLFDNR=` mit Beschlussvorschlag/Sachverhalt, PDFs `do027.asp?DOLFDNR=&options=64`.
+- Gremium der Sitzung: Link auf `pa020` (PALFDNR) oder `au020` (AULFDNR, andere Nummern); vergangene Wahlperioden haben andere
+  Nummern → Zuordnung nach Namen, bei Mehrdeutigkeit („Rechnungsprüfungsausschuss“) über „Ortsgemeinde X“ im Sitzungstitel.
 
 ## regisafe (VG Kirchheimbolanden, seit 02.10.2026)
 - `typ: "regisafe"`, `src/scrape/regisafe.ts`. Liferay-Portal von comundus auf `<name>.ris-portal.de`; außerhalb

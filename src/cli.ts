@@ -8,6 +8,7 @@ import { buildWeb } from './export/web.js';
 import { kandidaten, pruefe, type Gebiete } from './sync/discover.js';
 import { probeSource, saveProbe } from './sync/probe.js';
 import { syncAllris } from './scrape/allris.js';
+import { syncAllrisNet } from './scrape/allrisnet.js';
 import { syncIcs } from './scrape/ics.js';
 import { syncRegisafe } from './scrape/regisafe.js';
 import { syncRubinApi } from './scrape/rubin.js';
@@ -164,6 +165,8 @@ async function main(): Promise<void> {
             ? await syncRubinApi(db, client, s, { log, alles: values.full })
             : s.typ === 'allris'
               ? await syncAllris(db, client, s, { log, alles: values.full })
+              : s.typ === 'allris-net'
+                ? await syncAllrisNet(db, client, s, { log, alles: values.full })
               : s.typ === 'regisafe'
                 ? await syncRegisafe(db, client, s, { log, alles: values.full })
                 : s.typ === 'ics'
