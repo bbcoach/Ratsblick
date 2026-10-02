@@ -22,7 +22,7 @@ export function relayConfigAusUmgebung(env: NodeJS.ProcessEnv = process.env): Re
     url: (/^https?:\/\//i.test(env.RATSBLICK_RELAY_URL.trim()) ? '' : 'https://') + env.RATSBLICK_RELAY_URL.trim().replace(/\/+$/, ''),
     schluessel: env.RATSBLICK_RELAY_SCHLUESSEL,
     // Standard wie relay/lib/erlaubt.js
-    hosts: (env.RATSBLICK_RELAY_HOSTS || 'ris.kaiserslautern.de,gremieninfo.trier.de,www.buergerinfo-kreis-duew.de,kirchheimbolanden.ris-portal.de,bernkastel-kues.ris-portal.de,info.landau.de,ruedesheim.ris-portal.de,bellheim.ris-portal.de,dahner-felsenland.ris-portal.de,hauenstein.ris-portal.de,rip.stadt-pirmasens.de')
+    hosts: (env.RATSBLICK_RELAY_HOSTS || 'ris.kaiserslautern.de,gremieninfo.trier.de,www.buergerinfo-kreis-duew.de,kirchheimbolanden.ris-portal.de,bernkastel-kues.ris-portal.de,info.landau.de,ruedesheim.ris-portal.de,bellheim.ris-portal.de,dahner-felsenland.ris-portal.de,hauenstein.ris-portal.de,rip.stadt-pirmasens.de,sitzungsdienst.neuwied.de')
       .split(',')
       .map((h) => h.trim().toLowerCase())
       .filter(Boolean),
