@@ -58,5 +58,7 @@ describe('more!rubin-Schnittstelle (echte Antworten aus Rockenhausen)', () => {
     expect(koerperschaftsName('Ortsgemeinde Kirrweiler c/o Verbandsgemeinde Maikammer')).toBe('Ortsgemeinde Kirrweiler');
     expect(koerperschaftsName('Verbandsgemeinde Maxdorf für OG Birkenheide')).toBe('Ortsgemeinde Birkenheide');
     expect(koerperschaftsName('Verbandsgemeinde Maxdorf')).toBe('Verbandsgemeinde Maxdorf');
+    expect(koerperschaftsName('Ortsgemeinde Lambsheim Ortsbürgermeisterin Barbara Eisenbarth-Wahl')).toBe('Ortsgemeinde Lambsheim');
+    expect(koerperschaftsName('Verbandsgemeinde Lambsheim-Heßheim Bürgermeister Michael Reith')).toBe('Verbandsgemeinde Lambsheim-Heßheim');
   });
 });

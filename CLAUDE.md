@@ -128,7 +128,10 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   (`langenlonsheim`), Cochem (`vgcochem`), Nastätten (`vgnastaetten`), Eich (`vgeich`), Otterbach-Otterberg (`otterbach`);
   rubin-api bei Bad Breisig (`badbreisig`), Aar-Einrich, Arzfeld, Saarburg-Kell (`saarburg`), Wörrstadt (`vgwoerrstadt`),
   Maikammer, Maxdorf. Namen wie „Ortsgemeinde X c/o Verbandsgemeinde …“ und „Verbandsgemeinde … für OG X“ werden in
-  `koerperschaftsName` (rubin.ts) vereinheitlicht. `altenkirchen.gremien.info` ist der Kreis, nicht die VG. Weitere more!rubin-Systeme ohne OParl nur nach
+  `koerperschaftsName` (rubin.ts) vereinheitlicht. `altenkirchen.gremien.info` ist der Kreis, nicht die VG.
+  Über Links auf den VG-Websites zusätzlich: OParl bei Daaden-Herdorf (`vgdaaden`), Asbach (`ratsinfo-vg-asbach`),
+  Rengsdorf-Waldbreitbach (`vg-rw`), Sprendlingen-Gensingen (`vg-sg`); rubin-api bei Wittlich-Land (`vg-wittlich`),
+  Wachenheim, Bad Bergzabern (`bza`), Lambsheim-Heßheim (`hessheim`, Namen mit angehängtem Bürgermeister → bereinigt). Weitere more!rubin-Systeme ohne OParl nur nach
   Rücksprache freischalten.
 - Subdomains folgen teils alten VG-Namen (Rockenhausen = VG Nordpfälzer Land, Lauterecken = VG Lauterecken-Wolfstein mit
   OParl aktiv; `vgloreley` = VG Loreley, OParl aktiv, aber ohne Vorlagen – auch die interne Schnittstelle liefert keine) – `discover` findet die nicht. Links stehen meist auf der VG-Website unter „Bürgerinformation“.

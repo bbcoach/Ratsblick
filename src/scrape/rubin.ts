@@ -89,12 +89,17 @@ export interface RubinSitzung extends RubinKalenderSitzung {
 /**
  * Körperschaftsnamen vereinheitlichen, damit sie zum Gemeindeverzeichnis passen:
  * „Ortsgemeinde Kirrweiler c/o Verbandsgemeinde Maikammer“ → „Ortsgemeinde Kirrweiler“,
- * „Verbandsgemeinde Maxdorf für OG Birkenheide“ → „Ortsgemeinde Birkenheide“.
+ * „Verbandsgemeinde Maxdorf für OG Birkenheide“ → „Ortsgemeinde Birkenheide“,
+ * „Ortsgemeinde Heßheim Ortsbürgermeister Holger Korn“ → „Ortsgemeinde Heßheim“.
  */
 export function koerperschaftsName(name: string): string {
   const fuer = /^Verbandsgemeinde\s.+?\sfür\s+(?:OG|Ortsgemeinde)\s+(.+)$/.exec(name.trim());
   if (fuer) return `Ortsgemeinde ${fuer[1]!.trim()}`;
-  return name.replace(/\s+c\/o\s+.*$/i, '').trim();
+  // „… c/o Verbandsgemeinde …“ und angehängte Amtsträger („… Ortsbürgermeisterin Barbara …“, Lambsheim-Heßheim)
+  return name
+    .replace(/\s+c\/o\s+.*$/i, '')
+    .replace(/\s+(?:Orts|Stadt)?[Bb]ürgermeister(?:in)?\b.*$/, '')
+    .trim();
 }
 
 const zeit = (t: string | null | undefined) => (t && t !== '00:00:00' ? t.slice(0, 5) : null);
