@@ -413,7 +413,7 @@
     let grund;
     if (ris?.status === 'inaktiv') grund = 'Das Ratsinformationssystem hat eine Standardschnittstelle (OParl), sie ist aber nicht freigeschaltet. Sobald die Verwaltung sie freischaltet, können wir die Daten hier zeigen.';
     else if (ris?.status === 'robots') grund = 'Der Anbieter des Ratsinformationssystems untersagt automatische Abrufe. Wir zeigen die Daten erst, wenn das geklärt ist.';
-    else if (ris?.status === 'blockiert') grund = 'Das Ratsinformationssystem weist automatische Abrufe mit einem Bot-Schutz ab.';
+    else if (ris?.status === 'blockiert') grund = `${anzeigeName(t)} stellt die Ratsinformationen bisher nur zum Lesen im eigenen Ratsinformationssystem bereit – eine Übernahme in andere Angebote wie Ratsblick ist dort leider noch nicht vorgesehen. Sobald die Stadt das ermöglicht, zeigen wir die Sitzungen gern auch hier. Bis dahin finden Sie alle Unterlagen direkt beim Ratsinformationssystem der Stadt.`;
     else if (ris?.status === 'geplant') grund = 'Das Ratsinformationssystem erlaubt automatische Abrufe. Die Anbindung ist geplant.';
     else if (t.art === 'Ortsgemeinde') grund = 'Ortsgemeinden veröffentlichen ihre Sitzungen meist im Ratsinformationssystem der Verbandsgemeinde. Für diese ist noch keine offene Schnittstelle bekannt.';
     else grund = 'Für dieses Ratsinformationssystem ist noch keine offene Schnittstelle bekannt.';
