@@ -9,7 +9,8 @@ const schemaPath = fileURLToPath(new URL('./schema.sql', import.meta.url));
 export function openDb(path: string): DatabaseSync {
   if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true });
   const db = new DatabaseSync(path);
-  db.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
+  // busy_timeout: wartet, wenn ein anderer Prozess gerade schreibt (mehrere Abgleiche nebeneinander)
+  db.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 60000;');
   db.exec(readFileSync(schemaPath, 'utf8'));
   return db;
 }

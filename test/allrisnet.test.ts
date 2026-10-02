@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { koerperschaftsName, parseGremien, parseKalender, parseSitzung, parseVorlage } from '../src/scrape/allrisnet.js';
+import { koerperschaftsName, parseGremien, parseRaete, parseKalender, parseSitzung, parseVorlage } from '../src/scrape/allrisnet.js';
 
 const seite = (f: string) => readFileSync(new URL(`./fixtures/allrisnet/${f}`, import.meta.url), 'utf8');
 
@@ -53,5 +53,16 @@ describe('ALLRIS.net (VG Winnweiler)', () => {
   it('erkennt Ausschuss-Links (au020) und den Titel der Sitzung', () => {
     const s = parseSitzung(seite('winnweiler-to010-2270.html'));
     expect(s).toMatchObject({ gremium: 'Ortsbeirat Alsenbrück-Langmeil', bezeichnung: 'Sitzung des Ortsbeirates Alsenbrück-Langmeil' });
+  });
+});
+
+describe('ALLRIS.net mit Kalender je Rat (VG Kirchen)', () => {
+  it('liest die Räteliste aus pa000.asp', () => {
+    const raete = parseRaete(readFileSync(new URL('./fixtures/allrisnet/kirchen-pa000.html', import.meta.url), 'latin1'));
+    expect(raete).toHaveLength(7);
+    expect(raete[0]).toEqual({ id: '1', name: 'Verbandsgemeinderat der Verbandsgemeinde Kirchen (Sieg)', rat: '1' });
+    expect(raete.map((r) => koerperschaftsName(r.name))).toContain('Stadt Kirchen (Sieg)');
+    expect(koerperschaftsName('Ortsgemeinderat der Ortsgemeinde Brachbach')).toBe('Ortsgemeinde Brachbach');
+    expect(koerperschaftsName('Verbandsgemeinderat der Verbandsgemeinde Kirchen (Sieg)')).toBe('Verbandsgemeinde Kirchen (Sieg)');
   });
 });

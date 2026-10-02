@@ -14,5 +14,4 @@ export const ERLAUBT = [
   'bellheim.ris-portal.de', // VG, Freigabe Projektinhaber 02.10.2026
   'dahner-felsenland.ris-portal.de', // VG, Freigabe Projektinhaber 02.10.2026
   'hauenstein.ris-portal.de', // VG, Freigabe Projektinhaber 02.10.2026
-  'www.hagenbach.sitzung-online.de', // VG, Freigabe Projektinhaber 02.10.2026
 ];

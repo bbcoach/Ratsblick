@@ -103,7 +103,18 @@ export function parseMandanten(html: string): Mandant[] {
 
 /** Name für die Zuordnung zum Gemeindeverzeichnis („Sickingenstadt Landstuhl“ → „Stadt Landstuhl“). */
 export function mandantName(name: string): string {
-  return name.replace(/^\S*stadt\s+/i, 'Stadt ').replace(/^VG\s+/, 'Verbandsgemeinde ');
+  const n = name.replace(/^\S*stadt\s+/i, 'Stadt ').replace(/^VG\s+/, 'Verbandsgemeinde ').trim();
+  // Bloße Ortsnamen (Schweich: „Bekond“, „Detzem“) sind Ortsgemeinden; Verbände, Räte u. Ä. bleiben, wie sie sind
+  if (!/gemeinde|stadt|verband|zweck|rat\b|anstalt|a[öo]r|forst|kita|kinder|schul|werk|personal|\.\.\./i.test(n) && !/\s/.test(n.replace(/[-/]/g, ''))) {
+    return `Ortsgemeinde ${n}`;
+  }
+  return n;
+}
+
+/** Der gerade gewählte Mandant (Beschriftung des Filtermenüs), sofern angezeigt. */
+export function aktuellerMandant(html: string): string | null {
+  const m = /aria-label="Mandant auswählen"[^>]*>([^<]+)</.exec(html);
+  return m ? text(m[1]) || null : null;
 }
 
 export function parseKalender(html: string, jahr: number, monat: number): KalenderEintrag[] {
@@ -246,14 +257,17 @@ export async function syncSessionNet(
   upsertSource(db, source);
   db.prepare('UPDATE source SET vendor = ?, oparl_version = NULL WHERE id = ?').run('SessionNet (Scraper)', source.id);
   const bodyId = `${base}#koerperschaft`;
-  const bodyName = source.name.replace(/^VG /, 'Verbandsgemeinde ');
+  // Mandanten: Standard (ohne __cpanr, meist die VG) und auf Wunsch alle weiteren aus dem Filtermenü (Ortsgemeinden)
+  const info = source.mandanten ? await client.getText(`${base}info.${ext}`) : '';
+  const aktuell = source.mandanten ? aktuellerMandant(info) : null;
+  const bodyName = aktuell ? mandantName(aktuell) : source.name.replace(/^VG /, 'Verbandsgemeinde ');
   tx(db, () => upsertBody(db, source.id, { id: bodyId, name: bodyName, shortName: source.id } as never));
   stats.bodies = 1;
 
-  // Mandanten: Standard (ohne __cpanr, meist die VG) und auf Wunsch alle weiteren aus dem Filtermenü (Ortsgemeinden)
   const koerper: Array<{ cpanr: string | null; id: string }> = [{ cpanr: null, id: bodyId }];
   if (source.mandanten) {
-    const liste = parseMandanten(await client.getText(`${base}info.${ext}`));
+    // Der gewählte Mandant steht teils auch in der Liste (Bodenheim) – er ist schon die Standard-Körperschaft
+    const liste = parseMandanten(info).filter((m) => !aktuell || m.name !== aktuell);
     for (const m of liste) {
       const id = `${base}#mandant-${m.nr}`;
       tx(db, () => upsertBody(db, source.id, { id, name: mandantName(m.name), shortName: m.nr } as never));

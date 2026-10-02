@@ -4,6 +4,7 @@ import { openDb } from '../src/db/index.js';
 import { OParlClient } from '../src/oparl/client.js';
 import {
   berlinIso,
+  aktuellerMandant,
   mandantName,
   parseDokumente,
   parseKalender,
@@ -135,5 +136,10 @@ describe('SessionNet: PHP-Variante (echte Seiten aus Koblenz, SessionNet 5.4.7)'
     expect(m.find((x) => x.nr === '15')?.name).toBe('Werksausschuss Nahwärme VG');
     expect(mandantName('Sickingenstadt Landstuhl')).toBe('Stadt Landstuhl');
     expect(mandantName('Ortsgemeinde Bann')).toBe('Ortsgemeinde Bann');
+    expect(mandantName('Bekond')).toBe('Ortsgemeinde Bekond');
+    expect(mandantName('Stadt Schweich')).toBe('Stadt Schweich');
+    expect(mandantName('Forstzweckverbände')).toBe('Forstzweckverbände');
+    expect(mandantName('Personalrat VGV')).toBe('Personalrat VGV');
+    expect(aktuellerMandant('<a aria-label="Mandant auswählen" class="nav-link dropdown-toggle" href="#">Verbandsgemeinde Bodenheim </a>')).toBe('Verbandsgemeinde Bodenheim');
   });
 });

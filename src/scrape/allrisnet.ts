@@ -20,6 +20,8 @@ import { berlinIso, text } from './sessionnet.js';
  * - Sitzung `to010.asp?SILFDNR=…` (Kopf, Tagesordnung, Ergebnis im Titel des NA-Knopfs, Vorlagennummer am TOP)
  * - Vorlage `vo020.asp?VOLFDNR=…` mit Beschlussvorschlag/Sachverhalt als HTML
  * - Dokumente `do027.asp?DOLFDNR=…&options=64` (leitet auf eine kurzlebige PDF-Adresse weiter)
+ * - Ist die Monatsansicht gesperrt („Zugriff verweigert“, z. B. Kirchen, Betzdorf-Gebhardshain), gibt es den Kalender
+ *   nur je Rat: Räteliste `pa000.asp`, Kalender `si010_a.asp?MM=…&YY=…&PALFDNR=…` (Ausschüsse erscheinen beim Rat)
  * Seiten sind ISO-8859-1 ohne Angabe im Content-Type (getText liest den Zeichensatz aus der Seite).
  */
 
@@ -36,6 +38,8 @@ export interface AllrisNetTermin {
   zeit: string | null;
   name: string;
   raum: string | null;
+  /** Rat, über dessen Kalender die Sitzung gefunden wurde (nur bei Kalendern je Rat) */
+  rat?: string;
 }
 
 export interface AllrisNetDokument {
@@ -91,8 +95,20 @@ export function parseGremien(html: string): AllrisNetGremium[] {
   return out;
 }
 
+/** Räte aus der Auswahlseite pa000.asp (Links auf den Kalender je Rat). */
+export function parseRaete(html: string): AllrisNetGremium[] {
+  const out: AllrisNetGremium[] = [];
+  for (const m of html.matchAll(/si010_a\.asp\?[^"]*PALFDNR=(\d+)"[^>]*>(?:<b>)?([^<]+)/g)) {
+    if (!out.some((g) => g.id === m[1])) out.push({ id: m[1]!, name: text(m[2]), rat: m[1]! });
+  }
+  return out;
+}
+
 /** Name der Körperschaft zu einem Rat („Ortsgemeinderat Börrstadt“ → „Ortsgemeinde Börrstadt“). */
 export function koerperschaftsName(rat: string): string {
+  // „Ortsgemeinderat der Ortsgemeinde Brachbach“ → „Ortsgemeinde Brachbach“
+  const der = /^\S*(?:rat|tag)\s+der\s+((?:Orts|Verbands)?[Gg]emeinde\s.+|Stadt\s.+|Landkreis\s.+)$/.exec(rat.trim());
+  if (der) return der[1]!;
   return rat
     .replace(/^Ortsgemeinderat\s+/, 'Ortsgemeinde ')
     .replace(/^Verbandsgemeinderat\s+/, 'Verbandsgemeinde ')
@@ -216,6 +232,7 @@ export async function syncAllrisNet(
   // 1. Kalender je Monat; die erste Seite liefert auch die Gremienliste
   const termine = new Map<string, AllrisNetTermin>();
   let gremien: AllrisNetGremium[] = [];
+  let jeRat = false;
   const von = opts.monateZurueck ?? 2;
   const bis = opts.monateVoraus ?? 3;
   for (let i = -von; i <= bis; i++) {
@@ -223,7 +240,22 @@ export async function syncAllrisNet(
     const monat = d.getUTCMonth() + 1;
     const jahr = d.getUTCFullYear();
     try {
+      if (jeRat) {
+        for (const r of gremien) {
+          const html = await client.getText(`${base}si010_a.asp?MM=${monat}&YY=${jahr}&PALFDNR=${r.id}`);
+          for (const t of parseKalender(html, monat, jahr)) if (!termine.has(t.silfdnr)) termine.set(t.silfdnr, { ...t, rat: r.id });
+        }
+        continue;
+      }
       const html = await client.getText(`${base}si010_j.asp?MM=${monat}&YY=${jahr}`);
+      if (i === -von && /Zugriff verweigert/i.test(html)) {
+        // Monatsansicht gesperrt: Kalender je Rat
+        jeRat = true;
+        gremien = parseRaete(await client.getText(`${base}pa000.asp`));
+        log(`  Monatsansicht gesperrt – Kalender je Rat (${gremien.length} Räte)`);
+        i--;
+        continue;
+      }
       if (!gremien.length) gremien = parseGremien(html);
       for (const t of parseKalender(html, monat, jahr)) termine.set(t.silfdnr, t);
     } catch (err) {
@@ -280,9 +312,11 @@ export async function syncAllrisNet(
       log(`    Sitzung ${t.silfdnr}: ${(err as Error).message}`);
       continue;
     }
-    const { g, rat } = gremiumZu(s, t.name);
+    const { g, rat } = t.rat ? { g: gremiumNachId.get(s.gremiumId ?? ''), rat: t.rat } : gremiumZu(s, t.name);
     const body = koerperschaft(rat ?? vgRat);
-    const orgId = g ? `${base}pa020.asp?PALFDNR=${g.id}` : null;
+    // Kalender je Rat: Ausschüsse stehen nicht in der Räteliste, Gremium dann über die Nummer aus der Sitzung
+    const gremiumNr = g?.id ?? (t.rat ? s.gremiumId : null);
+    const orgId = gremiumNr ? `${base}pa020.asp?PALFDNR=${gremiumNr}` : null;
     if (orgId && !orgs.has(orgId)) {
       orgs.add(orgId);
       tx(db, () => upsertOrganization(db, body, { id: orgId, name: s.gremium ?? g?.name, organizationType: 'Gremium' } as never));
