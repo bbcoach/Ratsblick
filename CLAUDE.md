@@ -149,7 +149,7 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Rengsdorf-Waldbreitbach (`vg-rw`), Sprendlingen-Gensingen (`vg-sg`); rubin-api bei Wittlich-Land (`vg-wittlich`),
   Wachenheim, Bad Bergzabern (`bza`), Lambsheim-Heßheim (`hessheim`, Namen mit angehängtem Bürgermeister → bereinigt). Auf eigener Domain
   (Link vom Projektinhaber, 02.10.2026): VG Kirchberg (Hunsrück) `ris.kirchberg-hunsrueck.de` (rubin-api, 49 Körperschaften); VG Kelberg
-  `vgvkelberg.gremien.info` (rubin-api, 35 Körperschaften). Weitere more!rubin-Systeme ohne OParl nur nach
+  `vgvkelberg.gremien.info` (rubin-api, 35 Körperschaften); Stadt Andernach `andernach.gremien.info` (rubin-api). Weitere more!rubin-Systeme ohne OParl nur nach
   Rücksprache freischalten.
 - Subdomains folgen teils alten VG-Namen (Rockenhausen = VG Nordpfälzer Land, Lauterecken = VG Lauterecken-Wolfstein mit
   OParl aktiv; `vgloreley` = VG Loreley, OParl aktiv, aber ohne Vorlagen – auch die interne Schnittstelle liefert keine) – `discover` findet die nicht. Links stehen meist auf der VG-Website unter „Bürgerinformation“.
