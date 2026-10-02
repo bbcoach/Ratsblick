@@ -69,6 +69,7 @@ function bereich(g: Gebiete, gebiet: string) {
 export function zuordnen(g: Gebiete, gebiet: string, bodies: Koerperschaft[]): Map<string, string> {
   const { gemeinden, vgs, kreise } = bereich(g, gebiet);
   const out = new Map<string, string>();
+  const guete = new Map<string, number>(); // Gebiets-ID → Güte des bisherigen Treffers
   for (const b of bodies) {
     const n = b.name.toLowerCase();
     let pool: Array<{ id: string; name: string }>;
@@ -80,9 +81,12 @@ export function zuordnen(g: Gebiete, gebiet: string, bodies: Koerperschaft[]): M
       .map((x) => ({ x, s: vergleiche(b.name, x.name) }))
       .filter((t) => t.s > 0)
       .sort((p, q) => q.s - p.s);
-    // Nur eindeutige Treffer übernehmen
-    if (treffer.length && (treffer.length === 1 || treffer[0]!.s > treffer[1]!.s) && !out.has(treffer[0]!.x.id)) {
-      out.set(treffer[0]!.x.id, b.id);
+    // Nur eindeutige Treffer übernehmen; ein genauer Name verdrängt eine Kurzform („Verbandsgemeinde Bad Ems-Nassau“
+    // statt der Vorgänger-VG „Verbandsgemeinde Bad Ems“, die im selben System noch geführt wird)
+    const t = treffer[0];
+    if (t && (treffer.length === 1 || t.s > treffer[1]!.s) && t.s > (guete.get(t.x.id) ?? 0)) {
+      out.set(t.x.id, b.id);
+      guete.set(t.x.id, t.s);
     }
   }
   // Systeme einer einzelnen Stadt oder eines Kreises: die einzige Körperschaft ist das Gebiet selbst

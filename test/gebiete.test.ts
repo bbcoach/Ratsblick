@@ -7,6 +7,7 @@ const g: Gebiete = {
   verbandsgemeinden: [
     { id: '071435004', name: 'Verbandsgemeinde Montabaur', kreis: '07143' },
     { id: '071435009', name: 'Verbandsgemeinde Westerburg', kreis: '07143' },
+    { id: '071415010', name: 'Verbandsgemeinde Bad Ems-Nassau', kreis: '07141' },
   ],
   gemeinden: [
     { id: '07143072', name: 'Stahlhofen', art: 'Ortsgemeinde', kreis: '07143', vg: '071435004' },
@@ -47,6 +48,15 @@ describe('Zuordnung zu Gebietskörperschaften', () => {
 
     const westerburg = zuordnen(g, '071435009', [{ id: 'w1', name: 'Ortsgemeinde Stahlhofen a.W.' }]);
     expect(Object.fromEntries(westerburg)).toEqual({ '07143293': 'w1' });
+  });
+
+  it('bevorzugt den genauen Namen vor der Vorgänger-VG mit kürzerem Namen', () => {
+    const r = zuordnen(g, '071415010', [
+      { id: 'alt', name: 'Verbandsgemeinde Bad Ems' },
+      { id: 'neu', name: 'Verbandsgemeinde Bad Ems-Nassau' },
+      { id: 'alt2', name: 'Verbandsgemeinde Nassau' },
+    ]);
+    expect(r.get('071415010')).toBe('neu');
   });
 
   it('ordnet Systeme einer einzelnen Stadt direkt zu', () => {
