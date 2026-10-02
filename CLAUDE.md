@@ -173,7 +173,10 @@ Entwürfe „Ratsblick – Kernansichten“ (Claude Design): Kommune wählen →
 → Themen-Abo (Themen, Stichwort, eigene Straße, Push/E-Mail).
 Name in der App: „Ratsblick RLP“ (seit 02.10.2026).
 Stil: ruhig und behördennah, Akzent Weinrot #7B2736 (vorher Blau #1F4E79), Schrift Public Sans, Vorlagennummern in IBM Plex Mono.
-Icons (PNG) werden aus `web/icons/icon.svg` mit dem vorinstallierten Chromium gerendert (ImageMagick hat keinen SVG-Renderer).
+Logo (seit 02.10.2026): Umriss von Rheinland-Pfalz in Schwarz-Rot-Gold (diagonale Bänder, versetzte Füllung, weißer Umriss)
+mit Lupe auf Weinrot; Kopfzeile „Ratsblick **RLP**“ mit „RLP“ in Gold #F2C230. Eigene Zeichnung aus offenen Grenzdaten
+(`scripts/logo.py` → `web/icons/icon.svg`, `icon-maskable.svg`), keine Vorlage aus Bilddiensten (Vecteezy verlangt Namensnennung).
+Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromium rendern (ImageMagick hat keinen SVG-Renderer).
 
 ## Web-App (PWA)
 - `web/` enthält die App (Vanilla-JS, kein Build-Schritt), `npm run web -- --out dist` erzeugt die statische Seite

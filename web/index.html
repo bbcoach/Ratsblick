@@ -70,7 +70,8 @@ button { font: inherit; color: inherit; }
   display: flex; align-items: center; gap: 8px; padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px; min-height: 54px;
 }
 .logo { display: flex; align-items: center; gap: 8px; color: inherit; text-decoration: none; font-weight: 700; font-size: 18px; letter-spacing: .01em; flex: none; padding: 4px 6px 4px 0; border-radius: 8px; }
-.logo svg { width: 28px; height: 28px; flex: none; }
+.logo img { width: 32px; height: 32px; flex: none; border-radius: 8px; box-shadow: 0 0 0 1.5px rgba(255,255,255,.3); }
+.logo .rlp { color: #f2c230; }
 .logo:active { opacity: .75; }
 .ctx { flex: 1; min-width: 0; text-align: right; font-size: 14px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; font-weight: 500; }
 .backlink { justify-self: start; display: inline-flex; align-items: center; gap: 2px; background: none; border: 0; padding: 4px 8px 4px 0; color: var(--accent); font-weight: 600; cursor: pointer; font-size: 15px; }
@@ -208,8 +209,8 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
 <div class="app">
   <header class="bar">
     <a class="logo" href="#/" id="home" aria-label="Ratsblick RLP – zur Startseite">
-      <svg viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="currentColor" opacity=".16"/><g fill="currentColor"><path d="M256 104 L408 184 L104 184 Z"/><rect x="120" y="196" width="272" height="20" rx="4"/><rect x="144" y="228" width="36" height="140" rx="6"/><rect x="207" y="228" width="36" height="140" rx="6"/><rect x="269" y="228" width="36" height="140" rx="6"/><rect x="332" y="228" width="36" height="140" rx="6"/><rect x="104" y="380" width="304" height="28" rx="6"/></g></svg>
-      <span>Ratsblick RLP</span>
+      <img src="icons/icon.svg" alt="" width="32" height="32">
+      <span>Ratsblick <span class="rlp">RLP</span></span>
     </a>
     <p class="ctx" id="title"></p>
   </header>
