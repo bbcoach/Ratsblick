@@ -59,7 +59,7 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   `&smcspf=4`), Frankenthal (`ris.frankenthal.de/bi/`, ASP), Kreis Bad Dürkheim (`www.buergerinfo-kreis-duew.de`, PHP,
   unvollständige Zertifikatskette → über den Weiterleiter).
 - Cochem-Zell und Zweibrücken laufen auf `sessionnet.owl-it.de` (robots.txt). Südwestpfalz und Rhein-Pfalz-Kreis:
-  more!rubin ohne OParl (`rubin-api` nur nach Rücksprache). Worms: `worms.gremien.info` ohne OParl.
+  more!rubin ohne OParl, laufen seit 02.10.2026 über `rubin-api`. Worms: `worms.gremien.info` ohne OParl.
 - Unklar: Landau, Birkenfeld (kein RIS-Link gefunden), Mayen-Koblenz (Ratsinfo in die Kreis-Website eingebettet,
   Quelle unbekannt), Mainz-Bingen (Verweis auf cc-egov, ohne Treffer).
 - Trier (ALLRIS 4): Kalender per Wicket-Ajax mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch),
@@ -76,7 +76,7 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   `src/scrape/rubin.ts`. Kalender in einem Abruf für das ganze Fenster, je Sitzung ein Abruf (TOPs enthalten die
   Vorlage samt Drucksachennummer und Dokumenten; TOP-Status 1 = öffentlich, 2 = nicht öffentlich).
   PDF-Links = `documentUrl` ohne `json=1`. Erster Lauf: 38 Körperschaften, 55 Sitzungen, 124 Vorlagen in 63 s.
-  Ebenso freigegeben (Nutzer, 01.10.2026): Donnersbergkreis. Weitere more!rubin-Systeme ohne OParl nur nach
+  Ebenso freigegeben (Nutzer, 01.10.2026): Donnersbergkreis; (02.10.2026): Rhein-Pfalz-Kreis, Südwestpfalz. Weitere more!rubin-Systeme ohne OParl nur nach
   Rücksprache freischalten.
 - Subdomains folgen teils alten VG-Namen (Rockenhausen = VG Nordpfälzer Land) – `discover` findet die nicht.
 
