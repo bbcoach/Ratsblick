@@ -61,6 +61,9 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   `&smcspf=4`), Frankenthal (`ris.frankenthal.de/bi/`, ASP), Kreis Bad Dürkheim (`www.buergerinfo-kreis-duew.de`, PHP,
   unvollständige Zertifikatskette → über den Weiterleiter).
 - VG Kusel-Altenglan (`ratsinfo.vgka.de/bi/`, SessionNet ASP, keine robots.txt; nur VG-Gremien, Stadt Kusel nicht enthalten).
+- VG Oberes Glantal: SD.NET RIM auf `vgog.ratsinfomanagement.net` hinter Browser-Prüfung (rescaled WAF), robots.txt sperrt alles
+  außer `/termine/ics/`, OParl „nicht aktiviert“. Daher `typ: "ics"` (`src/scrape/ics.ts`): nur Termine der VG-Gremien aus
+  dem Kalenderexport (`/termine/ics/glm` – mit Pfadteil alle Termine, ohne nur die nächsten), Link zur Tagesordnung als Dokument.
 - Cochem-Zell und Zweibrücken laufen auf `sessionnet.owl-it.de` (robots.txt). Südwestpfalz und Rhein-Pfalz-Kreis:
   more!rubin ohne OParl, laufen seit 02.10.2026 über `rubin-api`. Worms: `worms.gremien.info` ohne OParl.
 - Unklar: Landau, Birkenfeld (kein RIS-Link gefunden), Mayen-Koblenz (Ratsinfo in die Kreis-Website eingebettet,

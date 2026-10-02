@@ -1,0 +1,486 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+METHOD:PUBLISH
+PRODID:-//SD.NET RIM v1.0//DE
+CALSCALE:GREGORIAN
+X-WR-CALNAME:SD.NET RIM
+X-WR-TIMEZONE:Europe/Berlin
+BEGIN:VTIMEZONE
+TZID:Europe/Berlin
+X-LIC-LOCATION:Europe/Berlin
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20241024T190500
+DTEND;TZID=Europe/Berlin:20241024T203000
+SUMMARY:Rechnungsprüfungsausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZc7EG0k7fGkVplHrGkuYebE
+UID:2024102912
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20241028T190000
+DTEND;TZID=Europe/Berlin:20241028T204000
+SUMMARY:Werkausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZZnULkN6GhFq6CeEHSMgLrk
+UID:2024102913
+LOCATION:Rathaus Schönenberg-Kübelberg, 66901 Schönenberg-Kübelberg, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20241029T190000
+DTEND;TZID=Europe/Berlin:20241029T195000
+SUMMARY:Haupt-, Finanz, Bau- & Umweltausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZUaM7V8giu-9XDTUfE2GfMY
+UID:2024102914
+LOCATION:Rathaus Schönenberg-Kübelberg, 66901 Schönenberg-Kübelberg, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20241105T190000
+DTEND;TZID=Europe/Berlin:20241105T201000
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZQVEkpJH4Fd1ziniZplj7MU
+UID:2024112915
+LOCATION:Kurpfalzhalle Nanzdietschweiler, 66909 Nanzdietschweiler, Saal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20241118T190000
+DTEND;TZID=Europe/Berlin:20241118T202000
+SUMMARY:Werkausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZbnu0vqZm6yeqz92nl8Sq8E
+UID:2024112916
+LOCATION:Rathaus Schönenberg-Kübelberg, 66901 Schönenberg-Kübelberg, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20241126T190000
+DTEND;TZID=Europe/Berlin:20241126T201000
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZfJVk1I7SWyfN2bDoGHNqwM
+UID:2024112918
+LOCATION:Kurpfalzhalle Nanzdietschweiler, 66909 Nanzdietschweiler, Saal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20241217T190000
+DTEND;TZID=Europe/Berlin:20241217T193000
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZfHWJImSaMFT72MwDZBQVMg
+UID:2024122923
+LOCATION:Bürgerhaus Quirnbach, 66909 Quirnbach/Pfalz, Saal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250128T190000
+DTEND;TZID=Europe/Berlin:20250128T193600
+SUMMARY:Werkausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZf6CAZw7DZTI8p81FPJN0OU
+UID:2025012924
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250203T180000
+DTEND;TZID=Europe/Berlin:20250203T194000
+SUMMARY:Schulträgerausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZYEeakzcftvhwL6ra84l-pg\n\nBemerkung:\nDIE SITZUNG WURDE ABGESAGT
+UID:2025022920
+LOCATION:Bürgerhaus Dittweiler, 66903 Dittweiler, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250204T190000
+DTEND;TZID=Europe/Berlin:20250204T202500
+SUMMARY:Haupt-, Finanz, Bau- & Umweltausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZUzHgsLv1ns9OxKbJYe1W7s
+UID:2025022925
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250218T190000
+DTEND;TZID=Europe/Berlin:20250218T211200
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZW3XNOWUzzpEkJx-J2-zBNw
+UID:2025022926
+LOCATION:Bürgerhaus Dittweiler, 66903 Dittweiler, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250224T180000
+DTEND;TZID=Europe/Berlin:20250224T190500
+SUMMARY:Schulträgerausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZTQCpQG6YBs41v0E9976Y_A
+UID:2025022928
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250318T190000
+DTEND;TZID=Europe/Berlin:20250318T204600
+SUMMARY:Werkausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZUUnm8RPmuNmY9oJVrLP8bo
+UID:2025032955
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250325T190000
+DTEND;TZID=Europe/Berlin:20250325T204500
+SUMMARY:Haupt-, Finanz, Bau- & Umweltausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZQlScoI-iM6KlMzFEKg3RUg
+UID:2025032956
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250408T190000
+DTEND;TZID=Europe/Berlin:20250408T194600
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZYZiscFlsONmIxa1wKOiIqA
+UID:2025042957
+LOCATION:Bürgerhaus Dittweiler, 66903 Dittweiler, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250506T190000
+DTEND;TZID=Europe/Berlin:20250506T193300
+SUMMARY:Haupt-, Finanz, Bau- & Umweltausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZUjhULtv09tYhZkk31BLUyo
+UID:2025052958
+LOCATION:Rathaus Schönenberg-Kübelberg, 66901 Schönenberg-Kübelberg, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250513T190000
+DTEND;TZID=Europe/Berlin:20250513T202500
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZbvU7jy_YzkNpTpNxG5w8rE
+UID:2025052959
+LOCATION:Henschtalhalle Henschtal, 66909 Henschtal, Saal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250527T190000
+DTEND;TZID=Europe/Berlin:20250527T201000
+SUMMARY:Haupt-, Finanz, Bau- & Umweltausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZWIiWOkOCrF296nNjq5MkVM
+UID:2025052961
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250610T190000
+DTEND;TZID=Europe/Berlin:20250610T200000
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZegrswPhLcbsyNYkvXlPuUY
+UID:2025062962
+LOCATION:Turn- und Festhalle Brücken, 66904 Brücken/Pfalz, Turn- und Festhalle Brücken
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250825T190000
+DTEND;TZID=Europe/Berlin:20250825T195000
+SUMMARY:Werkausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZRnZnaFD32d6VULtruLSDbI
+UID:2025082964
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250826T190000
+DTEND;TZID=Europe/Berlin:20250826T200000
+SUMMARY:Haupt-, Finanz, Bau- & Umweltausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZejO9Utd8WjqPH9PzUhUbis
+UID:2025082965
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250902T190000
+DTEND;TZID=Europe/Berlin:20250902T201500
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZZGiBhn2LPdRJ_8Fpp8ecvg
+UID:2025092966
+LOCATION:Kurpfalzhalle Nanzdietschweiler, 66909 Nanzdietschweiler, Saal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250929T190000
+DTEND;TZID=Europe/Berlin:20250929T203000
+SUMMARY:Werkausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZZBGiEL5FZlGigsGiIb6SiQ
+UID:2025092968
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20250930T190000
+DTEND;TZID=Europe/Berlin:20250930T195500
+SUMMARY:Haupt-, Finanz, Bau- & Umweltausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZTRokziXS7UrU4AR7xy26gI
+UID:2025092969
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20251028T190000
+DTEND;TZID=Europe/Berlin:20251028T195100
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZckRSSIu7S_7d4HhVpLx5GA
+UID:2025102970
+LOCATION:Turn- und Festhalle Brücken, 66904 Brücken/Pfalz, Turn- und Festhalle Brücken
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20251118T190000
+DTEND;TZID=Europe/Berlin:20251118T200500
+SUMMARY:Haupt-, Finanz, Bau- & Umweltausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZRNCqjSlaLrWaMX3DWGeE9c
+UID:2025112972
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20251124T190000
+DTEND;TZID=Europe/Berlin:20251124T194600
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZWcgIWY2ha7fM0t4NRT6BsI
+UID:2025112973
+LOCATION:Henschtalhalle Henschtal, 66909 Henschtal, Saal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20251201T170200
+DTEND;TZID=Europe/Berlin:20251201T171100
+SUMMARY:Fachausschuss Dorfentwicklung
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZa4nvaB-PWmZt1x-FH2K_5w
+UID:2025122974
+LOCATION:Rathaus Schönenberg-Kübelberg, 66901 Schönenberg-Kübelberg, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20251216T190000
+DTEND;TZID=Europe/Berlin:20251216T200500
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZZ4143o6WWpMtN9SsEbIAMg
+UID:2025122975
+LOCATION:Gasthaus Schleppi, 66901 Schönenberg-Kübelberg, Saal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260126T190000
+DTEND;TZID=Europe/Berlin:20260126T202700
+SUMMARY:Werkausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZRhFgJhArtqkoA4t3L9dZj0
+UID:2026012977
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260127T190000
+DTEND;TZID=Europe/Berlin:20260127T192500
+SUMMARY:Haupt-, Finanz, Bau- & Umweltausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZXgZ0i31tcqdd9NaLsfVe5I
+UID:2026012978
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260210T190000
+DTEND;TZID=Europe/Berlin:20260210T200000
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZRzXvzF73tRc2-5iLy0p50s
+UID:2026022979
+LOCATION:Bürgerhaus Dittweiler, 66903 Dittweiler, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260316T190000
+DTEND;TZID=Europe/Berlin:20260316T205300
+SUMMARY:Werkausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZWBs5uAED1tp4W-rAaFTsOk
+UID:2026033005
+LOCATION:Werksgebäude, 66904 Brücken/Pfalz, Besprechungsraum
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260324T190000
+DTEND;TZID=Europe/Berlin:20260324T212100
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZaBppUgHMUMzRGp9v_q_cDc
+UID:2026033007
+LOCATION:Bürgerhaus Quirnbach, 66909 Quirnbach/Pfalz, Saal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260504T190000
+DTEND;TZID=Europe/Berlin:20260504T195300
+SUMMARY:Werkausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZSsRv62Tu2yp7hvMdS39QXY
+UID:2026053008
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260505T190000
+DTEND;TZID=Europe/Berlin:20260505T205000
+SUMMARY:Haupt-, Finanz, Bau- & Umweltausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZfOyuKQDRphWbrOdk2u3Jc8
+UID:2026053009
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260519T190000
+DTEND;TZID=Europe/Berlin:20260519T205000
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZT2Y4Prm3P9Ipzua3KA4xbQ
+UID:2026053010
+LOCATION:Bürgerhaus Dittweiler, 66903 Dittweiler, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260623T190000
+DTEND;TZID=Europe/Berlin:20260623T204000
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZS0t_jeSCp5V_XD7NzYQZxY
+UID:2026063012
+LOCATION:Kurpfalzhalle Nanzdietschweiler, 66909 Nanzdietschweiler, Saal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260702T170000
+DTEND;TZID=Europe/Berlin:20260702T170500
+SUMMARY:Fachausschuss Dorfentwicklung
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZRzzOI0qPine8DioSQaIUV4
+UID:2026073013
+LOCATION:Dorfgemeinschaftshaus Glan-Münchweiler, 66907 Glan-Münchweiler, Saal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260824T190000
+DTEND;TZID=Europe/Berlin:20260824T191300
+SUMMARY:Werkausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZUnb1Baswq6pyKEpnWddqjc
+UID:2026083014
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260825T190000
+DTEND;TZID=Europe/Berlin:20260825T201000
+SUMMARY:Haupt-, Finanz, Bau- & Umweltausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZRlFky8_pRxXDIngeva1UtQ
+UID:2026083015
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260901T190000
+DTEND;TZID=Europe/Berlin:20260901T200500
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZV4VjlpVI5Liw8hTCSp17ic
+UID:2026093016
+LOCATION:Henschtalhalle Henschtal, 66909 Henschtal, Saal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260914T170000
+DTEND;TZID=Europe/Berlin:20260914T171600
+SUMMARY:Fachausschuss Dorfentwicklung
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZcHKguJSox_xJ4E1lYDIPrs
+UID:2026093021
+LOCATION:Henschtalhalle Henschtal, 66909 Henschtal, Saal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20260929T190000
+DTEND;TZID=Europe/Berlin:20260929T201000
+SUMMARY:Haupt-, Finanz, Bau- & Umweltausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZViUn6F1NzvrH0J0FfOw03g
+UID:2026093019
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20261020T190000
+DTEND;TZID=Europe/Berlin:20261020T204000
+SUMMARY:Verbandsgemeinderat Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZfxKVDnFYVBloYRkjLpSuvs
+UID:2026103020
+LOCATION:in Klärung, , in Klärung
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTAMP:20261002T061606Z
+DTSTART;TZID=Europe/Berlin:20261103T190000
+DTEND;TZID=Europe/Berlin:20261103T201300
+SUMMARY:Werkausschuss Oberes Glantal
+DESCRIPTION:Link zur Tagesordnung: https://vgog.ratsinfomanagement.net/tops/?__=UGhVM0hpd2NXNFdFcExjZbx8-33HLL5Hb48ILewmRgc
+UID:2026113018
+LOCATION:Rathaus Waldmohr, 66914 Waldmohr, Sitzungssaal
+END:VEVENT
+
+END:VCALENDAR
