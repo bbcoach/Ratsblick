@@ -8,6 +8,7 @@ import { buildWeb } from './export/web.js';
 import { kandidaten, pruefe, type Gebiete } from './sync/discover.js';
 import { probeSource, saveProbe } from './sync/probe.js';
 import { syncAllris } from './scrape/allris.js';
+import { syncRegisafe } from './scrape/regisafe.js';
 import { syncRubinApi } from './scrape/rubin.js';
 import { syncSessionNet } from './scrape/sessionnet.js';
 import { syncSource, type SourceRecord } from './sync/sync.js';
@@ -133,7 +134,9 @@ async function main(): Promise<void> {
               ? await syncRubinApi(db, client, s, { log, alles: values.full })
               : s.typ === 'allris'
                 ? await syncAllris(db, client, s, { log, alles: values.full })
-                : await syncSource(db, client, s, { full: values.full, log });
+                : s.typ === 'regisafe'
+                  ? await syncRegisafe(db, client, s, { log, alles: values.full })
+                  : await syncSource(db, client, s, { full: values.full, log });
         log(
           `✓ ${st.bodies} Körperschaften, ${st.organizations} Gremien, ${st.meetings} Sitzungen, ` +
             `${st.agendaItems} TOPs, ${st.papers} Vorlagen, ${st.consultations} Beratungen, ${st.files} Dateien ` +

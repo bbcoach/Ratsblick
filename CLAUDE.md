@@ -16,8 +16,8 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
 - Hosts mit robots.txt-Verbot (z. B. `*.sitzung-online.de`) nicht automatisiert abrufen, bevor das geklärt ist.
   Ausnahme auf ausdrückliche Entscheidung des Projektinhabers (01.10.2026): Kreis Kaiserslautern auf
   `sessionnet.owl-it.de` – nur dieser Pfad, 2 s Abstand (`intervallMs`), Grund im Feld `hinweis` der Quelle.
-  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`) und Stadt Trier (`gremieninfo.trier.de`, über den
-  Weiterleiter). Bei Einwänden des Betreibers sofort abschalten.
+  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`), Stadt Trier (`gremieninfo.trier.de`) und VG Kirchheimbolanden
+  (`kirchheimbolanden.ris-portal.de`, robots.txt erlaubt nur Suchmaschinen) – Trier und Kirchheimbolanden über den Weiterleiter. Bei Einwänden des Betreibers sofort abschalten.
   Andere owl-it-Kunden bleiben gesperrt.
 - Technik: TypeScript, Node ≥ 22.13, eingebautes `node:sqlite`, `tsx`, `vitest`. Keine schweren Abhängigkeiten
   ohne Grund.
@@ -69,6 +69,15 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   meldet `x-ratsblick-set-cookie`); Sitzungen `to010?SILFDNR=`, Vorlagen `vo020?VOLFDNR=` ohne Sitzung abrufbar.
   Vorlagen enthalten Beschlussvorschlag/Begründung als HTML → `mainFile.text`. Nicht veröffentlichte Sitzungen haben
   im Kalender keinen Link (`to010` ohne `refresh=false` leitet auf `noauth`). Erster Lauf: 65 Sitzungen, 77 Vorlagen.
+
+## regisafe (VG Kirchheimbolanden, seit 02.10.2026)
+- `typ: "regisafe"`, `src/scrape/regisafe.ts`. Liferay-Portal von comundus auf `<name>.ris-portal.de`; außerhalb
+  Europas HTTP 403 → Weiterleiter. Alles ohne Anmeldung:
+  Gremien aus der Filterliste von `/sitzungen` (nach Körperschaft gruppiert; Ort = Endung des Gremiumsnamens, „Verbandsgemeinde“
+  → VG, ohne Ort → Gruppe davor), Kalender als JSON (`…&_RisSitzung_resource=loadSessions&_RisSitzung_year=&_RisSitzung_month=`,
+  Monat ab 0), Sitzung `web/guest/sitzungen?sitzungId=` mit TOPs und Dokumenten (`singleDocument&_RisSitzung_schriftgutId=`, PDF).
+- Vorlagen haben keine eigene Seite: gebildet aus dem Dokument „Sitzungsvorlage (JJJJ/NNNN)“ am TOP. Ein System enthält
+  VG, Stadt und alle Ortsgemeinden (erster Lauf: 17 Körperschaften, 38 Sitzungen, 61 Vorlagen).
 
 ## more!rubin ohne OParl (geprüft an rockenhausen.gremien.info, 01.10.2026)
 - Neuere more!rubin-Oberfläche ist eine JavaScript-App; Daten über eine interne JSON-Schnittstelle, ohne Anmeldung:
