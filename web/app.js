@@ -102,9 +102,9 @@
     depth = 0;
     const tab = b.dataset.tab;
     if (tab === 'fav') location.hash = link('fav');
+    else if (tab === 'themen') location.hash = link('themen');
     else if (tab === 'wahl' || !kommune) location.hash = '#/';
-    else if (tab === 'start') location.hash = link('g', kommune);
-    else location.hash = link('abo');
+    else location.hash = link('g', kommune);
   }));
 
   function parse() {
@@ -132,9 +132,9 @@
       } else if (r.v === 'fav') {
         tab = 'fav';
         await vFavoriten();
-      } else if (r.v === 'abo' && kommune && G.has(kommune)) {
-        tab = 'abo';
-        await vAbo();
+      } else if (r.v === 'themen' || r.v === 'abo') {
+        tab = 'themen';
+        await vThemen();
       } else {
         vWahl();
       }
@@ -517,60 +517,106 @@
     });
   }
 
-  // ---------- Ansicht: Themen-Abo ----------
+  // ---------- Ansicht: Themensuche ----------
+  // Suchbegriffe je Thema (Teilwörter, klein, Umlaute ausgeschrieben); „^“ = nur am Wortanfang
   const THEMEN = {
-    'Bauen & Planen': ['bebauungsplan', 'bauantrag', 'bauvoranfrage', 'baugebiet', 'flächennutzungsplan', 'einvernehmen'],
-    'Kita & Schule': ['kita', 'kindertagesstätte', 'kindergarten', 'schule'],
-    'Straßen & Verkehr': ['straße', 'straßen', 'verkehr', 'gehweg', 'parken', 'radweg'],
-    'Haushalt & Finanzen': ['haushalt', 'jahresabschluss', 'auftragsvergabe', 'zuschuss', 'förderung'],
-    'Klima & Energie': ['wärmeplanung', 'photovoltaik', 'solarpark', 'windenergie', 'klimaschutz', 'klimaanpassung'],
-    'Feuerwehr': ['feuerwehr', 'brandschutz'],
-    'Friedhof': ['friedhof'],
-    'Wald': ['forst', 'wald'],
+    'Klima & Energie': ['klima', 'photovolt', 'solar', 'windkraft', 'windenerg', 'windpark', 'waermeplan', 'waermenetz', 'nahwaerme', 'fernwaerme', 'energie', 'ladesaeul', 'ladeinfrastruktur', 'e-mobil', '^pv'],
+    'Verkehr & Straßen': ['verkehr', 'strassenausbau', 'ausbaubeitr', 'gehweg', 'radweg', 'fahrrad', 'parkplatz', 'parkraum', 'bushaltestell', 'oepnv', 'nahverkehr', 'tempo', 'geschwindigkeit', 'kreisel', 'bruecke', 'schulweg', 'strassenbeleucht', 'winterdienst'],
+    'Bauen & Wohnen': ['bebauungsplan', 'flaechennutzungsplan', 'bauantrag', 'bauvoranfrage', 'bauleitplan', 'baugebiet', 'wohnbau', 'wohnraum', 'wohnungs', 'einvernehmen', 'abrundungssatzung', 'veraenderungssperre', 'dorferneuerung', 'staedtebau'],
+    'Schule & Kita': ['schule', 'grundschul', 'schultraeger', 'schulbau', 'schulhof', 'schulbus', 'schulsozial', 'schulzweckverband', 'kita', 'kindertages', 'kindergarten', 'krippe', '^hort', 'ganztag', 'jugend'],
+    'Haushalt & Finanzen': ['haushalt', 'jahresabschluss', 'jahresrechnung', 'steuer', 'hebesa', 'gebuehr', 'beitragssatzung', 'kredit', 'darlehen', 'finanz', 'rechnungspruef'],
+    'Wasser & Abwasser': ['wasser', 'kanal', 'klaeranlage', 'starkregen', 'hochwasser'],
+    'Feuerwehr & Sicherheit': ['feuerwehr', 'brandschutz', 'katastrophenschutz', 'rettung', 'sirene'],
+    'Natur & Umwelt': ['gemeindewald', 'stadtwald', 'waldweg', 'waldbrand', 'waldwirtschaft', 'forst', 'naturschutz', 'umwelt', 'baeume', 'baumpflanz', 'baumfaell', 'baumschutz', 'biotop', 'artenschutz', 'gruenflaeche', 'landschaft', 'jagd'],
+    'Soziales & Gesundheit': ['senior', 'sozial', '^pflege', 'altenpflege', 'aerzt', 'arzt', 'gesundheit', 'fluechtl', 'asyl', 'integration', 'inklusion', 'barrierefrei'],
+    'Sport, Kultur & Freizeit': ['^sport', 'sportplatz', 'sporthalle', 'sportanlage', '^kultur', 'museum', 'buecherei', 'bibliothek', 'schwimmbad', 'freibad', 'hallenbad', 'spielplatz', 'kirmes', 'tourismus', 'dorfgemeinschaftshaus', 'buergerhaus', 'mehrzweckhalle'],
+    'Digitales': ['digital', 'breitband', 'glasfaser', 'wlan', 'mobilfunk', 'internet'],
+    'Wirtschaft & Gewerbe': ['gewerbe', 'wirtschaftsfoerder', 'wirtschaftsstandort', 'einzelhandel', 'innenstadt', 'leerstand', 'ansiedlung'],
+    'Friedhof': ['friedhof', 'bestattung', '^urnen'],
   };
-  const abo = () => store.get('abo', { themen: ['Bauen & Planen', 'Kita & Schule'], stichwort: '', strasse: '', push: true, mail: false });
-  const saveAbo = (patch) => store.set('abo', { ...abo(), ...patch });
-
-  async function vAbo() {
-    const g = G.get(kommune);
-    setTitle(kurzName(kreisKurz(g.name)));
-    const a = abo();
-    const terms = [...a.themen.flatMap((t) => THEMEN[t] || []), ...[a.stichwort, a.strasse].filter(Boolean).map((s) => s.toLowerCase())];
-    const mitDaten = ebenen(g).filter((e) => !e.off && e.g.q).map((e) => e.g);
-    const vorlagen = [];
-    for (const e of mitDaten) {
-      const x = await quelle(e.q);
-      for (const v of x.vByK.get(e.b) || []) vorlagen.push({ v, x });
+  const norm = (t) => String(t || '').toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+  // Begriffe enthalten nur Buchstaben und Bindestriche; „^“ = nur am Wortanfang (z. B. „PV“, nicht „Pvc“ in Wörtern)
+  const begriffRegex = (b) => new RegExp(b.startsWith('^') ? `(?:^|[^a-z0-9])${b.slice(1)}` : b);
+  let SUCHE = null;
+  async function sucheLaden() {
+    if (!SUCHE) {
+      const d = await getJson('data/suche.json');
+      SUCHE = { quellen: d.quellen, eintraege: d.eintraege.map((e) => ({ art: e[0], titel: e[1], datum: e[2], q: d.quellen[e[3]], gebiet: e[4], id: e[5], nr: e[6], n: norm(e[1]) })) };
     }
-    vorlagen.sort((p, r) => String(r.v.datum).localeCompare(String(p.v.datum)));
-    const treffer = !terms.length ? [] : vorlagen.map(({ v, x }) => {
-      const hay = ((v.name || '') + ' ' + (v.text || '')).toLowerCase();
-      const hit = terms.find((t) => hay.includes(t));
-      return hit ? { v, x, hit } : null;
-    }).filter(Boolean).slice(0, 15);
-    const fuer = mitDaten.map((e) => anzeigeName(e)).join(', ');
-    $view.innerHTML = `
-      <section class="hero"><h3>Bescheid wissen, wenn es um Ihr Thema geht</h3><p class="muted small">${mitDaten.length ? `Für ${esc(fuer)}.` : `Für ${esc(anzeigeName(g))} liegen noch keine Sitzungsdaten vor. Sie können Ihre Themen trotzdem schon festlegen.`}</p></section>
-      <section><h2>Themen</h2><div class="chips">${Object.keys(THEMEN).map((t) => `<button type="button" class="chip" data-thema="${esc(t)}" aria-pressed="${a.themen.includes(t)}">${esc(t)}</button>`).join('')}</div></section>
-      <section class="field"><label for="stw">Stichwort</label><input type="text" id="stw" value="${esc(a.stichwort)}" placeholder="z. B. Dorfgemeinschaftshaus" enterkeyhint="done"></section>
-      <section class="field"><label for="str">Ihre Straße</label><input type="text" id="str" value="${esc(a.strasse)}" placeholder="z. B. Hauptstraße" autocomplete="address-line1" enterkeyhint="done"><p class="muted small">Wird nur auf diesem Gerät gespeichert.</p></section>
-      <section><h2>Benachrichtigung</h2><div class="list">
-        <label class="switch" for="push"><span>Push-Mitteilung</span><input type="checkbox" id="push" ${a.push ? 'checked' : ''}></label>
-        <label class="switch" for="mail"><span>E-Mail</span><input type="checkbox" id="mail" ${a.mail ? 'checked' : ''}></label>
-      </div><p class="notice">Benachrichtigungen werden noch nicht verschickt. Ihre Auswahl bleibt auf diesem Gerät gespeichert.</p></section>
-      <section><h2>Das wäre zuletzt gekommen (${treffer.length})</h2>
-        ${treffer.length ? `<div class="list">${treffer.map(({ v, x, hit }) => `<button class="row" type="button" data-go="${esc(link('v', v.id))}"><div class="body"><span class="meta"><span class="mono">${esc(v.nr)}</span><span>${esc(datum(v.datum))}</span><span>${esc(kurzName(x.k.get(v.k)?.name))}</span></span><span class="title">${esc(v.name)}</span><span class="meta">Treffer: <mark>${esc(hit)}</mark></span></div>${chev}</button>`).join('')}</div>` : '<div class="card empty">Keine passenden Vorlagen im aktuellen Datenstand.</div>'}
-      </section>`;
-    $view.querySelectorAll('[data-thema]').forEach((el) => el.addEventListener('click', () => {
-      const t = el.dataset.thema; const cur = abo().themen;
-      saveAbo({ themen: cur.includes(t) ? cur.filter((y) => y !== t) : [...cur, t] }); vAbo();
-    }));
-    for (const [id, key] of [['stw', 'stichwort'], ['str', 'strasse']]) {
-      const el = document.getElementById(id);
-      el.addEventListener('change', () => { saveAbo({ [key]: el.value.trim() }); vAbo(); });
-    }
-    for (const id of ['push', 'mail']) document.getElementById(id).addEventListener('change', (e) => saveAbo({ [id]: e.target.checked }));
+    return SUCHE;
   }
+  // Gebiete für den Ortsfilter: die gewählte Kommune mit VG und Kreis, dazu die Favoriten
+  function gebietsfilter() {
+    const opt = [{ key: 'alle', label: 'Ganz Rheinland-Pfalz' }];
+    const g = kommune && G.get(kommune);
+    if (g) for (const e of ebenen(g)) if (!e.off && e.g && e.g.typ !== 'body') opt.push({ key: 'g:' + e.g.id, label: anzeigeName(e.g), id: e.g.id });
+    const favs = favoriten().filter((f) => f.typ === 'gebiet' && G.has(f.id));
+    if (favs.length) opt.push({ key: 'fav', label: 'Meine Favoriten', ids: favs.map((f) => f.id) });
+    return opt;
+  }
+  // Liegt die Gebietskörperschaft „gebiet“ in „ziel“ (gleich, oder Gemeinde/VG im Kreis bzw. Gemeinde in der VG)?
+  function liegtIn(gebiet, ziel) {
+    if (!gebiet) return false;
+    if (gebiet === ziel) return true;
+    const g = G.get(gebiet);
+    return !!g && (g.vg === ziel || g.kreis === ziel);
+  }
+
+  async function vThemen() {
+    setTitle('Themen');
+    const zustand = store.get('themensuche', { thema: '', text: '', ort: 'alle' });
+    const filter = gebietsfilter();
+    if (!filter.some((f) => f.key === zustand.ort)) zustand.ort = 'alle';
+    $view.innerHTML = `
+      <section class="hero"><h3>Was wird zu Ihrem Thema beraten?</h3>
+        <p class="muted small">Vorlagen und Tagesordnungspunkte aller angebundenen Räte – in Ihrer Kommune, im Kreis oder in ganz Rheinland-Pfalz.</p></section>
+      <form class="searchbox" id="tf" role="search" autocomplete="off">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+        <input id="tq" type="search" enterkeyhint="search" placeholder="Stichwort, z. B. Windkraft oder Freibad" value="${esc(zustand.text)}" aria-label="Stichwort">
+      </form>
+      <div class="chips" role="group" aria-label="Themen">${Object.keys(THEMEN).map((t) => `<button type="button" class="chip" data-thema="${esc(t)}" aria-pressed="${zustand.thema === t}">${esc(t)}</button>`).join('')}</div>
+      <section class="field"><label for="tort">Wo</label><select id="tort">${filter.map((f) => `<option value="${esc(f.key)}" ${f.key === zustand.ort ? 'selected' : ''}>${esc(f.label)}</option>`).join('')}</select></section>
+      <div id="treffer"><div class="card empty">Lade Suchverzeichnis …</div></div>`;
+    let S;
+    try { S = await sucheLaden(); } catch (err) {
+      document.getElementById('treffer').innerHTML = `<div class="card empty">Die Suche konnte nicht geladen werden (${esc(err.message)}).</div>`;
+      return;
+    }
+    const zeigen = () => {
+      store.set('themensuche', zustand);
+      const $t = document.getElementById('treffer');
+      const begriffe = [...(zustand.thema ? THEMEN[zustand.thema] : []).map(begriffRegex)];
+      const woerter = norm(zustand.text).split(/\s+/).filter((w) => w.length >= 2);
+      if (!begriffe.length && !woerter.length) {
+        $t.innerHTML = '<div class="card empty">Wählen Sie ein Thema oder geben Sie ein Stichwort ein.</div>';
+        return;
+      }
+      const f = filter.find((x) => x.key === zustand.ort);
+      const imGebiet = (e) => !f || f.key === 'alle' || (f.id ? liegtIn(e.gebiet, f.id) : (f.ids || []).some((id) => liegtIn(e.gebiet, id)));
+      const treffer = S.eintraege.filter((e) =>
+        (!begriffe.length || begriffe.some((r) => r.test(e.n))) && woerter.every((w) => e.n.includes(w)) && imGebiet(e));
+      const ort = (e) => { const g = e.gebiet && G.get(e.gebiet); return g ? anzeigeName(g) : (INDEX.quellen.find((q) => q.id === e.q)?.name || ''); };
+      const zeige = treffer.slice(0, 150);
+      $t.innerHTML = treffer.length
+        ? `<p class="muted small">${fmtZahl(treffer.length)} Treffer${treffer.length > zeige.length ? `, die neuesten ${zeige.length}` : ''} · neueste zuerst</p>
+          <div class="list">${zeige.map((e) => `<button class="row" type="button" data-go="${esc(link(e.art === 0 ? 'v' : 's', e.id))}"><div class="body">
+            <span class="meta">${e.art === 0 ? `<span class="pill plain">Vorlage</span>${e.nr ? `<span class="mono">${esc(e.nr)}</span>` : ''}` : '<span class="pill plain">Tagesordnung</span>'}${e.datum ? `<span>${esc(datum(e.datum))}</span>` : ''}</span>
+            <span class="title">${esc(e.titel)}</span><span class="meta">${esc(ort(e))}</span></div>${chev}</button>`).join('')}</div>`
+        : '<div class="card empty">Keine Treffer im aktuellen Datenstand.</div>';
+    };
+    const input = document.getElementById('tq');
+    let warte;
+    input.addEventListener('input', () => { clearTimeout(warte); warte = setTimeout(() => { zustand.text = input.value; zeigen(); }, 200); });
+    document.getElementById('tf').addEventListener('submit', (e) => { e.preventDefault(); input.blur(); zustand.text = input.value; zeigen(); });
+    $view.querySelectorAll('[data-thema]').forEach((el) => el.addEventListener('click', () => {
+      zustand.thema = zustand.thema === el.dataset.thema ? '' : el.dataset.thema;
+      $view.querySelectorAll('[data-thema]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.thema === zustand.thema)));
+      zeigen();
+    }));
+    document.getElementById('tort').addEventListener('change', (e) => { zustand.ort = e.target.value; zeigen(); });
+    zeigen();
+  }
+
 
   // ---------- Service Worker: offline nutzbar, Hinweis bei neuer Version ----------
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {

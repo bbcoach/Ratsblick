@@ -187,6 +187,11 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
   Kreis – Stern neben dem Namen auf der Kommunenseite, je gewählter Ebene) und Gremien (Stern in der Sitzung neben dem Namen und auf
   der Kommunenseite unter „Gremien“) merken; gespeichert nur im Gerät (`localStorage` `ratsblick:favoriten`; Kommune
   `{typ:'gebiet', id}`, Gremium Quelle + Körperschaft + Gremiumsname), Anzeige gruppiert mit nächster und letzter Sitzung.
+- Reiter „Themen“ (seit 02.10.2026, statt Themen-Abo): Themensuche über Titel aller Vorlagen und öffentlichen Sach-TOPs im
+  aktuellen Datenstand (`data/suche.json`, beim Bauen aus den Momentaufnahmen, `suchEintraege` in `src/export/web.ts`; ~4 MB,
+  ~0,7 MB übertragen, wird erst im Reiter geladen). Themen als Begriffslisten (`THEMEN` in `web/app.js`, Teilwörter mit
+  ausgeschriebenen Umlauten, „^“ = Wortanfang), dazu Stichwort und Ort (ganz RLP, Gemeinde/VG/Kreis der gewählten Kommune,
+  Favoriten). KI-Zusammenfassungen vom Projektinhaber verworfen (zu teuer).
 - App-Dateien lädt der Service Worker zuerst aus dem Netz (Cache nur offline); neue Version kurz nach dem Start → automatisch neu laden.
 - Links ins Original-RIS (seit 02.10.2026): je Quelle `quelle.ris` (Startseite, `risStartseite`), je Sitzung/Vorlage `web`
   (`webSeite` in `src/export/snapshot.ts`: OParl-`web`, sonst Seitenadresse der Scraper; more!rubin-Sitzungen `/meeting?id=`
@@ -202,7 +207,7 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
 1. Kontakt im User-Agent ggf. auf eine E-Mail-Adresse umstellen (derzeit Repo-URL).
 2. Volltext aus `mainFile.text` in `file.text_extracted` übernehmen, Suche darüber.
 3. „Kurz erklärt“ automatisch erzeugen (statt von Hand).
-4. Themen-Abo (zurückgestellt, Projektinhaber 02.10.2026): als gespeicherte Suche – Was (Thema oder Stichwort) × Wo (eigene
+4. Benachrichtigungen zur Themensuche (Themen-Abo zurückgestellt, Projektinhaber 02.10.2026): als gespeicherte Suche – Was (Thema oder Stichwort) × Wo (eigene
    Gemeinde, VG, Nachbar-VGs, Landkreis, ganz RLP, Auswahl) × Welche (Vorlagen, TOPs, Beschlüsse mit Abstimmung); dazu
    Vergleichsansicht „ein Thema, mehrere Räte“. Stufe 1 ohne Server (Suche über RLP, Abo lokal gespeichert, „neu seit letztem
    Besuch“), Stufe 2 Benachrichtigungen (braucht kleinen Server für Web Push/E-Mail). Offen: Themenliste, Definition „Nachbar“.

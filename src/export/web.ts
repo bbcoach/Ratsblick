@@ -35,6 +35,40 @@ export function risStartseite(oparlUrl: string): string {
   return `${u.protocol}//${u.host}${pfad}`;
 }
 
+/**
+ * Eintrag der Themensuche: [Art (0 = Vorlage, 1 = TOP), Titel, Datum JJJJ-MM-TT, Quelle (Index), Gebiet, Ziel-ID, Nummer].
+ * Ziel ist die Vorlage bzw. bei TOPs die Sitzung. Gebiet = Gebietskörperschaft der Körperschaft, sonst die der Quelle.
+ */
+export type SuchEintrag = [0 | 1, string, string | null, number, string | null, string, string | null];
+
+/** Formalien der Tagesordnung, die bei der Themensuche nur stören. */
+const FORMALIE =
+  /^(?:er[öo]ffnung|begr[üu][ßs]ung|feststellung|genehmigung (?:der|des) (?:niederschrift|protokolls)|mitteilungen|anfragen|verschiedenes|einwohnerfragestunde|bekanntgabe|informationen?|sonstiges)\b/i;
+
+export function suchEintraege(
+  qi: number,
+  quellGebiet: string | null,
+  gebietVonBody: Map<string, string>,
+  sitzungen: Array<{ id: string; k: string; start: string | null; tops: Array<{ name: string | null; oeffentlich: boolean | null; vorlage: string | null }> }>,
+  vorlagen: Array<{ id: string; k: string; name: string | null; nr: string | null; datum: string | null }>,
+): SuchEintrag[] {
+  const out: SuchEintrag[] = [];
+  const gebiet = (k: string) => gebietVonBody.get(k) ?? quellGebiet;
+  for (const v of vorlagen) if (v.name) out.push([0, v.name, v.datum?.slice(0, 10) ?? null, qi, gebiet(v.k), v.id, v.nr]);
+  const vorlagenIds = new Set(vorlagen.map((v) => v.id));
+  for (const m of sitzungen) {
+    const gesehen = new Set<string>();
+    for (const t of m.tops) {
+      const name = t.name?.replace(/\s+/g, ' ').trim();
+      // TOPs mit Vorlage erscheinen über die Vorlage; nicht öffentliche und Formalien weglassen
+      if (!name || t.oeffentlich === false || (t.vorlage && vorlagenIds.has(t.vorlage)) || FORMALIE.test(name) || gesehen.has(name)) continue;
+      gesehen.add(name);
+      out.push([1, name, m.start?.slice(0, 10) ?? null, qi, gebiet(m.k), m.id, null]);
+    }
+  }
+  return out;
+}
+
 export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions = {}) {
   const webDir = opts.webDir ?? 'web';
   const kurzPath = opts.kurzPath ?? 'data/kurz-erklaert.json';
@@ -62,7 +96,9 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
 
   // Gebiet → [Quelle, Körperschaft]
   const daten: Record<string, [string, string]> = {};
-  const quellen = sources.map(({ id }) => {
+  // Themensuche: Titel aller Vorlagen und öffentlichen TOPs im aktuellen Datenstand
+  const suche: SuchEintrag[] = [];
+  const quellen = sources.map(({ id }, qi) => {
     const snap = buildSnapshot(db, id, { now, pastMeetings: 6, papers: 15, textLength: 1600 });
     const vorlagen = snap.vorlagen.map((v) => (kurz[v.id] ? { ...v, kurz: kurz[v.id] } : v));
 
@@ -77,6 +113,7 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
     const ris = quelleUrl ? risStartseite(quelleUrl) : null;
     const quelle = { ...snap.quelle, ris };
     writeFileSync(join(outDir, 'data', `${id}.json`), JSON.stringify({ ...snap, quelle, koerperschaften, vorlagen }));
+    suche.push(...suchEintraege(qi, gebiet ?? null, gebietVonBody, snap.sitzungen, vorlagen));
 
     const kommend = new Map<string, number>();
     for (const m of snap.sitzungen) {
@@ -114,6 +151,8 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
     quellen,
   };
   writeFileSync(join(outDir, 'data', 'index.json'), JSON.stringify(index));
+  suche.sort((a, b) => String(b[2]).localeCompare(String(a[2])));
+  writeFileSync(join(outDir, 'data', 'suche.json'), JSON.stringify({ erstellt: build, quellen: quellen.map((q) => q.id), eintraege: suche }));
 
   const mitDaten = gebiete.gemeinden.filter((g) => daten[g.id] || (g.vg && daten[g.vg])).length;
   return { quellen: quellen.length, gebiete: Object.keys(daten).length, gemeindenMitDaten: mitDaten, gemeinden: gebiete.gemeinden.length };
