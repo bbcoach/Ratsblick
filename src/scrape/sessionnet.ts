@@ -87,6 +87,25 @@ export interface KalenderEintrag {
   dokumente: Dokument[];
 }
 
+export interface Mandant {
+  nr: string;
+  name: string;
+}
+
+/** Mandanten (Körperschaften) aus dem Filtermenü; der gerade gewählte fehlt in der Liste. */
+export function parseMandanten(html: string): Mandant[] {
+  const out = new Map<string, string>();
+  for (const m of html.matchAll(/<a\s+href="[^"]*__cpanr=(\d+)"[^>]*smcfiltermenumandant[^>]*>([^<]*)<\/a>/g)) {
+    out.set(m[1]!, text(m[2]));
+  }
+  return [...out].map(([nr, name]) => ({ nr, name }));
+}
+
+/** Name für die Zuordnung zum Gemeindeverzeichnis („Sickingenstadt Landstuhl“ → „Stadt Landstuhl“). */
+export function mandantName(name: string): string {
+  return name.replace(/^\S*stadt\s+/i, 'Stadt ').replace(/^VG\s+/, 'Verbandsgemeinde ');
+}
+
 export function parseKalender(html: string, jahr: number, monat: number): KalenderEintrag[] {
   const out: KalenderEintrag[] = [];
   let tag: number | null = null;
@@ -231,37 +250,63 @@ export async function syncSessionNet(
   tx(db, () => upsertBody(db, source.id, { id: bodyId, name: bodyName, shortName: source.id } as never));
   stats.bodies = 1;
 
-  // 1. Kalender
-  const eintraege: KalenderEintrag[] = [];
+  // Mandanten: Standard (ohne __cpanr, meist die VG) und auf Wunsch alle weiteren aus dem Filtermenü (Ortsgemeinden)
+  const koerper: Array<{ cpanr: string | null; id: string }> = [{ cpanr: null, id: bodyId }];
+  if (source.mandanten) {
+    const liste = parseMandanten(await client.getText(`${base}info.${ext}`));
+    for (const m of liste) {
+      const id = `${base}#mandant-${m.nr}`;
+      tx(db, () => upsertBody(db, source.id, { id, name: mandantName(m.name), shortName: m.nr } as never));
+      stats.bodies++;
+      koerper.push({ cpanr: m.nr, id });
+    }
+    log(`  Mandanten: ${liste.length} zusätzlich`);
+  }
+
+  // 1. Kalender (je Mandant)
+  type Eintrag = KalenderEintrag & { body: string; cpanr: string | null };
+  const alle: Eintrag[] = [];
   const von = opts.monateZurueck ?? 2;
   const bis = opts.monateVoraus ?? 3;
-  for (let i = -von; i <= bis; i++) {
-    const d = new Date(Date.UTC(jetzt.getUTCFullYear(), jetzt.getUTCMonth() + i, 1));
-    const jahr = d.getUTCFullYear();
-    const monat = d.getUTCMonth() + 1;
-    const html = await client.getText(`${base}si0040.${ext}?__cjahr=${jahr}&__cmonat=${monat}&__canz=1&__cselect=0`);
-    eintraege.push(...parseKalender(html, jahr, monat));
+  for (const k of koerper) {
+    for (let i = -von; i <= bis; i++) {
+      const d = new Date(Date.UTC(jetzt.getUTCFullYear(), jetzt.getUTCMonth() + i, 1));
+      const jahr = d.getUTCFullYear();
+      const monat = d.getUTCMonth() + 1;
+      const filter = k.cpanr ? `__cpanr=${k.cpanr}&` : '';
+      const html = await client.getText(`${base}si0040.${ext}?${filter}__cjahr=${jahr}&__cmonat=${monat}&__canz=1&__cselect=0`);
+      alle.push(...parseKalender(html, jahr, monat).map((e) => ({ ...e, body: k.id, cpanr: k.cpanr })));
+    }
   }
+  // Dieselbe Sitzung nur einmal (bei Mandanten gilt der genauere Eintrag)
+  const eindeutig = new Map<string, Eintrag>();
+  alle.forEach((e, i) => {
+    const schluessel = e.ksinr ?? `${i}`;
+    const alt = eindeutig.get(schluessel);
+    if (!alt || (!alt.cpanr && e.cpanr)) eindeutig.set(schluessel, e);
+  });
+  const eintraege = [...eindeutig.values()];
   log(`  Kalender: ${eintraege.length} Sitzungen in ${von + bis + 1} Monaten`);
 
-  // 2. Gremien
+  // 2. Gremien (je Mandant, da gleichnamige Ausschüsse in mehreren Gemeinden vorkommen)
   const gremien = new Map<string, string>();
+  const gremiumSchluessel = (e: Eintrag) => `${e.cpanr ?? ''}|${e.gremium}`;
   for (const e of eintraege) {
-    if (!e.gremium || gremien.has(e.gremium)) continue;
-    const id = `${base}#gremium-${slug(e.gremium)}`;
-    gremien.set(e.gremium, id);
-    tx(db, () => upsertOrganization(db, bodyId, { id, name: e.gremium, organizationType: 'Gremium' } as never));
+    if (!e.gremium || gremien.has(gremiumSchluessel(e))) continue;
+    const id = e.cpanr ? `${base}#gremium-${e.cpanr}-${slug(e.gremium)}` : `${base}#gremium-${slug(e.gremium)}`;
+    gremien.set(gremiumSchluessel(e), id);
+    tx(db, () => upsertOrganization(db, e.body, { id, name: e.gremium, organizationType: 'Gremium' } as never));
     stats.organizations++;
   }
 
   // 3. Sitzungen
-  const vorlagenGesehen = new Set<string>();
+  const vorlagenGesehen = new Map<string, string>(); // kvonr → Körperschaft
   const festVor = new Date(jetzt.getTime() - (opts.festNachTagen ?? 14) * 86_400_000).toISOString().slice(0, 10);
   const vorhanden = db.prepare('SELECT COUNT(*) AS n FROM agenda_item WHERE meeting_id = ?');
   for (const e of eintraege) {
     const meetingId = e.ksinr
       ? `${base}si0057.${ext}?__ksinr=${e.ksinr}`
-      : `${base}si0040.${ext}#${e.datum}-${slug(e.gremium)}`;
+      : `${base}si0040.${ext}#${e.cpanr ? `${e.cpanr}-` : ''}${e.datum}-${slug(e.gremium)}`;
     const start = berlinIso(e.datum, e.beginn ?? '00:00');
     const vergangen = start < jetzt.toISOString();
     if (!opts.alles && e.verlinkt && e.datum < festVor && (vorhanden.get(meetingId) as { n: number }).n > 0) continue;
@@ -274,10 +319,10 @@ export async function syncSessionNet(
         log(`    Sitzung ${e.ksinr}: ${(err as Error).message}`);
       }
     }
-    const orgId = gremien.get(e.gremium);
+    const orgId = gremien.get(gremiumSchluessel(e));
     const agendaItem = (s?.tops ?? []).map((t, i) => {
       const paperId = t.vorlage ? `${base}vo0050.${ext}?__kvonr=${t.vorlage.kvonr}` : null;
-      if (t.vorlage) vorlagenGesehen.add(t.vorlage.kvonr);
+      if (t.vorlage && !vorlagenGesehen.has(t.vorlage.kvonr)) vorlagenGesehen.set(t.vorlage.kvonr, e.body);
       return {
         id: `${meetingId}#top-${i + 1}`,
         number: t.nr.replace(/^[ÖN]\s*/, ''),
@@ -306,7 +351,7 @@ export async function syncSessionNet(
       auxiliaryFile: docs.filter((d) => d !== einladung && d !== protokoll).map((d) => dokumentZuFile(base, d, ext)),
       quelle: 'sessionnet',
     } as unknown as OParlMeeting;
-    tx(db, () => upsertMeeting(db, bodyId, meeting, stats));
+    tx(db, () => upsertMeeting(db, e.body, meeting, stats));
     stats.meetings++;
   }
   log(`    Sitzungen: ${stats.meetings} gelesen`);
@@ -319,7 +364,7 @@ export async function syncSessionNet(
      LEFT JOIN meeting_organization mo ON mo.meeting_id = m.id
      WHERE a.consultation_id LIKE ? ORDER BY m.start`,
   );
-  for (const kvonr of vorlagenGesehen) {
+  for (const [kvonr, vorlageBody] of vorlagenGesehen) {
     const paperId = `${base}vo0050.${ext}?__kvonr=${kvonr}`;
     const alt = bekannt.get(paperId) as { raw: string } | undefined;
     let v: Vorlage;
@@ -354,7 +399,7 @@ export async function syncSessionNet(
       vorlage: v,
       quelle: 'sessionnet',
     } as unknown as OParlPaper;
-    tx(db, () => upsertPaper(db, bodyId, paper, stats));
+    tx(db, () => upsertPaper(db, vorlageBody, paper, stats));
     stats.papers++;
   }
   db.prepare('UPDATE source SET last_sync_at = ? WHERE id = ?').run(new Date().toISOString(), source.id);

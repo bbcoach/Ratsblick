@@ -107,6 +107,9 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Varianten: `endung` asp|php; Sitzungslinks im Kalender auf `si0056` oder `si0057`; Kopf der Sitzung teils nur in
   der Überschrift; Beschluss/Abstimmung teils direkt am TOP (`smc_field_smcdv0_box2_*`) → `agenda_item.result`;
   Einladung teils nur in der Kalenderzeile; Links teils mit doppeltem Leerzeichen (`<a  href`).
+  Mandanten: Manche Systeme führen mehrere Körperschaften (Filtermenü `smcfiltermenumandant`, Parameter `__cpanr`); mit
+  `"mandanten": true` in `endpoints.json` liest der Scraper den Kalender je Mandant und legt je Mandant eine Körperschaft
+  an (VG Landstuhl: VG + 12 Ortsgemeinden/Stadt). Ohne `__cpanr` zeigt der Kalender nur den Standardmandanten (VG).
   `npm run sync -- --full --id …` lädt bei Scrapern alle Sitzungen im Fenster neu.
 - Kaiserslautern (`ris.kaiserslautern.de`) sperrt Zugriffe außerhalb Europas (GitHub Actions läuft in den USA) und
   schickt sein Zwischenzertifikat nicht mit. Lösung: Weiterleiter `relay/` bei Vercel in Frankfurt

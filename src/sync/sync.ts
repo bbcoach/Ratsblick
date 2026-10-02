@@ -25,6 +25,8 @@ export interface SourceRecord {
   endung?: 'asp' | 'php';
   /** Größerer Mindestabstand zwischen Anfragen an diesen Server (ms). */
   intervallMs?: number;
+  /** Nur SessionNet: Kalender je Mandant (`__cpanr`) lesen, z. B. Ortsgemeinden im System der VG. */
+  mandanten?: boolean;
 }
 
 export interface SyncOptions {

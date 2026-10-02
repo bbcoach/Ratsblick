@@ -2,7 +2,17 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { openDb } from '../src/db/index.js';
 import { OParlClient } from '../src/oparl/client.js';
-import { berlinIso, parseDokumente, parseKalender, parseSitzung, parseVorlage, syncSessionNet, text } from '../src/scrape/sessionnet.js';
+import {
+  berlinIso,
+  mandantName,
+  parseDokumente,
+  parseKalender,
+  parseMandanten,
+  parseSitzung,
+  parseVorlage,
+  syncSessionNet,
+  text,
+} from '../src/scrape/sessionnet.js';
 
 const seite = (f: string) => readFileSync(new URL(`./fixtures/sessionnet/${f}`, import.meta.url), 'utf8');
 const BASE = 'https://ris.kaiserslautern.de/buergerinfo/';
@@ -116,5 +126,14 @@ describe('SessionNet: PHP-Variante (echte Seiten aus Koblenz, SessionNet 5.4.7)'
     const mitVorlage = s.tops.filter((t) => t.vorlage);
     expect(mitVorlage.length).toBeGreaterThan(5);
     expect(mitVorlage.every((t) => /^\d+$/.test(t.vorlage!.kvonr))).toBe(true);
+  });
+
+  it('liest die Mandanten aus dem Filtermenü (Landstuhl)', () => {
+    const m = parseMandanten(seite('landstuhl-mandanten.html'));
+    expect(m).toContainEqual({ nr: '5', name: 'Sickingenstadt Landstuhl' });
+    expect(m).toContainEqual({ nr: '2', name: 'Ortsgemeinde Kindsbach' });
+    expect(m.find((x) => x.nr === '15')?.name).toBe('Werksausschuss Nahwärme VG');
+    expect(mandantName('Sickingenstadt Landstuhl')).toBe('Stadt Landstuhl');
+    expect(mandantName('Ortsgemeinde Bann')).toBe('Ortsgemeinde Bann');
   });
 });
