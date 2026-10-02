@@ -231,7 +231,7 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
   background: var(--surface); border-top: 1px solid var(--line);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-.tabs .inner { max-width: var(--w); margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); }
+.tabs .inner { max-width: var(--w); margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
 .tabs button { border: 0; background: none; padding: 8px 4px 10px; display: grid; justify-items: center; gap: 2px; font-size: 12px; color: var(--muted); cursor: pointer; }
 .tabs button[aria-current="page"] { color: var(--accent); font-weight: 600; }
 .tabs svg { width: 22px; height: 22px; }
@@ -268,15 +268,12 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
 .sitzliste .neu { font-size: 12px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .sitz path, :root:not([data-theme="light"]) .sitzliste i { fill: var(--cd); background: var(--cd); } }
 :root[data-theme="dark"] .sitz path, :root[data-theme="dark"] .sitzliste i { fill: var(--cd); background: var(--cd); }
-/* Textseiten (Über, Impressum, Datenschutz) und dezente Fußzeile */
+/* Textseiten (Über, Impressum, Datenschutz) im Reiter „Info“ */
 .textseite { padding: 16px 18px; display: grid; gap: 10px; line-height: 1.6; }
 .textseite h4 { margin: 10px 0 0; font-size: 15px; }
 .textseite p { margin: 0; overflow-wrap: anywhere; }
 .textseite .lead { font-size: 16px; }
 .textseite .fehlt { color: var(--warn); background: var(--warn-soft); padding: 0 4px; border-radius: 4px; }
-.fuss { font-size: 12px; color: var(--muted); text-align: center; margin: 4px 0 0; }
-.fuss a { color: var(--muted); text-decoration: none; padding: 6px 2px; }
-.fuss a:hover { text-decoration: underline; }
 .offline { background: var(--warn-soft); color: var(--warn); font-size: 13px; padding: 6px 16px; text-align: center; }
 </style>
 </head>
@@ -304,6 +301,10 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
       <button type="button" data-tab="themen">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h7"/><circle cx="17.5" cy="16.5" r="3"/><path d="M19.7 18.7L22 21"/></svg>
         Themen
+      </button>
+      <button type="button" data-tab="info">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg>
+        Info
       </button>
     </div>
   </nav>

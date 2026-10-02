@@ -115,6 +115,7 @@
     const tab = b.dataset.tab;
     if (tab === 'fav') location.hash = link('fav');
     else if (tab === 'themen') location.hash = link('themen');
+    else if (tab === 'info') location.hash = link('info');
     else location.hash = '#/';
   }));
 
@@ -143,8 +144,11 @@
       } else if (r.v === 'fav') {
         tab = 'fav';
         await vFavoriten();
+      } else if (r.v === 'info') {
+        tab = 'info';
+        vInfo();
       } else if (TEXTSEITEN[r.v]) {
-        tab = null;
+        tab = 'info';
         vText(r.v);
       } else if (r.v === 'themen' || r.v === 'abo') {
         tab = 'themen';
@@ -273,7 +277,6 @@
         </form>
         <div id="hits"></div>
         <p class="coverage">Alle ${fmtZahl(gemeinden)} Gemeinden in Rheinland-Pfalz · Sitzungsdaten für ${fmtZahl(mitDaten)} davon<br>Datenstand ${esc(stand(INDEX.erstellt))}</p>
-        ${FUSSZEILE}
       </div>`;
     const input = document.getElementById('q');
     const $hits = document.getElementById('hits');
@@ -346,7 +349,7 @@
     const favs = favoriten().filter((f) => f.typ !== 'gebiet' || G.has(f.id));
     if (!favs.length) {
       $view.innerHTML = `<section class="hero"><h3>Favoriten</h3></section>
-        <div class="card empty">Noch keine Favoriten. Tippen Sie auf den Stern – neben dem Namen einer Gemeinde, Stadt, Verbandsgemeinde oder eines Kreises, bei einem Gremium in einer Sitzung oder auf der Seite Ihrer Kommune unter „Gremien“. Hier finden Sie dann jeweils die nächste und letzte Sitzung.</div>${FUSSZEILE}`;
+        <div class="card empty">Noch keine Favoriten. Tippen Sie auf den Stern – neben dem Namen einer Gemeinde, Stadt, Verbandsgemeinde oder eines Kreises, bei einem Gremium in einer Sitzung oder auf der Seite Ihrer Kommune unter „Gremien“. Hier finden Sie dann jeweils die nächste und letzte Sitzung.</div>`;
       return;
     }
     const jetzt = now();
@@ -380,7 +383,7 @@
     }
     $view.innerHTML = `<section class="hero"><h3>Favoriten</h3><p class="muted small">Nur auf diesem Gerät gespeichert.</p></section>
       ${kommunen.length ? `<p class="favgruppe">Kommunen</p>${kommunen.join('')}` : ''}
-      ${gremien.length ? `<p class="favgruppe">Gremien</p>${gremien.join('')}` : ''}${FUSSZEILE}`;
+      ${gremien.length ? `<p class="favgruppe">Gremien</p>${gremien.join('')}` : ''}`;
   }
 
   // ---------- Über Wahlheimat, Impressum, Datenschutz ----------
@@ -392,7 +395,6 @@
   };
   const ang = (v) => (v ? esc(v).replace(/\n/g, '<br>') : '<span class="fehlt">[wird ergänzt]</span>');
   const mail = () => (BETREIBER.email ? `<a href="mailto:${esc(BETREIBER.email)}">${esc(BETREIBER.email)}</a>` : ang(null));
-  const FUSSZEILE = '<p class="fuss"><a href="#/ueber">Über Wahlheimat</a> · <a href="#/impressum">Impressum</a> · <a href="#/datenschutz">Datenschutz</a></p>';
   const extern = (url, text) => `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(text || url)}</a>`;
 
   const TEXTSEITEN = {
@@ -447,10 +449,23 @@
     }),
   };
 
+  // Reiter „Info“: Übersicht der Textseiten
+  function vInfo() {
+    setTitle('Info');
+    const zeile = (art, text) => `<button class="row" type="button" data-go="${esc(link(art))}"><div class="body"><span class="title">${esc(TEXTSEITEN[art]().titel)}</span><span class="meta">${esc(text)}</span></div>${chev}</button>`;
+    $view.innerHTML = `<section class="hero"><h3>Info</h3><p class="muted small">Wahlheimat ist ein unabhängiges Angebot – kein Angebot des Landes oder der Kommunen.</p></section>
+      <div class="list">
+        ${zeile('ueber', 'Was Wahlheimat ist, woher die Daten kommen, Kontakt')}
+        ${zeile('impressum', 'Anbieterkennzeichnung')}
+        ${zeile('datenschutz', 'Keine Cookies, kein Tracking – die Einzelheiten')}
+      </div>
+      <p class="stand">Datenstand ${esc(stand(INDEX.erstellt))}</p>`;
+  }
+
   function vText(art) {
     const t = TEXTSEITEN[art]();
     setTitle(t.titel);
-    $view.innerHTML = `<section class="hero"><h3>${esc(t.titel)}</h3></section><div class="card textseite">${t.html}</div>${FUSSZEILE}`;
+    $view.innerHTML = `${backLink}<section class="hero"><h3>${esc(t.titel)}</h3></section><div class="card textseite">${t.html}</div>`;
   }
 
   // ---------- Ansicht: Kommune (eine Ebene) ----------
