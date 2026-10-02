@@ -95,7 +95,7 @@ export interface Mandant {
 /** Mandanten (Körperschaften) aus dem Filtermenü; der gerade gewählte fehlt in der Liste. */
 export function parseMandanten(html: string): Mandant[] {
   const out = new Map<string, string>();
-  for (const m of html.matchAll(/<a\s+href="[^"]*__cpanr=(\d+)"[^>]*smcfiltermenumandant[^>]*>([^<]*)<\/a>/g)) {
+  for (const m of html.matchAll(/<a\s+href="[^"]*__cpanr=(\d+)[^"]*"[^>]*smcfiltermenumandant[^>]*>([^<]*)<\/a>/g)) {
     out.set(m[1]!, text(m[2]));
   }
   return [...out].map(([nr, name]) => ({ nr, name }));
@@ -263,7 +263,9 @@ export async function syncSessionNet(
   db.prepare('UPDATE source SET vendor = ?, oparl_version = NULL WHERE id = ?').run('SessionNet (Scraper)', source.id);
   const bodyId = `${base}#koerperschaft`;
   // Mandanten: Standard (ohne __cpanr, meist die VG) und auf Wunsch alle weiteren aus dem Filtermenü (Ortsgemeinden)
-  const info = source.mandanten ? await client.getText(`${base}info.${ext}`) : '';
+  let info = source.mandanten ? await client.getText(`${base}info.${ext}`) : '';
+  // Manche Systeme zeigen das Mandantenmenü nur im Kalender (Trier-Land)
+  if (source.mandanten && !parseMandanten(info).length) info = await client.getText(`${base}si0040.${ext}`);
   const aktuell = source.mandanten ? aktuellerMandant(info) : null;
   const bodyName = aktuell ? mandantName(aktuell) : source.name.replace(/^VG /, 'Verbandsgemeinde ');
   tx(db, () => upsertBody(db, source.id, { id: bodyId, name: bodyName, shortName: source.id } as never));

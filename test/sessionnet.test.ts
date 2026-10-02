@@ -129,6 +129,13 @@ describe('SessionNet: PHP-Variante (echte Seiten aus Koblenz, SessionNet 5.4.7)'
     expect(mitVorlage.every((t) => /^\d+$/.test(t.vorlage!.kvonr))).toBe(true);
   });
 
+  it('liest Mandantenlinks mit weiteren Parametern (Trier-Land, Kalenderseite)', () => {
+    const m = parseMandanten(seite('trierland-si0040.html'));
+    expect(m).toContainEqual({ nr: '15', name: 'Aach' });
+    expect(m).toContainEqual({ nr: '35', name: 'Verbandsgemeindeverwaltung Trier-Land' });
+    expect(aktuellerMandant(seite('trierland-si0040.html'))).toBe('Verbandsgemeindeverwaltung Trier-Land (PV-Rat)');
+  });
+
   it('liest die Mandanten aus dem Filtermenü (Landstuhl)', () => {
     const m = parseMandanten(seite('landstuhl-mandanten.html'));
     expect(m).toContainEqual({ nr: '5', name: 'Sickingenstadt Landstuhl' });
