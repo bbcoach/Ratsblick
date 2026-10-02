@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { parseIcs } from '../src/scrape/ics.js';
+import { orteAusTiteln, parseIcs } from '../src/scrape/ics.js';
 
 describe('Kalenderexport (iCalendar)', () => {
   it('liest Termine aus SD.NET RIM (Oberes Glantal)', () => {
@@ -20,5 +20,22 @@ describe('Kalenderexport (iCalendar)', () => {
     const ics = 'BEGIN:VEVENT\r\nUID:1\r\nDTSTART:20261103T180000Z\r\nSUMMARY:Rat\\, Sitzung mit sehr\r\n  langem Titel\r\nEND:VEVENT\r\n';
     expect(parseIcs(ics.replace('END:VEVENT', 'LOCATION:in Klärung\\, \\, in Klärung\r\nEND:VEVENT'))[0]!.ort).toBe('in Klärung');
     expect(parseIcs(ics)[0]).toMatchObject({ titel: 'Rat, Sitzung mit sehr langem Titel', start: '2026-11-03T18:00:00.000Z', link: null });
+  });
+
+  it('ordnet Termine über den Gremiumsnamen Orten zu (Ramstein-Miesenbach)', () => {
+    const z = orteAusTiteln([
+      'Gemeinderat Hütschenhausen',
+      'Stadtrat Ramstein-Miesenbach',
+      'Gemeinderat Nanzdietschweiler/Niedermohr',
+      'Gemeinderat Niedermohr',
+      'Verbandsgemeinderat Ramstein-Miesenbach',
+    ]);
+    expect(z.ort('Fachausschuss "Nachhaltigkeit" Hütschenhausen')).toBe('Hütschenhausen');
+    expect(z.ort('Hauptausschuss Stadt Ramstein-Miesenbach')).toBe('Ramstein-Miesenbach');
+    expect(z.ort('Verbandsgemeinderat Ramstein-Miesenbach')).toBeNull();
+    expect(z.ort('Hauptausschuss VG Ramstein-Miesenbach')).toBeNull();
+    expect(z.ort('Gemeinderat Nanzdietschweiler/Niedermohr')).toBe('Niedermohr');
+    expect(z.name('Ramstein-Miesenbach')).toBe('Stadt Ramstein-Miesenbach');
+    expect(z.name('Niedermohr')).toBe('Ortsgemeinde Niedermohr');
   });
 });

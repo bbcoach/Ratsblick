@@ -68,6 +68,9 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - VG Oberes Glantal: SD.NET RIM auf `vgog.ratsinfomanagement.net` hinter Browser-Prüfung (rescaled WAF), robots.txt sperrt alles
   außer `/termine/ics/`, OParl „nicht aktiviert“. Daher `typ: "ics"` (`src/scrape/ics.ts`): nur Termine der VG-Gremien aus
   dem Kalenderexport (`/termine/ics/glm` – mit Pfadteil alle Termine, ohne nur die nächsten), Link zur Tagesordnung als Dokument.
+- VG Ramstein-Miesenbach: ebenfalls SD.NET RIM hinter rescaled WAF (robots.txt sperrt nur PDFs, OParl nicht aktiviert) →
+  `typ: "ics"` mit `"mandanten": true`: Kalenderexport `/termine/ics/vg` enthält alle Gremien (180 Termine); Körperschaft aus
+  dem Gremiumsnamen („Gemeinderat X“, „… Stadt X“, „… VG …“ → VG). Ohne Tagesordnungen.
 - Zweibrücken läuft auf `sessionnet.owl-it.de` (robots.txt); Cochem-Zell ebenfalls, seit 02.10.2026 trotzdem angebunden (s. o.). Südwestpfalz und Rhein-Pfalz-Kreis:
   more!rubin ohne OParl, laufen seit 02.10.2026 über `rubin-api`. Worms: `worms.gremien.info` ohne OParl.
 - Unklar: Landau, Birkenfeld (kein RIS-Link gefunden), Mayen-Koblenz (Ratsinfo in die Kreis-Website eingebettet,

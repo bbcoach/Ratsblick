@@ -67,6 +67,27 @@ export function parseIcs(ics: string): IcsTermin[] {
   return out;
 }
 
+/**
+ * Körperschaft eines Termins aus dem Gremiumsnamen (nur mit `mandanten: true`): „… VG …“/„Verbandsgemeinde…“ → VG,
+ * sonst der Ort, auf den der Name endet („Gemeinderat Hütschenhausen“, „Hauptausschuss Stadt Ramstein-Miesenbach“).
+ * Orte ergeben sich aus den Rats-Gremien („Gemeinderat X“, „Stadtrat X“ → Stadt). null = VG.
+ */
+export function orteAusTiteln(titel: string[]): { ort: (t: string) => string | null; name: (ort: string) => string } {
+  const staedte = new Set<string>();
+  const orte = new Set<string>();
+  for (const t of titel) {
+    const m = /^(Gemeinderat|Stadtrat)\s+([^/]+)$/.exec(t.trim());
+    if (!m) continue;
+    orte.add(m[2]!.trim());
+    if (m[1] === 'Stadtrat') staedte.add(m[2]!.trim());
+  }
+  const liste = [...orte].sort((a, b) => b.length - a.length);
+  return {
+    ort: (t) => (/\bVG\b|Verbandsgemeinde/.test(t) ? null : (liste.find((o) => [' ', '/'].some((z) => t.trim().endsWith(`${z}${o}`))) ?? null)),
+    name: (o) => `${staedte.has(o) ? 'Stadt' : 'Ortsgemeinde'} ${o}`,
+  };
+}
+
 export async function syncIcs(
   db: DatabaseSync,
   client: OParlClient,
@@ -85,12 +106,27 @@ export async function syncIcs(
 
   const termine = parseIcs(await client.getText(source.url));
   log(`  Kalender: ${termine.length} Termine`);
+  // Auf Wunsch je Ort eine Körperschaft (Kalender einer VG mit den Terminen der Ortsgemeinden)
+  const zuordnung = source.mandanten ? orteAusTiteln(termine.map((t) => t.titel)) : null;
+  const angelegt = new Set<string>([bodyId]);
+  const koerperschaft = (titel: string) => {
+    const ort = zuordnung?.ort(titel);
+    if (!zuordnung || !ort) return bodyId;
+    const id = `${basis}#koerperschaft-${encodeURIComponent(ort)}`;
+    if (!angelegt.has(id)) {
+      angelegt.add(id);
+      tx(db, () => upsertBody(db, source.id, { id, name: zuordnung.name(ort), shortName: ort } as never));
+      stats.bodies++;
+    }
+    return id;
+  };
   const gremien = new Set<string>();
   for (const t of termine) {
+    const body = koerperschaft(t.titel);
     const orgId = `${basis}#gremium-${encodeURIComponent(t.titel)}`;
     if (!gremien.has(orgId)) {
       gremien.add(orgId);
-      tx(db, () => upsertOrganization(db, bodyId, { id: orgId, name: t.titel, organizationType: 'Gremium' } as never));
+      tx(db, () => upsertOrganization(db, body, { id: orgId, name: t.titel, organizationType: 'Gremium' } as never));
       stats.organizations++;
     }
     const meeting = {
@@ -107,7 +143,7 @@ export async function syncIcs(
         : [],
       quelle: 'ics',
     } as unknown as OParlMeeting;
-    tx(db, () => upsertMeeting(db, bodyId, meeting, stats));
+    tx(db, () => upsertMeeting(db, body, meeting, stats));
     stats.meetings++;
   }
   db.prepare('UPDATE source SET last_sync_at = ? WHERE id = ?').run(new Date().toISOString(), source.id);
