@@ -151,7 +151,7 @@
   const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
   function installCard() {
     if (standalone() || store.get('installHidden', false)) return '';
-    if (installEvent) return `<div class="card install"><p>Ratsblick als App auf dem Startbildschirm ablegen.</p><button class="btn" type="button" id="inst">Installieren</button><button class="x" type="button" id="instx" aria-label="Hinweis ausblenden">×</button></div>`;
+    if (installEvent) return `<div class="card install"><p>Ratsblick RLP als App auf dem Startbildschirm ablegen.</p><button class="btn" type="button" id="inst">Installieren</button><button class="x" type="button" id="instx" aria-label="Hinweis ausblenden">×</button></div>`;
     if (isIos()) return `<div class="card install"><p>Als App nutzen: in Safari auf <strong>Teilen</strong> tippen, dann <strong>Zum Home-Bildschirm</strong>.</p><button class="x" type="button" id="instx" aria-label="Hinweis ausblenden">×</button></div>`;
     return '';
   }

@@ -123,7 +123,9 @@ Entwürfe „Ratsblick – Kernansichten“ (Claude Design): Kommune wählen →
 (Ebenen-Umschalter Gemeinde/VG/Landkreis, nächste Sitzungen, neue Vorlagen) → Vorlage im Detail
 („Kurz erklärt“ in einfacher Sprache, als automatisch erstellt gekennzeichnet, Beratungsfolge, Dokumente)
 → Themen-Abo (Themen, Stichwort, eigene Straße, Push/E-Mail).
-Stil: ruhig und behördennah, Akzent #1F4E79, Schrift Public Sans, Vorlagennummern in IBM Plex Mono.
+Name in der App: „Ratsblick RLP“ (seit 02.10.2026).
+Stil: ruhig und behördennah, Akzent Weinrot #7B2736 (vorher Blau #1F4E79), Schrift Public Sans, Vorlagennummern in IBM Plex Mono.
+Icons (PNG) werden aus `web/icons/icon.svg` mit dem vorinstallierten Chromium gerendert (ImageMagick hat keinen SVG-Renderer).
 
 ## Web-App (PWA)
 - `web/` enthält die App (Vanilla-JS, kein Build-Schritt), `npm run web -- --out dist` erzeugt die statische Seite

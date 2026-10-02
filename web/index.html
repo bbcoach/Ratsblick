@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ratsblick</title>
+<title>Ratsblick RLP</title>
 <meta name="description" content="Sitzungen, Tagesordnungen und Vorlagen aus den Ratsinformationssystemen in Rheinland-Pfalz">
-<meta name="theme-color" content="#1f4e79">
+<meta name="theme-color" content="#7b2736">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Ratsblick">
+<meta name="apple-mobile-web-app-title" content="Ratsblick RLP">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -21,15 +21,15 @@ html, body { margin: 0; }
 [hidden] { display: none !important; }
 /* Layout: eine schmale Spalte wie eine App, oben Titelleiste, unten Reiter. Ruhig und behördennah. */
 :root {
-  --bg: #f4f6f9;
+  --bg: #f6f4f4;
   --surface: #ffffff;
-  --fg: #16202b;
-  --muted: #5b6876;
-  --line: #dbe2ea;
-  --accent: #1f4e79;
+  --fg: #1f1a1c;
+  --muted: #655a5e;
+  --line: #e4dcdf;
+  --accent: #7b2736;
   --accent-fg: #ffffff;
-  --accent-soft: #e5edf5;
-  --bar: #1f4e79;
+  --accent-soft: #f5e9ec;
+  --bar: #7b2736;
   --bar-fg: #ffffff;
   --ok: #2f6b45;
   --ok-soft: #e3efe7;
@@ -43,15 +43,15 @@ html, body { margin: 0; }
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0e151d; --surface: #16202b; --fg: #e3e9ef; --muted: #96a4b2; --line: #273444;
-    --accent: #86b4e0; --accent-fg: #0e151d; --accent-soft: #1a2d41; --bar: #173a5c; --bar-fg: #ffffff;
+    --bg: #141113; --surface: #1e1a1c; --fg: #ece5e8; --muted: #a8999f; --line: #392f33;
+    --accent: #e6a0ad; --accent-fg: #141113; --accent-soft: #3b1f26; --bar: #5c1d29; --bar-fg: #ffffff;
     --ok: #86c79c; --ok-soft: #183026; --warn: #e2b866; --warn-soft: #34290f; --bad: #ec9a9a; --bad-soft: #3a1c1c;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0e151d; --surface: #16202b; --fg: #e3e9ef; --muted: #96a4b2; --line: #273444;
-  --accent: #86b4e0; --accent-fg: #0e151d; --accent-soft: #1a2d41; --bar: #173a5c; --bar-fg: #ffffff;
+  --bg: #141113; --surface: #1e1a1c; --fg: #ece5e8; --muted: #a8999f; --line: #392f33;
+  --accent: #e6a0ad; --accent-fg: #141113; --accent-soft: #3b1f26; --bar: #5c1d29; --bar-fg: #ffffff;
   --ok: #86c79c; --ok-soft: #183026; --warn: #e2b866; --warn-soft: #34290f; --bad: #ec9a9a; --bad-soft: #3a1c1c;
   color-scheme: dark;
 }
@@ -204,9 +204,9 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
 <body>
 <div class="app">
   <header class="bar">
-    <a class="logo" href="#/" id="home" aria-label="Ratsblick – zur Startseite">
+    <a class="logo" href="#/" id="home" aria-label="Ratsblick RLP – zur Startseite">
       <svg viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="currentColor" opacity=".16"/><g fill="currentColor"><path d="M256 104 L408 184 L104 184 Z"/><rect x="120" y="196" width="272" height="20" rx="4"/><rect x="144" y="228" width="36" height="140" rx="6"/><rect x="207" y="228" width="36" height="140" rx="6"/><rect x="269" y="228" width="36" height="140" rx="6"/><rect x="332" y="228" width="36" height="140" rx="6"/><rect x="104" y="380" width="304" height="28" rx="6"/></g></svg>
-      <span>Ratsblick</span>
+      <span>Ratsblick RLP</span>
     </a>
     <p class="ctx" id="title"></p>
   </header>
