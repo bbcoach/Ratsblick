@@ -84,7 +84,8 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - VG Wallmerod: SD.NET RIM wie Ramstein-Miesenbach (`wallmerod.ratsinfomanagement.net/termine/ics/vg`, Gremien „Ortsgemeinderat X“).
   `birkenfeld.ratsinfomanagement.net` zeigt nur „Gemeinderat“ ohne Ort – Zuordnung unklar, nicht angebunden.
 - Zweibrücken läuft auf `sessionnet.owl-it.de` (robots.txt); Cochem-Zell ebenfalls, seit 02.10.2026 trotzdem angebunden (s. o.). Südwestpfalz und Rhein-Pfalz-Kreis:
-  more!rubin ohne OParl, laufen seit 02.10.2026 über `rubin-api`. Worms: `worms.gremien.info` ohne OParl.
+  more!rubin ohne OParl, laufen seit 02.10.2026 über `rubin-api`. Worms: `worms.gremien.info` ohne OParl, seit 02.10.2026 über
+  `rubin-api` (Link vom Projektinhaber; Quelle `stadt-worms`, Körperschaften Stadt Worms und städtische Gesellschaften).
 - Kreis Mayen-Koblenz: SessionNet PHP auf `ris.kvmyk.de/bi/` (keine robots.txt; die Kreis-Website bettet es nur ein).
 - Stadt Landau: SessionNet ASP auf `info.landau.de/0001_bi/` (keine robots.txt, außerhalb Europas 403 → Weiterleiter). Sitzungen
   ohne freigegebene Tagesordnung leiten von `si0057` auf `si0050` um (HTTP 302) – sie bleiben als Kalendertermin.
