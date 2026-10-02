@@ -93,7 +93,8 @@
   document.querySelectorAll('.tabs button').forEach((b) => b.addEventListener('click', () => {
     depth = 0;
     const tab = b.dataset.tab;
-    if (tab === 'wahl' || !kommune) location.hash = '#/';
+    if (tab === 'fav') location.hash = link('fav');
+    else if (tab === 'wahl' || !kommune) location.hash = '#/';
     else if (tab === 'start') location.hash = link('g', kommune);
     else location.hash = link('abo');
   }));
@@ -120,6 +121,9 @@
         if (!qid) throw new Error('Unbekannte Quelle');
         const x = await quelle(qid);
         if (r.v === 's') vSitzung(x, r.a); else vVorlage(x, r.a);
+      } else if (r.v === 'fav') {
+        tab = 'fav';
+        await vFavoriten();
       } else if (r.v === 'abo' && kommune && G.has(kommune)) {
         tab = 'abo';
         await vAbo();
@@ -140,6 +144,8 @@
   // Klicks auf Einträge: Navigation über data-Attribute
   $view.addEventListener('click', (e) => {
     if (e.target.closest('[data-back]')) { e.preventDefault(); back(); return; }
+    const stern = e.target.closest('[data-fav]');
+    if (stern) { e.preventDefault(); favUmschalten(stern); return; }
     const el = e.target.closest('[data-go]');
     if (el) { e.preventDefault(); go(el.dataset.go); }
   });
@@ -185,7 +191,7 @@
     // frühere Auswahl (Körperschafts-ID) übernehmen
     const migr = (id) => (G.has(id) ? id : gebietVonBody.get(id) ?? null);
     kommune = kommune ? migr(kommune) : null;
-    store.set('zuletzt', store.get('zuletzt', []).map(migr).filter(Boolean));
+    try { localStorage.removeItem('ratsblick:zuletzt'); } catch {} // „Zuletzt angesehen“ gibt es nicht mehr
   }
 
   function anzeigeName(g) {
@@ -229,7 +235,6 @@
   }
   function vWahl() {
     setTitle('');
-    const zuletzt = store.get('zuletzt', []).filter((id) => G.has(id)).map((id) => G.get(id));
     const gemeinden = INDEX.gemeinden.length;
     const mitDaten = INDEX.gemeinden.filter(([id]) => hatDaten(G.get(id))).length;
     $view.innerHTML = `
@@ -244,16 +249,13 @@
           <input id="q" type="search" inputmode="search" enterkeyhint="search" placeholder="Kommune oder Postleitzahl" value="${esc(q)}" aria-label="Kommune oder Postleitzahl">
         </form>
         <div id="hits"></div>
-        ${zuletzt.length ? `<section id="recent"><h2>Zuletzt angesehen</h2><div class="list">${zuletzt.map(gebietRow).join('')}</div></section>` : ''}
         <p class="coverage">Alle ${fmtZahl(gemeinden)} Gemeinden in Rheinland-Pfalz · Sitzungsdaten für ${fmtZahl(mitDaten)} davon<br>Datenstand ${esc(stand(INDEX.erstellt))}</p>
       </div>`;
     const input = document.getElementById('q');
     const $hits = document.getElementById('hits');
-    const $recent = document.getElementById('recent');
     const show = () => {
       q = input.value;
       const hits = suche(q);
-      if ($recent) $recent.hidden = !!q.trim();
       $hits.innerHTML = !q.trim() ? '' : hits.length
         ? `<div class="list suggest">${hits.map(gebietRow).join('')}</div>`
         : `<div class="card empty">Keine Kommune in Rheinland-Pfalz gefunden für „${esc(q.trim())}“.</div>`;
@@ -287,6 +289,56 @@
     ];
   }
 
+  // ---------- Favoriten (Gremien, nur auf diesem Gerät gespeichert) ----------
+  // Eintrag: { q: Quelle, k: Körperschaft, g: Gremiumsname, kn: Name der Körperschaft, ort: Gebiet für die Rückkehr }
+  const favKey = (f) => `${f.q}|${f.k}|${f.g}`;
+  function favoriten() { return store.get('favoriten', []); }
+  function istFav(f) { return favoriten().some((x) => favKey(x) === favKey(f)); }
+  function sternKnopf(f) {
+    const an = istFav(f);
+    return `<button class="stern" type="button" data-fav="${esc(JSON.stringify(f))}" aria-pressed="${an}" aria-label="${an ? 'Aus Favoriten entfernen' : 'Als Favorit merken'}: ${esc(f.g)}">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></button>`;
+  }
+  function favUmschalten(el) {
+    const f = JSON.parse(el.dataset.fav);
+    const an = istFav(f);
+    store.set('favoriten', an ? favoriten().filter((x) => favKey(x) !== favKey(f)) : [...favoriten(), f]);
+    el.setAttribute('aria-pressed', String(!an));
+    el.setAttribute('aria-label', `${!an ? 'Aus Favoriten entfernen' : 'Als Favorit merken'}: ${f.g}`);
+    toast(!an ? `<span>„${esc(gremiumKurz(f.g))}“ unter Favoriten gemerkt</span>` : 'Aus den Favoriten entfernt');
+    if (an && parse().v === 'fav') route(); // entfernter Favorit verschwindet aus der Liste
+  }
+  function gremienVon(sitz) {
+    // Gremien einer Körperschaft, nach Zahl der Sitzungen
+    const n = new Map();
+    for (const m of sitz) for (const g of m.gremien.length ? m.gremien : []) n.set(g, (n.get(g) || 0) + 1);
+    return [...n].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'de')).map(([g]) => g);
+  }
+
+  async function vFavoriten() {
+    setTitle('Favoriten');
+    const favs = favoriten();
+    if (!favs.length) {
+      $view.innerHTML = `<section class="hero"><h3>Favoriten</h3></section>
+        <div class="card empty">Noch keine Favoriten. Tippen Sie bei einem Gremium auf den Stern – in einer Sitzung neben dem Namen oder auf der Seite Ihrer Kommune unter „Gremien“. Gemerkte Gremien finden Sie hier mit ihrer nächsten und letzten Sitzung.</div>`;
+      return;
+    }
+    const jetzt = now();
+    const teile = [];
+    for (const f of favs) {
+      let x = null;
+      try { x = await quelle(f.q); } catch { /* Quelle nicht erreichbar */ }
+      const sitz = x ? (x.sByK.get(f.k) || []).filter((m) => m.gremien.includes(f.g)) : [];
+      const naechste = sitz.find((m) => m.start >= jetzt);
+      const letzte = sitz.filter((m) => m.start < jetzt).at(-1);
+      teile.push(`<section class="fav">
+        <div class="favkopf"><div><h2>${esc(gremiumKurz(f.g))}</h2><span class="muted small">${esc(x?.k.get(f.k)?.name || f.kn || '')}</span></div>${sternKnopf(f)}</div>
+        ${naechste || letzte ? `<div class="list">${[naechste, letzte].filter(Boolean).map(sitzungRow).join('')}</div>` : '<div class="card empty">Im aktuellen Datenstand keine Sitzung dieses Gremiums.</div>'}
+      </section>`);
+    }
+    $view.innerHTML = `<section class="hero"><h3>Favoriten</h3><p class="muted small">Nur auf diesem Gerät gespeichert.</p></section>${teile.join('')}`;
+  }
+
   // ---------- Ansicht: Kommune (eine Ebene) ----------
   const ERKLAERUNG = {
     vg: 'Die Verbandsgemeinde entscheidet u. a. über Grundschulen, Feuerwehr, Wasser, Abwasser und den Flächennutzungsplan.',
@@ -299,7 +351,6 @@
     const sel = eb.find((e) => e.key === ebene && !e.off)
       || eb.find((e) => !e.off && e.g.q) || eb.find((e) => !e.off);
     setTitle(kurzName(kreisKurz(g.name)));
-    store.set('zuletzt', [id, ...store.get('zuletzt', []).filter((x) => x !== id)].slice(0, 4));
     const seg = `<div class="seg" role="group" aria-label="Ebene">${eb.map((e) => `<button type="button" ${e.off ? 'disabled' : `data-go="${esc(link('g', id, e.key))}"`} aria-pressed="${e.key === sel.key}" class="${!e.off && !e.g.q ? 'nodata' : ''}">${e.label}<small>${esc(e.sub)}</small></button>`).join('')}</div>`;
     const t = sel.g;
     const kopf = `<section class="hero"><h3>${esc(anzeigeName(t))}</h3><p class="muted small">${esc([t.ew ? fmtZahl(t.ew) + ' Einwohner' : '', sel.key !== 'gemeinde' ? ERKLAERUNG[sel.key] : untertitel(t)].filter(Boolean).join(' · '))}</p></section>`;
@@ -314,6 +365,7 @@
     const kommend = sitz.filter((m) => m.start >= jetzt);
     const vergangen = sitz.filter((m) => m.start < jetzt).reverse().slice(0, 6);
     const vorl = (x.vByK.get(t.b) || []).slice(0, 10);
+    const gremien = gremienVon(sitz);
     $view.innerHTML = `${seg}${kopf}
       <section><h2>Nächste Sitzungen</h2>
         ${kommend.length ? `<div class="list">${kommend.map(sitzungRow).join('')}</div>` : '<div class="card empty">Zurzeit sind keine Sitzungen angekündigt.</div>'}
@@ -322,6 +374,9 @@
         ${vorl.length ? `<div class="list">${vorl.map(vorlageRow).join('')}</div>` : '<div class="card empty">Keine aktuellen Vorlagen.</div>'}
       </section>
       ${vergangen.length ? `<section><h2>Zuletzt getagt</h2><div class="list">${vergangen.map(sitzungRow).join('')}</div></section>` : ''}
+      ${gremien.length ? `<section><details class="gremien"><summary>Gremien (${gremien.length}) – mit dem Stern als Favorit merken</summary>
+        <div class="list">${gremien.map((g) => `<div class="row static"><div class="body"><span class="title">${esc(gremiumKurz(g))}</span></div>${sternKnopf({ q: t.q, k: t.b, g, kn: x.k.get(t.b)?.name || '', ort: id })}</div>`).join('')}</div>
+      </details></section>` : ''}
       ${risLink(null, x.D.quelle.ris)}
       <p class="stand">Abgleich mit ${esc(x.D.quelle.name)}: ${esc(stand(x.D.quelle.abgleich))}</p>`;
   }
@@ -380,7 +435,7 @@
       ${backLink}
       <section class="hero">
         <span class="meta">${statusPill(m)}<span>${esc(x.k.get(m.k)?.name)}</span></span>
-        <h3>${esc(String(m.gremien[0] || m.name).replace(/\s+/g, ' '))}</h3>
+        <div class="favkopf"><h3>${esc(String(m.gremien[0] || m.name).replace(/\s+/g, ' '))}</h3>${m.gremien[0] ? sternKnopf({ q: x.D.quelle.id, k: m.k, g: m.gremien[0], kn: x.k.get(m.k)?.name || '', ort: kommune || '' }) : ''}</div>
         <p>${esc(langDatum(m.start))}, ${esc(uhr(m.start))} Uhr${m.ende && m.status === 'durchgeführt' ? ' bis ' + esc(uhr(m.ende)) + ' Uhr' : ''}</p>
         ${m.ort ? `<p class="muted">${esc(m.ort)}</p>` : ''}
       </section>

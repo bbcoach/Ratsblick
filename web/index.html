@@ -180,12 +180,23 @@ details.beschluss p { margin-top: 6px; font-size: 14px; color: var(--muted); }
 .notice { font-size: 13px; color: var(--muted); padding: 12px 14px; border: 1px dashed var(--line); border-radius: var(--r); }
 mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radius: 3px; }
 
+.stern { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border: 0; background: none; color: var(--muted); cursor: pointer; border-radius: 999px; }
+.stern svg { width: 24px; height: 24px; fill: none; }
+.stern[aria-pressed="true"] { color: #c99a1e; }
+.stern[aria-pressed="true"] svg { fill: #f2c230; }
+.stern:hover { background: var(--accent-soft); }
+.favkopf { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.favkopf h2 { margin: 0; }
+.fav { display: grid; gap: 8px; }
+.row.static { cursor: default; padding-top: 4px; padding-bottom: 4px; align-items: center; }
+.row.static:hover { background: none; }
+.gremien summary { cursor: pointer; color: var(--accent); font-weight: 600; padding: 4px 0 8px; }
 .tabs {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
   background: var(--surface); border-top: 1px solid var(--line);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-.tabs .inner { max-width: 640px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); }
+.tabs .inner { max-width: 640px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
 .tabs button { border: 0; background: none; padding: 8px 4px 10px; display: grid; justify-items: center; gap: 2px; font-size: 12px; color: var(--muted); cursor: pointer; }
 .tabs button[aria-current="page"] { color: var(--accent); font-weight: 600; }
 .tabs svg { width: 22px; height: 22px; }
@@ -225,6 +236,10 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
       <button type="button" data-tab="start">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
         Übersicht
+      </button>
+      <button type="button" data-tab="fav">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>
+        Favoriten
       </button>
       <button type="button" data-tab="abo">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>
