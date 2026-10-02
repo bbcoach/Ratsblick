@@ -239,6 +239,11 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
   Stand 02.10.2026: 2 453 Räte (2 288 Gemeinderäte, davon 1 546 Mehrheitswahl; 129 VG-Räte, 24 Kreistage, 12 Stadträte kreisfreier
   Städte unter dem Kreisschlüssel). Gemeinden mit neuem Schlüssel nach der Wahl über den Namen (Obergeckler; Niedergeckler entfällt).
   Farben: übliche Parteifarben, Wählergruppen #2a9d8f/#a0522d/#6a5acd (mit dem dataviz-Validator geprüft), danach grau.
+- Rechtliches (seit 02.10.2026): Seiten `#/ueber`, `#/impressum`, `#/datenschutz` (`TEXTSEITEN` in web/app.js), dezente Fußzeile auf
+  Start- und Favoritenseite. Betreiberangaben nur in `BETREIBER` (app.js) eintragen – fehlende erscheinen als „[wird ergänzt]“.
+  Kein Cookie-Banner nötig (keine Cookies/Tracking; localStorage nur für Nutzerfunktionen, § 25 Abs. 2 Nr. 2 TDDDG). Schriften liegen
+  in `web/fonts/` (keine Google-Fonts-Abrufe, LG München 2022); App lädt nichts von fremden Servern. Design bewusst nicht wie rlp.de
+  (keine Verwechslung mit einem Landesangebot), Unabhängigkeit auf „Über Wahlheimat“ und im Impressum.
 - App-Dateien lädt der Service Worker zuerst aus dem Netz (Cache nur offline); neue Version kurz nach dem Start → automatisch neu laden.
 - Links ins Original-RIS (seit 02.10.2026): je Quelle `quelle.ris` (Startseite, `risStartseite`), je Sitzung/Vorlage `web`
   (`webSeite` in `src/export/snapshot.ts`: OParl-`web`, sonst Seitenadresse der Scraper; more!rubin-Sitzungen `/meeting?id=`

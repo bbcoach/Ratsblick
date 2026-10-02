@@ -143,6 +143,9 @@
       } else if (r.v === 'fav') {
         tab = 'fav';
         await vFavoriten();
+      } else if (TEXTSEITEN[r.v]) {
+        tab = null;
+        vText(r.v);
       } else if (r.v === 'themen' || r.v === 'abo') {
         tab = 'themen';
         await vThemen();
@@ -270,6 +273,7 @@
         </form>
         <div id="hits"></div>
         <p class="coverage">Alle ${fmtZahl(gemeinden)} Gemeinden in Rheinland-Pfalz · Sitzungsdaten für ${fmtZahl(mitDaten)} davon<br>Datenstand ${esc(stand(INDEX.erstellt))}</p>
+        ${FUSSZEILE}
       </div>`;
     const input = document.getElementById('q');
     const $hits = document.getElementById('hits');
@@ -342,7 +346,7 @@
     const favs = favoriten().filter((f) => f.typ !== 'gebiet' || G.has(f.id));
     if (!favs.length) {
       $view.innerHTML = `<section class="hero"><h3>Favoriten</h3></section>
-        <div class="card empty">Noch keine Favoriten. Tippen Sie auf den Stern – neben dem Namen einer Gemeinde, Stadt, Verbandsgemeinde oder eines Kreises, bei einem Gremium in einer Sitzung oder auf der Seite Ihrer Kommune unter „Gremien“. Hier finden Sie dann jeweils die nächste und letzte Sitzung.</div>`;
+        <div class="card empty">Noch keine Favoriten. Tippen Sie auf den Stern – neben dem Namen einer Gemeinde, Stadt, Verbandsgemeinde oder eines Kreises, bei einem Gremium in einer Sitzung oder auf der Seite Ihrer Kommune unter „Gremien“. Hier finden Sie dann jeweils die nächste und letzte Sitzung.</div>${FUSSZEILE}`;
       return;
     }
     const jetzt = now();
@@ -376,7 +380,77 @@
     }
     $view.innerHTML = `<section class="hero"><h3>Favoriten</h3><p class="muted small">Nur auf diesem Gerät gespeichert.</p></section>
       ${kommunen.length ? `<p class="favgruppe">Kommunen</p>${kommunen.join('')}` : ''}
-      ${gremien.length ? `<p class="favgruppe">Gremien</p>${gremien.join('')}` : ''}`;
+      ${gremien.length ? `<p class="favgruppe">Gremien</p>${gremien.join('')}` : ''}${FUSSZEILE}`;
+  }
+
+  // ---------- Über Wahlheimat, Impressum, Datenschutz ----------
+  // Angaben zum Betreiber – nur hier eintragen; fehlende Angaben erscheinen als „[wird ergänzt]“
+  const BETREIBER = {
+    name: null,       // Vor- und Nachname
+    anschrift: null,  // ladungsfähige Anschrift, Zeilen mit \n trennen
+    email: null,      // Kontaktadresse
+  };
+  const ang = (v) => (v ? esc(v).replace(/\n/g, '<br>') : '<span class="fehlt">[wird ergänzt]</span>');
+  const mail = () => (BETREIBER.email ? `<a href="mailto:${esc(BETREIBER.email)}">${esc(BETREIBER.email)}</a>` : ang(null));
+  const FUSSZEILE = '<p class="fuss"><a href="#/ueber">Über Wahlheimat</a> · <a href="#/impressum">Impressum</a> · <a href="#/datenschutz">Datenschutz</a></p>';
+  const extern = (url, text) => `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(text || url)}</a>`;
+
+  const TEXTSEITEN = {
+    ueber: () => ({
+      titel: 'Über Wahlheimat',
+      html: `<p class="lead">Wahlheimat zeigt an einem Ort, was in den Räten Ihrer Kommune beraten und beschlossen wird – Sitzungen, Tagesordnungen, Vorlagen und Beschlüsse aus ganz Rheinland-Pfalz.</p>
+        <h4>Ein unabhängiges Angebot</h4>
+        <p>Wahlheimat ist ein privates, unabhängiges Projekt. Es ist <strong>kein Angebot des Landes Rheinland-Pfalz, der Kommunen oder der Anbieter der Ratsinformationssysteme</strong> und wird von ihnen weder betrieben noch beauftragt.</p>
+        <h4>Woher die Daten kommen</h4>
+        <p>Alle Inhalte stammen aus den öffentlich zugänglichen Ratsinformationssystemen der Gemeinden, Städte, Verbandsgemeinden und Kreise – soweit möglich über die Standardschnittstelle OParl, sonst über die öffentlichen Seiten. Der Abgleich läuft etwa alle sechs Stunden und geht mit den Servern der Kommunen schonend um. Dokumente (PDF) werden nicht kopiert, sondern im Original-System verlinkt.</p>
+        <p>Die Sitzverteilung der Räte stammt aus den Ergebnissen der Kommunalwahl 2024 des ${extern('https://www.wahlen.rlp.de/kommunalwahlen/ergebnisse-1', 'Landeswahlleiters Rheinland-Pfalz')}.</p>
+        <h4>Ohne Gewähr</h4>
+        <p>Wir geben uns Mühe, alles vollständig und richtig darzustellen. Fehler beim Übernehmen oder Zuordnen lassen sich aber nicht ausschließen. <strong>Maßgeblich ist immer das Ratsinformationssystem der Kommune</strong> – jede Sitzung und Vorlage ist dorthin verlinkt.</p>
+        <h4>Für Kommunen und Betreiber</h4>
+        <p>Sie betreiben ein Ratsinformationssystem und möchten nicht, dass es hier abgerufen wird, oder haben einen anderen Hinweis? Schreiben Sie uns an ${mail()} – wir reagieren umgehend und schalten den Abruf auf Wunsch sofort ab.</p>
+        <h4>Namen in Tagesordnungen</h4>
+        <p>Tagesordnungen und Vorlagen können Namen von Personen enthalten, etwa bei Bauanträgen. Wenn Sie hier genannt werden und das entfernt haben möchten, melden Sie sich bitte unter ${mail()}.</p>
+        <h4>Urheberrecht</h4>
+        <p>Vorlagen, Beschlüsse und Bekanntmachungen sind in der Regel amtliche Werke (§ 5 UrhG). Die Rechte an Dokumenten bleiben bei den jeweiligen Stellen. Das Logo ist eine eigene Gestaltung und kein Hoheitszeichen des Landes.</p>
+        <p class="muted small">Quelltext: ${extern('https://github.com/bbcoach/Ratsblick', 'github.com/bbcoach/Ratsblick')}</p>`,
+    }),
+    impressum: () => ({
+      titel: 'Impressum',
+      html: `<h4>Angaben gemäß § 5 DDG</h4>
+        <p>${ang(BETREIBER.name)}<br>${ang(BETREIBER.anschrift)}</p>
+        <h4>Kontakt</h4>
+        <p>E-Mail: ${mail()}</p>
+        <h4>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h4>
+        <p>${ang(BETREIBER.name)}, Anschrift wie oben</p>
+        <h4>Hinweis</h4>
+        <p>Wahlheimat ist ein unabhängiges, nicht kommerzielles Angebot und kein Angebot des Landes Rheinland-Pfalz oder der Kommunen. Für die Inhalte verlinkter Seiten, insbesondere der Ratsinformationssysteme, sind deren Betreiber verantwortlich.</p>`,
+    }),
+    datenschutz: () => ({
+      titel: 'Datenschutz',
+      html: `<p class="lead">Kurz gesagt: Wahlheimat braucht keine Anmeldung, setzt keine Cookies, verwendet kein Tracking und keine Analyse- oder Werbedienste. Was Sie sich merken, bleibt auf Ihrem Gerät.</p>
+        <h4>1. Verantwortlich</h4>
+        <p>${ang(BETREIBER.name)}, ${ang(BETREIBER.anschrift)}, E-Mail: ${mail()}</p>
+        <h4>2. Bereitstellung der Website (Hosting)</h4>
+        <p>Die Website liegt bei GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA). Beim Aufruf verarbeitet GitHub technisch notwendige Daten wie IP-Adresse, Zeitpunkt, abgerufene Datei und Browser-Kennung, um die Seite auszuliefern und vor Missbrauch zu schützen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer sicheren, funktionierenden Website). GitHub ist nach dem EU-US Data Privacy Framework zertifiziert. Einzelheiten: ${extern('https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement', 'Datenschutzerklärung von GitHub')}.</p>
+        <p>Schriften und alle übrigen Bestandteile der App werden von dieser Website selbst geladen, nicht von Dritten.</p>
+        <h4>3. Speicher auf Ihrem Gerät</h4>
+        <p>Die App speichert im Speicher Ihres Browsers (<em>localStorage</em>) Ihre Favoriten, die zuletzt gewählte Kommune und die Einstellungen der Themensuche, außerdem App-Dateien und den zuletzt geladenen Datenstand für die Nutzung ohne Verbindung. Diese Angaben verlassen Ihr Gerät nicht und werden nicht an uns übertragen. Sie dienen ausschließlich Funktionen, die Sie selbst nutzen (§ 25 Abs. 2 Nr. 2 TDDDG); eine Einwilligung ist dafür nicht erforderlich. Sie können sie jederzeit löschen, indem Sie die Websitedaten in Ihrem Browser entfernen.</p>
+        <h4>4. Links zu Ratsinformationssystemen</h4>
+        <p>Wenn Sie einen Link zu einem Ratsinformationssystem oder Dokument antippen, verbindet sich Ihr Browser direkt mit dem Server der jeweiligen Kommune bzw. ihres Anbieters. Dafür gelten deren Datenschutzhinweise.</p>
+        <h4>5. Personenbezogene Angaben in Ratsunterlagen</h4>
+        <p>Wahlheimat gibt öffentlich bekannt gemachte Informationen aus den Ratsinformationssystemen wieder, darunter Titel von Tagesordnungspunkten und Vorlagen, in denen Namen vorkommen können. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (öffentliches Interesse an nachvollziehbarer Kommunalpolitik). Sie können dem jederzeit widersprechen (Art. 21 DSGVO); wir prüfen das und entfernen die Angaben.</p>
+        <h4>6. Kontakt per E-Mail</h4>
+        <p>Wenn Sie uns schreiben, verwenden wir Ihre Angaben nur, um Ihre Anfrage zu bearbeiten (Art. 6 Abs. 1 lit. b bzw. f DSGVO), und löschen sie, sobald sie dafür nicht mehr nötig sind.</p>
+        <h4>7. Ihre Rechte</h4>
+        <p>Sie haben das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18) und Widerspruch (Art. 21). Außerdem können Sie sich bei einer Datenschutz-Aufsichtsbehörde beschweren, etwa beim ${extern('https://www.datenschutz.rlp.de', 'Landesbeauftragten für den Datenschutz und die Informationsfreiheit Rheinland-Pfalz')}, Hintere Bleiche 34, 55116 Mainz.</p>
+        <p class="muted small">Stand: Oktober 2026</p>`,
+    }),
+  };
+
+  function vText(art) {
+    const t = TEXTSEITEN[art]();
+    setTitle(t.titel);
+    $view.innerHTML = `<section class="hero"><h3>${esc(t.titel)}</h3></section><div class="card textseite">${t.html}</div>${FUSSZEILE}`;
   }
 
   // ---------- Ansicht: Kommune (eine Ebene) ----------
