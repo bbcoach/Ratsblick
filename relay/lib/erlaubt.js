@@ -10,4 +10,9 @@ export const ERLAUBT = [
   'kirchheimbolanden.ris-portal.de', // regisafe, VG Kirchheimbolanden, außerhalb Europas 403
   'bernkastel-kues.ris-portal.de', // regisafe, VG Bernkastel-Kues, außerhalb Europas 403
   'info.landau.de', // SessionNet Stadt Landau, außerhalb Europas 403
+  'ruedesheim.ris-portal.de', // VG, Freigabe Projektinhaber 02.10.2026
+  'bellheim.ris-portal.de', // VG, Freigabe Projektinhaber 02.10.2026
+  'dahner-felsenland.ris-portal.de', // VG, Freigabe Projektinhaber 02.10.2026
+  'hauenstein.ris-portal.de', // VG, Freigabe Projektinhaber 02.10.2026
+  'www.hagenbach.sitzung-online.de', // VG, Freigabe Projektinhaber 02.10.2026
 ];

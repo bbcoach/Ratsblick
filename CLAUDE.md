@@ -22,6 +22,8 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
   anbinden – auch bei robots.txt-Verbot** (2 s Abstand, Vermerk in `hinweis` und hier). Gilt nicht für technische Sperren
   (Bot-Schutz/WAF wie MyraCloud oder rescaled): die werden nicht umgangen. Selbst gefundene Systeme mit robots.txt-Verbot
   weiterhin nur nach Rückfrage; more!rubin-Systeme ohne OParl, deren Link der Projektinhaber schickt, ebenfalls ohne Rückfrage.
+  **Freigabe (Projektinhaber, 02.10.2026): alle verbleibenden Verbandsgemeinden anbinden, auch bei robots.txt-Verbot**
+  (sitzung-online.de, ris-portal.de, sessionnet.owl-it.de; 2 s Abstand, Vermerk in `hinweis`). Technische Sperren weiterhin nicht umgehen.
 - Technik: TypeScript, Node ≥ 22.13, eingebautes `node:sqlite`, `tsx`, `vitest`. Keine schweren Abhängigkeiten
   ohne Grund.
 
