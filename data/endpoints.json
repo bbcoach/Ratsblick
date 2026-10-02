@@ -98,6 +98,7 @@
     { "id": "kreis-cochem-zell", "name": "Landkreis Cochem-Zell", "ebene": "Landkreis", "landkreis": "Cochem-Zell", "url": "https://sessionnet.owl-it.de/cochem-zell/bi/", "status": "robots", "gebiet": "07135" },
     { "id": "stadt-zweibruecken", "name": "Stadt Zweibrücken", "ebene": "Kreisfreie Stadt", "landkreis": null, "url": "https://sessionnet.owl-it.de/zweibruecken/bi/", "status": "robots", "gebiet": "07320000" },
     { "id": "kreis-suedwestpfalz", "name": "Landkreis Südwestpfalz", "ebene": "Landkreis", "landkreis": "Südwestpfalz", "url": "https://lksuedwestpfalz.gremien.info/oparl/system", "status": "inaktiv", "gebiet": "07340" },
+    { "id": "vg-landstuhl", "name": "VG Landstuhl", "ebene": "Verbandsgemeinde", "landkreis": "Kaiserslautern", "url": "https://sessionnet.owl-it.de/vglandstuhl/bi/", "status": "robots", "gebiet": "073355011" },
     { "id": "kreis-kaiserslautern", "name": "Landkreis Kaiserslautern", "ebene": "Landkreis", "landkreis": "Kaiserslautern", "url": "https://sessionnet.owl-it.de/kaiserslautern-kreis/BI/", "status": "aktiv", "gebiet": "07335", "typ": "sessionnet", "endung": "asp", "intervallMs": 2000, "hinweis": "robots.txt von sessionnet.owl-it.de verbietet automatische Abrufe; auf ausdrückliche Entscheidung des Projektinhabers (01.10.2026) trotzdem abgerufen, mit 2 s Abstand" }
   ]
 }
