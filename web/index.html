@@ -250,7 +250,19 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
 .ris p { margin: 0; text-align: center; }
 /* Sitzverteilung: Halbkreis mit 2px Fugen in Flächenfarbe, Liste mit Zahlen daneben */
 .sitz { padding: 14px; display: grid; gap: 12px; }
-.sitz svg { width: 100%; max-width: 360px; justify-self: center; display: block; }
+.sitz svg { width: 100%; max-width: 240px; justify-self: center; display: block; }
+.sitz-oben { display: grid; gap: 10px; }
+@media (min-width: 560px) { .sitz-oben { grid-template-columns: 240px 1fr; align-items: center; gap: 18px; } }
+.sitz-kurz { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 14px; justify-content: center; }
+@media (min-width: 560px) { .sitz-kurz { justify-content: flex-start; } }
+.sitz-kurz li { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; max-width: 100%; }
+.sitz-kurz li span { overflow: hidden; text-overflow: ellipsis; }
+.sitz-kurz li.aktiv { text-decoration: underline; }
+.sitz-kurz i { flex: none; width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+.sitz-mehr summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: 14px; }
+.sitz-mehr[open] summary { margin-bottom: 8px; }
+.sitz-mehr { display: grid; gap: 8px; }
+.sitz-mw { margin: -8px 0 0; }
 .sitz path { fill: var(--c); stroke: var(--surface); stroke-width: 1.5; stroke-linejoin: round; cursor: pointer; transition: opacity .15s; }
 .sitz svg:has(.aktiv) path:not(.aktiv) { opacity: .35; }
 .sitz .summe { text-anchor: middle; font-size: 22px; font-weight: 700; fill: var(--fg); }
@@ -266,8 +278,8 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
 .sitzliste .zahl { text-align: right; font-variant-numeric: tabular-nums; }
 .sitzliste .zeile .zahl:nth-child(2) { font-weight: 700; }
 .sitzliste .neu { font-size: 12px; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .sitz path, :root:not([data-theme="light"]) .sitzliste i { fill: var(--cd); background: var(--cd); } }
-:root[data-theme="dark"] .sitz path, :root[data-theme="dark"] .sitzliste i { fill: var(--cd); background: var(--cd); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .sitz path, :root:not([data-theme="light"]) .sitzliste i, :root:not([data-theme="light"]) .sitz-kurz i { fill: var(--cd); background: var(--cd); } }
+:root[data-theme="dark"] .sitz path, :root[data-theme="dark"] .sitzliste i, :root[data-theme="dark"] .sitz-kurz i { fill: var(--cd); background: var(--cd); }
 /* Textseiten (Über, Impressum, Datenschutz) im Reiter „Info“ */
 .textseite { padding: 16px 18px; display: grid; gap: 10px; line-height: 1.6; }
 .textseite h4 { margin: 10px 0 0; font-size: 15px; }

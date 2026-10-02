@@ -485,7 +485,7 @@
     const kopf = `<section class="hero"><div class="favkopf"><h3>${esc(anzeigeName(t))}</h3>${sternKnopf({ typ: 'gebiet', id: t.id })}</div><p class="muted small">${esc([t.ew ? fmtZahl(t.ew) + ' Einwohner' : '', sel.key !== 'gemeinde' ? ERKLAERUNG[sel.key] : untertitel(t)].filter(Boolean).join(' · '))}</p></section>`;
 
     if (!t.q) {
-      $view.innerHTML = seg + kopf + ohneDaten(t, eb) + SITZE_PLATZ;
+      $view.innerHTML = seg + kopf + SITZE_PLATZ + ohneDaten(t, eb);
       sitzverteilung(t);
       return;
     }
@@ -496,7 +496,7 @@
     const vergangen = sitz.filter((m) => m.start < jetzt).reverse().slice(0, 6);
     const vorl = (x.vByK.get(t.b) || []).slice(0, 10);
     const gremien = gremienVon(sitz);
-    $view.innerHTML = `${seg}${kopf}${nurTermineHinweis(x)}
+    $view.innerHTML = `${seg}${kopf}${SITZE_PLATZ}${nurTermineHinweis(x)}
       <section class="spalte"><h2>Nächste Sitzungen</h2>
         ${kommend.length ? `<div class="list">${kommend.map(sitzungRow).join('')}</div>` : '<div class="card empty">Zurzeit sind keine Sitzungen angekündigt.</div>'}
       </section>
@@ -504,7 +504,6 @@
         ${vorl.length ? `<div class="list">${vorl.map(vorlageRow).join('')}</div>` : '<div class="card empty">Keine aktuellen Vorlagen.</div>'}
       </section>`}
       ${vergangen.length ? `<section><h2>Zuletzt getagt</h2><div class="list">${vergangen.map(sitzungRow).join('')}</div></section>` : ''}
-      ${SITZE_PLATZ}
       ${gremien.length ? `<section><details class="gremien"><summary>Gremien (${gremien.length}) – mit dem Stern als Favorit merken</summary>
         <div class="list">${gremien.map((g) => `<div class="row static"><div class="body"><span class="title">${esc(gremiumKurz(g))}</span></div>${sternKnopf({ q: t.q, k: t.b, g, kn: x.k.get(t.b)?.name || '', ort: id })}</div>`).join('')}</div>
       </details></section>` : ''}
@@ -540,7 +539,8 @@
     if (rat === 'Gemeinderat' && t.art === 'Ortsgemeinde') rat = 'Ortsgemeinderat';
     el.hidden = false;
     if (r.mehrheitswahl) {
-      el.innerHTML = `<h2>Sitzverteilung im ${esc(rat)}</h2><div class="card empty">Bei der Kommunalwahl 2024 gab es hier nur eine oder keine Liste. Der ${esc(rat)} wurde deshalb per Mehrheitswahl gewählt – ohne Sitzverteilung nach Parteien.</div>`;
+      // Oben auf der Seite nur eine dezente Zeile statt eines Kastens
+      el.innerHTML = `<p class="muted small sitz-mw">${esc(rat)}: 2024 per Mehrheitswahl gewählt (nur eine oder keine Liste) – keine Sitzverteilung nach Parteien.</p>`;
       return;
     }
     let wg = 0;
@@ -565,16 +565,22 @@
     }).join('');
     // Wählergruppen haben 2024 neue Kennungen – ohne Vorwert kein Vergleich; bei Parteien heißt das „neu im Rat“
     const diff = (l) => (l.vorher == null ? (l.wg ? '<span title="Vergleich nicht verfügbar">–</span>' : '<span class="neu">neu</span>') : l.sitze === l.vorher ? '±0' : (l.sitze > l.vorher ? '+' : '−') + Math.abs(l.sitze - l.vorher));
+    // Kompakt oben auf der Kommunenseite: Halbkreis und Kurzlegende, die Tabelle zum Aufklappen
     el.innerHTML = `<h2>Sitzverteilung im ${esc(rat)}</h2>
       <div class="card sitz">
-        <svg viewBox="0 0 200 108" role="img" aria-label="Sitzverteilung im ${esc(rat)}: ${esc(listen.map((l) => `${l.kurz} ${l.sitze}`).join(', '))}">${boegen}
-          <text x="100" y="88" class="summe">${summe}</text><text x="100" y="102" class="summe-l">Sitze</text></svg>
-        <div class="sitzliste" role="table" aria-label="Sitze je Liste">
-          <div class="kopf" role="row"><span role="columnheader">Liste</span><span role="columnheader">Sitze</span><span role="columnheader" title="Veränderung gegenüber 2019">ggü. 2019</span><span role="columnheader">Stimmen</span></div>
-          ${listen.map((l, i) => `<div class="zeile" role="row" data-i="${i}"><span role="cell"><i style="--c:${l.farbe[0]};--cd:${l.farbe[1]}"></i><span title="${esc(l.lang || l.kurz)}">${esc(l.kurz)}</span></span><span role="cell" class="zahl">${l.sitze}</span><span role="cell" class="zahl muted">${diff(l)}</span><span role="cell" class="zahl muted">${l.prozent != null ? l.prozent.toLocaleString('de-DE', { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + ' %' : ''}</span></div>`).join('')}
+        <div class="sitz-oben">
+          <svg viewBox="0 0 200 108" role="img" aria-label="Sitzverteilung im ${esc(rat)}: ${esc(listen.map((l) => `${l.kurz} ${l.sitze}`).join(', '))}">${boegen}
+            <text x="100" y="88" class="summe">${summe}</text><text x="100" y="102" class="summe-l">Sitze</text></svg>
+          <ul class="sitz-kurz" aria-hidden="true">${listen.map((l, i) => `<li data-i="${i}"><i style="--c:${l.farbe[0]};--cd:${l.farbe[1]}"></i><span title="${esc(l.lang || l.kurz)}">${esc(l.kurz)}</span> <b>${l.sitze}</b></li>`).join('')}</ul>
         </div>
-        ${weg.length ? `<p class="muted small">2024 nicht mehr im Rat: ${esc(weg.join(', '))}</p>` : ''}
-        <p class="muted small">Kommunalwahl 9. Juni 2024 · Quelle: <a href="https://www.wahlen.rlp.de/kommunalwahlen/ergebnisse-1" target="_blank" rel="noopener">Landeswahlleiter Rheinland-Pfalz</a></p>
+        <details class="sitz-mehr"><summary>Alle Zahlen</summary>
+          <div class="sitzliste" role="table" aria-label="Sitze je Liste">
+            <div class="kopf" role="row"><span role="columnheader">Liste</span><span role="columnheader">Sitze</span><span role="columnheader" title="Veränderung gegenüber 2019">ggü. 2019</span><span role="columnheader">Stimmen</span></div>
+            ${listen.map((l, i) => `<div class="zeile" role="row" data-i="${i}"><span role="cell"><i style="--c:${l.farbe[0]};--cd:${l.farbe[1]}"></i><span title="${esc(l.lang || l.kurz)}">${esc(l.kurz)}</span></span><span role="cell" class="zahl">${l.sitze}</span><span role="cell" class="zahl muted">${diff(l)}</span><span role="cell" class="zahl muted">${l.prozent != null ? l.prozent.toLocaleString('de-DE', { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + ' %' : ''}</span></div>`).join('')}
+          </div>
+          ${weg.length ? `<p class="muted small">2024 nicht mehr im Rat: ${esc(weg.join(', '))}</p>` : ''}
+          <p class="muted small">Kommunalwahl 9. Juni 2024 · Quelle: <a href="https://www.wahlen.rlp.de/kommunalwahlen/ergebnisse-1" target="_blank" rel="noopener">Landeswahlleiter Rheinland-Pfalz</a></p>
+        </details>
       </div>`;
     // Hover: Bogen und Zeile gemeinsam hervorheben
     const an = (i) => el.querySelectorAll('[data-i]').forEach((x) => x.classList.toggle('aktiv', i != null && x.dataset.i === i));

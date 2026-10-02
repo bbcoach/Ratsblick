@@ -231,7 +231,8 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
   Beginn der bürgerlichen Dämmerung, berechnet für RLP, `nachtModus` im `<head>`, minütlich geprüft), tagsüber wie im Gerät eingestellt. Breite: Kopfzeile/Reiter über die ganze Breite, Inhaltsspalte `--w` 640/840/1120 px;
   ab 1180 px „Nächste Sitzungen“ und „Neue Vorlagen“ nebeneinander (`section.spalte`). Domain: wahlheimat-rlp.de (GitHub Pages).
 - Sitzverteilung (seit 02.10.2026, Idee des Projektinhabers): Kommunalwahl 2024 je Rat (Gemeinde-, Stadt-, VG-Rat, Kreistag) als
-  Halbkreis mit Liste (Sitze, ggü. 2019, Stimmenanteil) auf der Kommunenseite. Daten: `npm run sitze` (scripts/sitzverteilung.ts)
+  kompakter Halbkreis mit Kurzlegende direkt unter dem Kopf der Kommunenseite (vor den Sitzungen, Projektinhaber), Tabelle (Sitze,
+  ggü. 2019, Stimmenanteil) unter „Alle Zahlen“ zum Aufklappen; bei Mehrheitswahl nur eine dezente Zeile. Daten: `npm run sitze` (scripts/sitzverteilung.ts)
   liest die statischen JSON-Dateien der Ergebnis-App des Landeswahlleiters (`rlp-kw24.wahlen.23degrees.eu/assets/`:
   `wahlen-vec-tree.json` = Gebietsbaum, `json/wahlen/<WAHL>/<geoId>.json`; geoId = KKK VV GGG 00, Gemeinde-Schlüssel = 07+KKK+GGG,
   VGs über ihre Gemeinden) → `data/sitze-2024.json` (im Repo, Rohdateien in `.cache/kw24/`). „PRESTART_ONE_LIST“ = Mehrheitswahl.
