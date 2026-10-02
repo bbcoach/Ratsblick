@@ -26,6 +26,8 @@
   const datum = (iso) => fmt(iso, { day: '2-digit', month: '2-digit', year: 'numeric' });
   const uhr = (iso) => fmt(iso, { hour: '2-digit', minute: '2-digit' });
   const langDatum = (iso) => fmt(iso, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  // Quellen ohne Uhrzeit (nur Datum, z. B. edith) speichern 00:00 – dann auf die Einladung verweisen
+  const uhrText = (iso) => (uhr(iso) === '00:00' ? 'Uhrzeit laut Einladung' : `${uhr(iso)} Uhr`);
   const stand = (iso) => (iso ? `${datum(iso)}, ${uhr(iso)} Uhr` : 'unbekannt');
   const kurzName = (name) => String(name || '').replace(/^(Ortsgemeinde|Ortsbezirk|Verbandsgemeinde|Stadt) /, '');
   const gremiumKurz = (g) => String(g || '').replace(/\s+/g, ' ')
@@ -537,7 +539,7 @@
 
   function sitzungRow(m) {
     const n = m.tops.length;
-    return `<button class="row" type="button" data-go="${esc(link('s', m.id))}">${dateBox(m.start)}<div class="body"><span class="title">${esc(gremiumKurz(m.gremien[0] || m.name || 'Sitzung'))}</span><span class="meta">${esc(uhr(m.start))} Uhr${m.ort ? ' · ' + esc(ortKurz(m.ort)) : ''}</span><span class="meta">${statusPill(m)}${n ? `<span>${n} TOP${n > 1 ? 's' : ''}</span>` : ''}</span></div>${chev}</button>`;
+    return `<button class="row" type="button" data-go="${esc(link('s', m.id))}">${dateBox(m.start)}<div class="body"><span class="title">${esc(gremiumKurz(m.gremien[0] || m.name || 'Sitzung'))}</span><span class="meta">${esc(uhrText(m.start))}${m.ort ? ' · ' + esc(ortKurz(m.ort)) : ''}</span><span class="meta">${statusPill(m)}${n ? `<span>${n} TOP${n > 1 ? 's' : ''}</span>` : ''}</span></div>${chev}</button>`;
   }
   function vorlageRow(v) {
     return `<button class="row" type="button" data-go="${esc(link('v', v.id))}"><div class="body"><span class="meta"><span class="mono">${esc(v.nr)}</span><span>${esc(datum(v.datum))}</span>${v.kurz ? '<span class="pill">Kurz erklärt</span>' : ''}</span><span class="title">${esc(v.name)}</span><span class="meta">${esc(v.art || '')}</span></div>${chev}</button>`;
@@ -558,7 +560,7 @@
       <section class="hero">
         <span class="meta">${statusPill(m)}<span>${esc(x.k.get(m.k)?.name)}</span></span>
         <div class="favkopf"><h3>${esc(String(m.gremien[0] || m.name).replace(/\s+/g, ' '))}</h3>${m.gremien[0] ? sternKnopf({ q: x.D.quelle.id, k: m.k, g: m.gremien[0], kn: x.k.get(m.k)?.name || '', ort: kommune || '' }) : ''}</div>
-        <p>${esc(langDatum(m.start))}, ${esc(uhr(m.start))} Uhr${m.ende && m.status === 'durchgeführt' ? ' bis ' + esc(uhr(m.ende)) + ' Uhr' : ''}</p>
+        <p>${esc(langDatum(m.start))}, ${esc(uhrText(m.start))}${m.ende && m.status === 'durchgeführt' ? ' bis ' + esc(uhr(m.ende)) + ' Uhr' : ''}</p>
         ${m.ort ? `<p class="muted">${esc(m.ort)}</p>` : ''}
       </section>
       ${docs.length ? `<section><h2>Dokumente</h2><div class="list">${docs.map(docRow).join('')}</div></section>` : ''}

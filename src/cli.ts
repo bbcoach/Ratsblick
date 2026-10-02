@@ -10,6 +10,7 @@ import { probeSource, saveProbe } from './sync/probe.js';
 import { syncAllris } from './scrape/allris.js';
 import { syncAllrisNet } from './scrape/allrisnet.js';
 import { syncIcs } from './scrape/ics.js';
+import { syncEdith } from './scrape/edith.js';
 import { syncRegisafe } from './scrape/regisafe.js';
 import { syncRubinApi } from './scrape/rubin.js';
 import { syncSessionNet } from './scrape/sessionnet.js';
@@ -174,7 +175,9 @@ async function main(): Promise<void> {
                 ? await syncRegisafe(db, client, s, { log, alles: values.full })
                 : s.typ === 'ics'
                   ? await syncIcs(db, client, s, { log })
-                  : await syncSource(db, client, s, { full: values.full, log });
+                  : s.typ === 'edith'
+                    ? await syncEdith(db, client, s, { log })
+                    : await syncSource(db, client, s, { full: values.full, log });
       log(
         `✓ ${st.bodies} Körperschaften, ${st.organizations} Gremien, ${st.meetings} Sitzungen, ` +
           `${st.agendaItems} TOPs, ${st.papers} Vorlagen, ${st.consultations} Beratungen, ${st.files} Dateien ` +
