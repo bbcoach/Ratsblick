@@ -73,11 +73,19 @@
 
   /** Findet die Quelle zu einer OParl-ID über den Hostnamen. */
   function quelleFuerObjekt(id) {
+    // Bereits geladene Quelle, die das Objekt enthält (häufigster Fall: Klick innerhalb einer Kommune)
+    for (const [qid, x] of loaded) if (x.s.has(id) || x.v.has(id)) return qid;
+    // Sonst über die Adresse: mehrere Quellen können auf einem Server liegen (sessionnet.owl-it.de, sitzung-online.de) –
+    // dann die mit dem längsten gemeinsamen Pfad zur Systemadresse („…/vglandstuhl/bi/“)
     try {
       const host = new URL(id).hostname;
-      return INDEX.quellen.find((qq) => qq.host === host)?.id ?? null;
+      const gemeinsam = (a, b) => { let i = 0; while (i < a.length && a[i] === b[i]) i++; return i; };
+      const kandidaten = INDEX.quellen.filter((qq) => qq.host === host);
+      kandidaten.sort((a, b) => gemeinsam(b.system || '', id) - gemeinsam(a.system || '', id));
+      return kandidaten[0]?.id ?? null;
     } catch { return null; }
   }
+
 
   // ---------- Navigation über die Adresse (#/…) ----------
   const enc = encodeURIComponent;
