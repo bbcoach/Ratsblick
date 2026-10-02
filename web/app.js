@@ -298,13 +298,15 @@
   }
 
   // ---------- Favoriten (Gremien, nur auf diesem Gerät gespeichert) ----------
-  // Eintrag: { q: Quelle, k: Körperschaft, g: Gremiumsname, kn: Name der Körperschaft, ort: Gebiet für die Rückkehr }
-  const favKey = (f) => `${f.q}|${f.k}|${f.g}`;
+  // Gremium: { q: Quelle, k: Körperschaft, g: Gremiumsname, kn: Name der Körperschaft, ort: Gebiet für die Rückkehr }
+  // Kommune (Gemeinde, Stadt, VG, Kreis): { typ: 'gebiet', id: Gebiets-ID }
+  const favKey = (f) => (f.typ === 'gebiet' ? `gebiet|${f.id}` : `${f.q}|${f.k}|${f.g}`);
+  const favName = (f) => (f.typ === 'gebiet' ? (G.has(f.id) ? anzeigeName(G.get(f.id)) : f.id) : gremiumKurz(f.g));
   function favoriten() { return store.get('favoriten', []); }
   function istFav(f) { return favoriten().some((x) => favKey(x) === favKey(f)); }
   function sternKnopf(f) {
     const an = istFav(f);
-    return `<button class="stern" type="button" data-fav="${esc(JSON.stringify(f))}" aria-pressed="${an}" aria-label="${an ? 'Aus Favoriten entfernen' : 'Als Favorit merken'}: ${esc(f.g)}">
+    return `<button class="stern" type="button" data-fav="${esc(JSON.stringify(f))}" aria-pressed="${an}" aria-label="${an ? 'Aus Favoriten entfernen' : 'Als Favorit merken'}: ${esc(favName(f))}">
       <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></button>`;
   }
   function favUmschalten(el) {
@@ -312,8 +314,8 @@
     const an = istFav(f);
     store.set('favoriten', an ? favoriten().filter((x) => favKey(x) !== favKey(f)) : [...favoriten(), f]);
     el.setAttribute('aria-pressed', String(!an));
-    el.setAttribute('aria-label', `${!an ? 'Aus Favoriten entfernen' : 'Als Favorit merken'}: ${f.g}`);
-    toast(!an ? `<span>„${esc(gremiumKurz(f.g))}“ unter Favoriten gemerkt</span>` : 'Aus den Favoriten entfernt');
+    el.setAttribute('aria-label', `${!an ? 'Aus Favoriten entfernen' : 'Als Favorit merken'}: ${favName(f)}`);
+    toast(!an ? `<span>„${esc(favName(f))}“ unter Favoriten gemerkt</span>` : 'Aus den Favoriten entfernt');
     if (an && parse().v === 'fav') route(); // entfernter Favorit verschwindet aus der Liste
   }
   function gremienVon(sitz) {
@@ -325,26 +327,44 @@
 
   async function vFavoriten() {
     setTitle('Favoriten');
-    const favs = favoriten();
+    const favs = favoriten().filter((f) => f.typ !== 'gebiet' || G.has(f.id));
     if (!favs.length) {
       $view.innerHTML = `<section class="hero"><h3>Favoriten</h3></section>
-        <div class="card empty">Noch keine Favoriten. Tippen Sie bei einem Gremium auf den Stern – in einer Sitzung neben dem Namen oder auf der Seite Ihrer Kommune unter „Gremien“. Gemerkte Gremien finden Sie hier mit ihrer nächsten und letzten Sitzung.</div>`;
+        <div class="card empty">Noch keine Favoriten. Tippen Sie auf den Stern – neben dem Namen einer Gemeinde, Stadt, Verbandsgemeinde oder eines Kreises, bei einem Gremium in einer Sitzung oder auf der Seite Ihrer Kommune unter „Gremien“. Hier finden Sie dann jeweils die nächste und letzte Sitzung.</div>`;
       return;
     }
     const jetzt = now();
-    const teile = [];
-    for (const f of favs) {
-      let x = null;
-      try { x = await quelle(f.q); } catch { /* Quelle nicht erreichbar */ }
-      const sitz = x ? (x.sByK.get(f.k) || []).filter((m) => m.gremien.includes(f.g)) : [];
+    const sitzungen = (sitz) => {
       const naechste = sitz.find((m) => m.start >= jetzt);
       const letzte = sitz.filter((m) => m.start < jetzt).at(-1);
-      teile.push(`<section class="fav">
-        <div class="favkopf"><div><h2>${esc(gremiumKurz(f.g))}</h2><span class="muted small">${esc(x?.k.get(f.k)?.name || f.kn || '')}</span></div>${sternKnopf(f)}</div>
-        ${naechste || letzte ? `<div class="list">${[naechste, letzte].filter(Boolean).map(sitzungRow).join('')}</div>` : '<div class="card empty">Im aktuellen Datenstand keine Sitzung dieses Gremiums.</div>'}
-      </section>`);
+      return [naechste, letzte].filter(Boolean);
+    };
+    const kommunen = [];
+    const gremien = [];
+    for (const f of favs) {
+      if (f.typ === 'gebiet') {
+        const g = G.get(f.id);
+        let liste = [];
+        if (g.q) {
+          try { const x = await quelle(g.q); liste = sitzungen(x.sByK.get(g.b) || []); } catch { /* Quelle nicht erreichbar */ }
+        }
+        kommunen.push(`<section class="fav">
+          <div class="favkopf"><button class="linkbtn favtitel" type="button" data-go="${esc(link('g', f.id))}"><h2>${esc(anzeigeName(g))}</h2><span class="muted small">${esc(untertitel(g))}</span></button>${sternKnopf(f)}</div>
+          ${liste.length ? `<div class="list">${liste.map(sitzungRow).join('')}</div>` : `<div class="card empty">${g.q ? 'Im aktuellen Datenstand keine Sitzung.' : 'Für diese Kommune gibt es noch keine Sitzungsdaten.'}</div>`}
+        </section>`);
+      } else {
+        let x = null;
+        try { x = await quelle(f.q); } catch { /* Quelle nicht erreichbar */ }
+        const liste = x ? sitzungen((x.sByK.get(f.k) || []).filter((m) => m.gremien.includes(f.g))) : [];
+        gremien.push(`<section class="fav">
+          <div class="favkopf"><div><h2>${esc(gremiumKurz(f.g))}</h2><span class="muted small">${esc(x?.k.get(f.k)?.name || f.kn || '')}</span></div>${sternKnopf(f)}</div>
+          ${liste.length ? `<div class="list">${liste.map(sitzungRow).join('')}</div>` : '<div class="card empty">Im aktuellen Datenstand keine Sitzung dieses Gremiums.</div>'}
+        </section>`);
+      }
     }
-    $view.innerHTML = `<section class="hero"><h3>Favoriten</h3><p class="muted small">Nur auf diesem Gerät gespeichert.</p></section>${teile.join('')}`;
+    $view.innerHTML = `<section class="hero"><h3>Favoriten</h3><p class="muted small">Nur auf diesem Gerät gespeichert.</p></section>
+      ${kommunen.length ? `<p class="favgruppe">Kommunen</p>${kommunen.join('')}` : ''}
+      ${gremien.length ? `<p class="favgruppe">Gremien</p>${gremien.join('')}` : ''}`;
   }
 
   // ---------- Ansicht: Kommune (eine Ebene) ----------
@@ -361,7 +381,7 @@
     setTitle(kurzName(kreisKurz(g.name)));
     const seg = `<div class="seg" role="group" aria-label="Ebene">${eb.map((e) => `<button type="button" ${e.off ? 'disabled' : `data-go="${esc(link('g', id, e.key))}"`} aria-pressed="${e.key === sel.key}" class="${!e.off && !e.g.q ? 'nodata' : ''}">${e.label}<small>${esc(e.sub)}</small></button>`).join('')}</div>`;
     const t = sel.g;
-    const kopf = `<section class="hero"><h3>${esc(anzeigeName(t))}</h3><p class="muted small">${esc([t.ew ? fmtZahl(t.ew) + ' Einwohner' : '', sel.key !== 'gemeinde' ? ERKLAERUNG[sel.key] : untertitel(t)].filter(Boolean).join(' · '))}</p></section>`;
+    const kopf = `<section class="hero"><div class="favkopf"><h3>${esc(anzeigeName(t))}</h3>${sternKnopf({ typ: 'gebiet', id: t.id })}</div><p class="muted small">${esc([t.ew ? fmtZahl(t.ew) + ' Einwohner' : '', sel.key !== 'gemeinde' ? ERKLAERUNG[sel.key] : untertitel(t)].filter(Boolean).join(' · '))}</p></section>`;
 
     if (!t.q) {
       $view.innerHTML = seg + kopf + ohneDaten(t, eb);

@@ -182,9 +182,11 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
 - `web/` enthält die App (Vanilla-JS, kein Build-Schritt), `npm run web -- --out dist` erzeugt die statische Seite
   mit `data/index.json` und je Quelle `data/<id>.json` (Momentaufnahme aus `src/export/snapshot.ts`).
 - „Kurz erklärt“-Texte liegen von Hand gepflegt in `data/kurz-erklaert.json` (Schlüssel: Vorlagen-ID).
-- Startseite nur mit Suche (seit 02.10.2026, „Zuletzt angesehen“ entfernt). Reiter „Favoriten“: Gremien per Stern merken (in der
-  Sitzung neben dem Namen, auf der Kommunenseite unter „Gremien“); gespeichert nur im Gerät (`localStorage` `ratsblick:favoriten`,
-  Eintrag Quelle + Körperschaft + Gremiumsname), Anzeige mit nächster und letzter Sitzung.
+- Startseite nur mit Suche (seit 02.10.2026, „Zuletzt angesehen“ entfernt). Reiter „Favoriten“: Kommunen (Gemeinde, Stadt, VG,
+  Kreis – Stern neben dem Namen auf der Kommunenseite, je gewählter Ebene) und Gremien (Stern in der Sitzung neben dem Namen und auf
+  der Kommunenseite unter „Gremien“) merken; gespeichert nur im Gerät (`localStorage` `ratsblick:favoriten`; Kommune
+  `{typ:'gebiet', id}`, Gremium Quelle + Körperschaft + Gremiumsname), Anzeige gruppiert mit nächster und letzter Sitzung.
+- App-Dateien lädt der Service Worker zuerst aus dem Netz (Cache nur offline); neue Version kurz nach dem Start → automatisch neu laden.
 - Links ins Original-RIS (seit 02.10.2026): je Quelle `quelle.ris` (Startseite, `risStartseite`), je Sitzung/Vorlage `web`
   (`webSeite` in `src/export/snapshot.ts`: OParl-`web`, sonst Seitenadresse der Scraper; more!rubin-Sitzungen `/meeting?id=`
   ohne `ni_`; ALLRIS 4 mit `&refresh=false`; ohne verlässliche Einzelseite → null, die App verlinkt dann die Startseite).
