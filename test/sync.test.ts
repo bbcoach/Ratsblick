@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { openDb } from '../src/db/index.js';
 import { OParlClient } from '../src/oparl/client.js';
 import { probeSource } from '../src/sync/probe.js';
-import { syncSource, type SourceRecord } from '../src/sync/sync.js';
+import { gespeicherteAdresse, leereQuelle, syncSource, type SourceRecord } from '../src/sync/sync.js';
 import * as fx from './fixtures.js';
 
 const H = fx.HOST;
@@ -123,5 +123,16 @@ describe('probeSource', () => {
     const { fetchImpl } = fx.fakeServer({ [`${H}/system`]: fx.system, [`${H}/Body`]: () => ({ status: 500, body: {} }) });
     const r = await probeSource(newClient(fetchImpl), source);
     expect(r.status).toBe('teilweise');
+  });
+
+  it('entfernt beim Umstellen einer Quelle alle bisherigen Daten', async () => {
+    const db = openDb(':memory:');
+    const { fetchImpl } = fx.fakeServer(routes());
+    await syncSource(db, newClient(fetchImpl), source);
+    expect(gespeicherteAdresse(db, 'vg-test')).toBe(`${H}/system`);
+    expect(leereQuelle(db, 'vg-test')).toBe(2);
+    for (const t of ['body', 'meeting', 'paper', 'organization', 'agenda_item', 'consultation', 'file']) {
+      expect((db.prepare(`SELECT COUNT(*) AS n FROM ${t}`).get() as { n: number }).n).toBe(0);
+    }
   });
 });

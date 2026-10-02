@@ -47,6 +47,9 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
 - Beratungen verweisen auf Sitzungs-IDs ohne Präfix `ni_` (passt nicht); Verknüpfung über `agendaItem` nutzen.
 - Ein System kann mehrere Verbandsgemeinden enthalten (Emmelshausen: VG Emmelshausen und Hunsrück-Mittelrhein
   nach Fusion 2020) – maßgeblich ist die mit den jüngsten Sitzungen.
+- **OParl kann Körperschaften auslassen**: Emmelshausen liefert per OParl nur 6 von 40 Körperschaften (ohne die Ortsgemeinden),
+  die interne Schnittstelle alle → seit 02.10.2026 `rubin-api`. Wird eine Quelle umgestellt (Adresse ändert sich), entfernt
+  `sync` vorher ihre alten Daten (`leereQuelle`), damit nichts doppelt erscheint.
 - Quellenliste: `data/endpoints.json` (aus dem RIS-Verzeichnis RLP).
 
 ## Kreisfreie Städte und Landkreise (Erhebung 01.10.2026)

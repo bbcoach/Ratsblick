@@ -49,6 +49,32 @@ const b = (v: boolean | undefined) => (v ? 1 : 0);
 const n = <T>(v: T | undefined): T | null => (v === undefined ? null : v);
 const j = (v: unknown) => JSON.stringify(v);
 
+/**
+ * Entfernt alle gespeicherten Daten einer Quelle (Körperschaften samt Sitzungen, Vorlagen, Dateien).
+ * Nötig, wenn eine Quelle auf einen anderen Zugang umgestellt wird (andere IDs), damit nichts doppelt erscheint.
+ */
+export function leereQuelle(db: DatabaseSync, sourceId: string): number {
+  const bodies = (db.prepare('SELECT id FROM body WHERE source_id = ?').all(sourceId) as Array<{ id: string }>).map((b) => b.id);
+  if (!bodies.length) return 0;
+  const imBody = `IN (SELECT id FROM body WHERE source_id = ?)`;
+  tx(db, () => {
+    db.prepare(`DELETE FROM file_link WHERE (owner_type = 'meeting' AND owner_id IN (SELECT id FROM meeting WHERE body_id ${imBody}))
+      OR (owner_type = 'paper' AND owner_id IN (SELECT id FROM paper WHERE body_id ${imBody}))`).run(sourceId, sourceId);
+    db.prepare(`DELETE FROM agenda_item WHERE meeting_id IN (SELECT id FROM meeting WHERE body_id ${imBody})`).run(sourceId);
+    db.prepare(`DELETE FROM meeting_organization WHERE meeting_id IN (SELECT id FROM meeting WHERE body_id ${imBody})`).run(sourceId);
+    db.prepare(`DELETE FROM consultation WHERE paper_id IN (SELECT id FROM paper WHERE body_id ${imBody})`).run(sourceId);
+    for (const t of ['meeting', 'paper', 'file', 'organization']) db.prepare(`DELETE FROM ${t} WHERE body_id ${imBody}`).run(sourceId);
+    db.prepare(`DELETE FROM sync_state WHERE body_id ${imBody}`).run(sourceId);
+    db.prepare('DELETE FROM body WHERE source_id = ?').run(sourceId);
+  });
+  return bodies.length;
+}
+
+/** Gespeicherte Adresse einer Quelle (null, wenn noch nie abgeglichen). */
+export function gespeicherteAdresse(db: DatabaseSync, sourceId: string): string | null {
+  return (db.prepare('SELECT system_url FROM source WHERE id = ?').get(sourceId) as { system_url: string } | undefined)?.system_url ?? null;
+}
+
 export function upsertSource(db: DatabaseSync, s: SourceRecord): void {
   db.prepare(
     `INSERT INTO source (id, name, ebene, landkreis, system_url, status)

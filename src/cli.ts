@@ -13,7 +13,7 @@ import { syncIcs } from './scrape/ics.js';
 import { syncRegisafe } from './scrape/regisafe.js';
 import { syncRubinApi } from './scrape/rubin.js';
 import { syncSessionNet } from './scrape/sessionnet.js';
-import { syncSource, type SourceRecord } from './sync/sync.js';
+import { gespeicherteAdresse, leereQuelle, syncSource, type SourceRecord } from './sync/sync.js';
 
 const USAGE = `Ratsblick – Datenebene
 
@@ -157,6 +157,9 @@ async function main(): Promise<void> {
     const log = (msg: string) => console.log(`[${s.id}] ${msg}`);
     log(`▶ ${s.name}`);
     const t0 = Date.now();
+    // Quelle auf einen anderen Zugang umgestellt (neue Adresse, andere IDs): alte Daten entfernen
+    const vorher = gespeicherteAdresse(db, s.id);
+    if (vorher && vorher !== s.url) log(`  Adresse geändert (${vorher} → ${s.url}): ${leereQuelle(db, s.id)} Körperschaften entfernt`);
     try {
       const st =
         s.typ === 'sessionnet'
