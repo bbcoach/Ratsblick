@@ -16,7 +16,8 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
 - Hosts mit robots.txt-Verbot (z. B. `*.sitzung-online.de`) nicht automatisiert abrufen, bevor das geklärt ist.
   Ausnahme auf ausdrückliche Entscheidung des Projektinhabers (01.10.2026): Kreis Kaiserslautern auf
   `sessionnet.owl-it.de` – nur dieser Pfad, 2 s Abstand (`intervallMs`), Grund im Feld `hinweis` der Quelle.
-  Bei Einwänden des Betreibers sofort abschalten. Andere owl-it-Kunden bleiben gesperrt.
+  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`). Bei Einwänden des Betreibers sofort abschalten.
+  Andere owl-it-Kunden bleiben gesperrt.
 - Technik: TypeScript, Node ≥ 22.13, eingebautes `node:sqlite`, `tsx`, `vitest`. Keine schweren Abhängigkeiten
   ohne Grund.
 
