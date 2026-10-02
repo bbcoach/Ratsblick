@@ -68,7 +68,8 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Kreis Ahrweiler, Trier-Saarburg, Kusel (PHP). Alle außer Kaiserslautern auch aus den USA erreichbar.
 - robots.txt „Disallow: /“: alle `*.sitzung-online.de` (ALLRIS: Kreis Bad Kreuznach, Germersheim; Bitburg-Prüm),
   `sessionnet.owl-it.de` (Westerwaldkreis, Neuwied, Südliche Weinstraße; erlaubt nur `/stadt-weingarten/bi/`; Kreis Kaiserslautern läuft trotzdem, s. o.), Vulkaneifel (SD.NET RIM), Trier (ALLRIS 4).
-- Bot-Schutz (MyraCloud): Ludwigshafen. Pirmasens: OParl-Adresse antwortet 403.
+- Bot-Schutz (MyraCloud): Ludwigshafen. Pirmasens: OParl-Adresse antwortet 403; seit 02.10.2026 SessionNet ASP auf
+  `rip.stadt-pirmasens.de/bi/` (Link vom Projektinhaber, keine robots.txt, außerhalb Europas 403 → Weiterleiter).
 - Nachträglich angebunden (SessionNet, keine robots.txt): Speyer (`buergerinfo2.speyer.de`, PHP; Vorlagenlinks mit
   `&smcspf=4`), Frankenthal (`ris.frankenthal.de/bi/`, ASP), Kreis Bad Dürkheim (`www.buergerinfo-kreis-duew.de`, PHP,
   unvollständige Zertifikatskette → über den Weiterleiter).
