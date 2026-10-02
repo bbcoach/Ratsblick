@@ -108,6 +108,9 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   je Gremium Auswahllisten „Sitzungseinladungen“ und „Unterrichtungen“ (Datum → `pollink_…` → 302 auf PDF). Sitzungen ohne Uhrzeit
   (00:00, App zeigt „Uhrzeit laut Einladung“) und ohne TOPs; Ortsgemeinden über `…/ortsgemeinden/<ort>/politik.html` (`mandanten`).
   Letzte Einträge Juni 2026.
+- VG Zweibrücken-Land (Link vom Projektinhaber, 02.10.2026, Seite mit Kurzberichten verlinkt das RIS): regisafe `vgzwland.ris-portal.de/`
+  (wie Kirchheimbolanden unter `/`), robots.txt nur für Suchmaschinen, außerhalb Europas 403 → Weiterleiter. VG, Stadt Hornbach und
+  14 Ortsgemeinden; Rosenkopf hat im Portal keine Gremien.
 - Unklar: Birkenfeld (kein RIS-Link gefunden). Mainz-Bingen: `www.landkreis-mainz-bingen.sitzung-online.de/bi/` (seit 02.10.2026).
 - Trier (ALLRIS 4, `typ: "allris"`, `src/scrape/allris.ts`, seit 02.10.2026): Kalender `si010?MM=&YY=` lädt die
   Tabelle per Wicket-Ajax (`si010?0-1.0-&MM=…`) mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch,

@@ -16,4 +16,5 @@ export const ERLAUBT = [
   'hauenstein.ris-portal.de', // VG, Freigabe Projektinhaber 02.10.2026
   'rip.stadt-pirmasens.de', // Stadt Pirmasens, Link vom Projektinhaber 02.10.2026 (außerhalb Europas 403)
   'sitzungsdienst.neuwied.de', // Stadt Neuwied, Link vom Projektinhaber 02.10.2026 (außerhalb Europas Verbindungsabbruch)
+  'vgzwland.ris-portal.de', // VG Zweibrücken-Land, Link vom Projektinhaber 02.10.2026 (außerhalb Europas 403)
 ];
