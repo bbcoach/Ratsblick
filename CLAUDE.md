@@ -83,6 +83,8 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   dem Gremiumsnamen („Gemeinderat X“, „… Stadt X“, „… VG …“ → VG). Ohne Tagesordnungen.
 - VG Wallmerod: SD.NET RIM wie Ramstein-Miesenbach (`wallmerod.ratsinfomanagement.net/termine/ics/vg`, Gremien „Ortsgemeinderat X“).
   `birkenfeld.ratsinfomanagement.net` zeigt nur „Gemeinderat“ ohne Ort – Zuordnung unklar, nicht angebunden.
+- VG Altenkirchen-Flammersfeld (seit 02.10.2026, Link vom Projektinhaber): SD.NET RIM `vg-altenkirchen.ratsinfomanagement.net`,
+  ebenfalls hinter rescaled WAF → `typ: "ics"` mit Mandanten (`/termine/ics/vg`, 730 Termine, VG + Stadt + 66 Ortsgemeinden).
 - Zweibrücken läuft auf `sessionnet.owl-it.de` (robots.txt), seit 02.10.2026 trotzdem angebunden (Link vom Projektinhaber, 2 s Abstand); Cochem-Zell ebenfalls, seit 02.10.2026 trotzdem angebunden (s. o.). Südwestpfalz und Rhein-Pfalz-Kreis:
   more!rubin ohne OParl, laufen seit 02.10.2026 über `rubin-api`. Worms: `worms.gremien.info` ohne OParl, seit 02.10.2026 über
   `rubin-api` (Link vom Projektinhaber; Quelle `stadt-worms`, Körperschaften Stadt Worms und städtische Gesellschaften).
