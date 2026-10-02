@@ -28,6 +28,15 @@ export function tokens(name: string): string[] {
  * 2 = gleich, 1 = Kurzform passt (erstes Wort gleich, weitere Wörter sind Anfänge der amtlichen),
  * 0 = passt nicht. Das erste Wort muss gleich sein, sonst passt „Herxheim“ auch auf „Herxheimweyher“.
  */
+/** Kürzel als Wortanfang („Prüm“, „W“ ↔ „Wald“) oder aus Buchstaben des Worts in Reihenfolge („Hw“ ↔ „Hochwald“). */
+function kuerzelVon(k: string, wort: string): boolean {
+  if (wort.startsWith(k)) return true;
+  if (k[0] !== wort[0] || k.length > 3) return false;
+  let i = 0;
+  for (const c of wort) if (c === k[i]) i++;
+  return i === k.length;
+}
+
 export function vergleiche(oparl: string, amtlich: string): number {
   let a = tokens(oparl);
   const b = tokens(amtlich);
@@ -41,7 +50,7 @@ export function vergleiche(oparl: string, amtlich: string): number {
   // („Niederhausen/Appel“ ↔ „Niederhausen an der Appel“, „Auw b. Prüm“ ↔ „Auw bei Prüm“)
   let j = 1;
   for (const t of a.slice(1)) {
-    while (j < b.length && !b[j]!.startsWith(t)) j++;
+    while (j < b.length && !kuerzelVon(t, b[j]!)) j++;
     if (j >= b.length) return 0;
     j++;
   }

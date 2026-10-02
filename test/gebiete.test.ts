@@ -20,6 +20,8 @@ describe('Zuordnung zu Gebietskörperschaften', () => {
     expect(vergleiche('Ortsgemeinde Herchweiler i.O.', 'Herchweiler')).toBe(1);
     expect(vergleiche('Ortsgemeinde Haschbach a.R.', 'Haschbach am Remigiusberg')).toBe(1);
     expect(vergleiche('Ortsgemeinde Herchweiler Nord', 'Herchweiler')).toBe(0);
+    expect(vergleiche('Ortsgemeinde Beuren/Hw.', 'Beuren (Hochwald)')).toBe(1);
+    expect(vergleiche('Ortsgemeinde Beuren/Hw.', 'Beuren (Eifel)')).toBe(0);
   });
 
   it('vergleicht Namen tolerant', () => {
