@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { openDb } from './db/index.js';
 import { relayConfigAusUmgebung, relayFetch } from './net/relay.js';
-import { OParlClient } from './oparl/client.js';
+import { OParlClient, serverKey } from './oparl/client.js';
 import { writeSnapshot } from './export/snapshot.js';
 import { buildWeb } from './export/web.js';
 import { kandidaten, pruefe, type Gebiete } from './sync/discover.js';
@@ -30,6 +30,8 @@ Optionen:
   --full             Stand ignorieren, alles neu laden
   --max-pages <n>    höchstens n Seiten je Liste (zum Ausprobieren)
   --interval <ms>    Mindestabstand je Server (Standard: 1000)
+  --budget-min <n>   sync: nach n Minuten keine weitere Quelle mehr beginnen (Rest im nächsten Lauf;
+                     zuerst die am längsten nicht abgeglichenen)
   --out <pfad>       Zieldatei für snapshot bzw. Zielordner für web
 `;
 
@@ -49,6 +51,7 @@ async function main(): Promise<void> {
       full: { type: 'boolean', default: false },
       'max-pages': { type: 'string' },
       interval: { type: 'string', default: '1000' },
+      'budget-min': { type: 'string' },
       out: { type: 'string' },
       help: { type: 'boolean', short: 'h', default: false },
     },
@@ -121,36 +124,61 @@ async function main(): Promise<void> {
 
   const targets = values.id?.length ? sources : sources.filter((s) => s.status === 'aktiv');
   for (const s of targets) if (s.intervallMs) client.setzeIntervall(s.url, s.intervallMs);
-  // Quellen liegen auf verschiedenen Servern; die Drosselung gilt je Server, daher parallel abgleichen.
+  // Am längsten nicht abgeglichene Quellen zuerst
+  const stand = new Map(
+    (db.prepare('SELECT id, last_sync_at FROM source').all() as Array<{ id: string; last_sync_at: string | null }>).map((r) => [
+      r.id,
+      r.last_sync_at ?? '',
+    ]),
+  );
+  targets.sort((a, b) => (stand.get(a.id) ?? '').localeCompare(stand.get(b.id) ?? ''));
+  const start = Date.now();
+  const budgetMs = values['budget-min'] ? Number(values['budget-min']) * 60_000 : Infinity;
+  const verschoben: string[] = [];
+  // Quellen liegen auf verschiedenen Servern; die Drosselung gilt je Server. Daher je Server nacheinander,
+  // die Server untereinander parallel.
+  const gruppen = new Map<string, SourceRecord[]>();
+  for (const s of targets) gruppen.set(serverKey(s.url), [...(gruppen.get(serverKey(s.url)) ?? []), s]);
   await Promise.all(
-    targets.map(async (s) => {
-      const log = (msg: string) => console.log(`[${s.id}] ${msg}`);
-      log(`▶ ${s.name}`);
-      const t0 = Date.now();
-      try {
-        const st =
-          s.typ === 'sessionnet'
-            ? await syncSessionNet(db, client, s, { log, alles: values.full })
-            : s.typ === 'rubin-api'
-              ? await syncRubinApi(db, client, s, { log, alles: values.full })
-              : s.typ === 'allris'
-                ? await syncAllris(db, client, s, { log, alles: values.full })
-                : s.typ === 'regisafe'
-                  ? await syncRegisafe(db, client, s, { log, alles: values.full })
-                  : s.typ === 'ics'
-                    ? await syncIcs(db, client, s, { log })
-                    : await syncSource(db, client, s, { full: values.full, log });
-        log(
-          `✓ ${st.bodies} Körperschaften, ${st.organizations} Gremien, ${st.meetings} Sitzungen, ` +
-            `${st.agendaItems} TOPs, ${st.papers} Vorlagen, ${st.consultations} Beratungen, ${st.files} Dateien ` +
-            `in ${Math.round((Date.now() - t0) / 1000)} s`,
-        );
-      } catch (err) {
-        log(`✗ ${(err as Error).message}`);
-        process.exitCode = 1;
+    [...gruppen.values()].map(async (gruppe) => {
+      for (const s of gruppe) {
+        if (Date.now() - start > budgetMs) {
+          verschoben.push(s.id);
+          continue;
+        }
+        await syncEine(s);
       }
     }),
   );
+  if (verschoben.length) console.log(`Zeitbudget erreicht – im nächsten Lauf: ${verschoben.join(', ')}`);
+
+  async function syncEine(s: SourceRecord): Promise<void> {
+    const log = (msg: string) => console.log(`[${s.id}] ${msg}`);
+    log(`▶ ${s.name}`);
+    const t0 = Date.now();
+    try {
+      const st =
+        s.typ === 'sessionnet'
+          ? await syncSessionNet(db, client, s, { log, alles: values.full })
+          : s.typ === 'rubin-api'
+            ? await syncRubinApi(db, client, s, { log, alles: values.full })
+            : s.typ === 'allris'
+              ? await syncAllris(db, client, s, { log, alles: values.full })
+              : s.typ === 'regisafe'
+                ? await syncRegisafe(db, client, s, { log, alles: values.full })
+                : s.typ === 'ics'
+                  ? await syncIcs(db, client, s, { log })
+                  : await syncSource(db, client, s, { full: values.full, log });
+      log(
+        `✓ ${st.bodies} Körperschaften, ${st.organizations} Gremien, ${st.meetings} Sitzungen, ` +
+          `${st.agendaItems} TOPs, ${st.papers} Vorlagen, ${st.consultations} Beratungen, ${st.files} Dateien ` +
+          `in ${Math.round((Date.now() - t0) / 1000)} s`,
+      );
+    } catch (err) {
+      log(`✗ ${(err as Error).message}`);
+      process.exitCode = 1;
+    }
+  }
 }
 
 main().catch((err) => {

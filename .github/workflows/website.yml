@@ -58,6 +58,9 @@ jobs:
           (github.event_name == 'workflow_dispatch' && inputs.abgleich) ||
           steps.db.outputs.cache-matched-key == ''
         continue-on-error: true
+        # Eigene Zeitgrenze, damit Sichern und Veröffentlichen immer stattfinden; das Budget sorgt dafür,
+        # dass nach 50 min keine neue Quelle mehr beginnt (Rest im nächsten Lauf, älteste zuerst).
+        timeout-minutes: 75
         env:
           # Weiterleiter in Frankfurt für Server, die nur aus Europa erreichbar sind (relay/README.md)
           RATSBLICK_RELAY_URL: ${{ vars.RATSBLICK_RELAY_URL }}
@@ -66,7 +69,12 @@ jobs:
         run: |
           args=()
           for q in $QUELLEN; do args+=(--id "$q"); done
-          npm run sync -- "${args[@]}"
+          npm run sync -- --budget-min 50 "${args[@]}"
+
+      # Nach einem Abbruch können Änderungen noch im Write-Ahead-Log stehen; in die Datenbank übernehmen
+      - name: Datenbank abschließen
+        if: steps.sync.outcome != 'skipped'
+        run: node -e "new (require('node:sqlite').DatabaseSync)('data/ratsblick.sqlite').exec('PRAGMA wal_checkpoint(TRUNCATE)')"
 
       - name: Datenstand sichern
         if: steps.sync.outcome != 'skipped'

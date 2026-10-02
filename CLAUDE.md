@@ -133,6 +133,10 @@ Icons (PNG) werden aus `web/icons/icon.svg` mit dem vorinstallierten Chromium ge
 - „Kurz erklärt“-Texte liegen von Hand gepflegt in `data/kurz-erklaert.json` (Schlüssel: Vorlagen-ID).
 - `.github/workflows/website.yml`: alle 6 h Abgleich + Veröffentlichung auf GitHub Pages; bei Pushes nur neu bauen.
   Die Datenbank wird zwischen Läufen im Actions-Cache gehalten.
+  Abgleich mit Zeitbudget (`--budget-min 50`, Schritt-Zeitgrenze 75 min): je Server nacheinander, älteste zuerst, Rest im
+  nächsten Lauf; danach `wal_checkpoint`, damit auch ein abgebrochener Abgleich gesichert wird.
+  Achtung Concurrency-Gruppe „website“: nur EIN wartender Lauf – jeder neue ersetzt den wartenden. Nicht gleichzeitig
+  pushen und manuell starten; ein Push auf den Standard-Branch baut und veröffentlicht ohnehin.
 
 ## Nächste Schritte
 1. Kontakt im User-Agent ggf. auf eine E-Mail-Adresse umstellen (derzeit Repo-URL).
