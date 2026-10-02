@@ -8,4 +8,5 @@ export const ERLAUBT = [
   'gremieninfo.trier.de', // ALLRIS 4, Ländersperre
   'www.buergerinfo-kreis-duew.de', // SessionNet Kreis Bad Dürkheim, unvollständige Zertifikatskette
   'kirchheimbolanden.ris-portal.de', // regisafe, VG Kirchheimbolanden, außerhalb Europas 403
+  'bernkastel-kues.ris-portal.de', // regisafe, VG Bernkastel-Kues, außerhalb Europas 403
 ];
