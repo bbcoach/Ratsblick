@@ -103,8 +103,7 @@
     const tab = b.dataset.tab;
     if (tab === 'fav') location.hash = link('fav');
     else if (tab === 'themen') location.hash = link('themen');
-    else if (tab === 'wahl' || !kommune) location.hash = '#/';
-    else location.hash = link('g', kommune);
+    else location.hash = '#/';
   }));
 
   function parse() {
@@ -121,10 +120,10 @@
         location.replace(link('g', gebietVonBody.get(r.a) ?? 'b:' + r.a, ...(r.b ? [r.b] : [])));
         return;
       } else if (r.v === 'g' && G.has(r.a)) {
-        kommune = r.a; store.set('kommune', kommune); tab = 'start';
+        kommune = r.a; store.set('kommune', kommune); tab = 'wahl';
         await vGebiet(r.a, r.b);
       } else if (r.v === 's' || r.v === 'v') {
-        tab = 'start';
+        tab = 'wahl';
         const qid = quelleFuerObjekt(r.a);
         if (!qid) throw new Error('Unbekannte Quelle');
         const x = await quelle(qid);
