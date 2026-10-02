@@ -60,7 +60,8 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - Nachträglich angebunden (SessionNet, keine robots.txt): Speyer (`buergerinfo2.speyer.de`, PHP; Vorlagenlinks mit
   `&smcspf=4`), Frankenthal (`ris.frankenthal.de/bi/`, ASP), Kreis Bad Dürkheim (`www.buergerinfo-kreis-duew.de`, PHP,
   unvollständige Zertifikatskette → über den Weiterleiter).
-- VG Kusel-Altenglan (`ratsinfo.vgka.de/bi/`, SessionNet ASP, keine robots.txt; nur VG-Gremien, Stadt Kusel nicht enthalten).
+- VG Kusel-Altenglan (`ratsinfo.vgka.de/bi/`, SessionNet ASP, keine robots.txt; `mandanten`: VG + 16 von 34 Ortsgemeinden,
+  Stadt Kusel nicht enthalten).
 - VG Oberes Glantal: SD.NET RIM auf `vgog.ratsinfomanagement.net` hinter Browser-Prüfung (rescaled WAF), robots.txt sperrt alles
   außer `/termine/ics/`, OParl „nicht aktiviert“. Daher `typ: "ics"` (`src/scrape/ics.ts`): nur Termine der VG-Gremien aus
   dem Kalenderexport (`/termine/ics/glm` – mit Pfadteil alle Termine, ohne nur die nächsten), Link zur Tagesordnung als Dokument.

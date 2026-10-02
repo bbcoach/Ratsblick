@@ -29,10 +29,12 @@ export function tokens(name: string): string[] {
  * 0 = passt nicht. Das erste Wort muss gleich sein, sonst passt „Herxheim“ auch auf „Herxheimweyher“.
  */
 export function vergleiche(oparl: string, amtlich: string): number {
-  const a = tokens(oparl);
+  let a = tokens(oparl);
   const b = tokens(amtlich);
   if (!a.length || !b.length) return 0;
   if (a.join(' ') === b.join(' ')) return 2;
+  // Angehängte Kürzel aus Einzelbuchstaben, die amtlich fehlen („Herchweiler i.O.“ ↔ „Herchweiler“)
+  while (a.length > b.length && a.at(-1)!.length === 1) a = a.slice(0, -1);
   if (a.length > b.length) return 0;
   if (a[0] !== b[0]) return 0;
   // Weitere Wörter der Reihe nach als Anfänge amtlicher Wörter; amtliche Füllwörter dürfen fehlen

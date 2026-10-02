@@ -16,6 +16,12 @@ const g: Gebiete = {
 };
 
 describe('Zuordnung zu Gebietskörperschaften', () => {
+  it('übergeht angehängte Kürzel aus Einzelbuchstaben', () => {
+    expect(vergleiche('Ortsgemeinde Herchweiler i.O.', 'Herchweiler')).toBe(1);
+    expect(vergleiche('Ortsgemeinde Haschbach a.R.', 'Haschbach am Remigiusberg')).toBe(1);
+    expect(vergleiche('Ortsgemeinde Herchweiler Nord', 'Herchweiler')).toBe(0);
+  });
+
   it('vergleicht Namen tolerant', () => {
     expect(vergleiche('Ortsgemeinde Girod', 'Girod')).toBe(2);
     expect(vergleiche('Ortsgemeinde Stahlhofen a.W.', 'Stahlhofen am Wiesensee')).toBe(1);
