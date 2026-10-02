@@ -92,7 +92,8 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   PDF-Links = `documentUrl` ohne `json=1`. Erster Lauf: 38 Körperschaften, 55 Sitzungen, 124 Vorlagen in 63 s.
   Ebenso freigegeben (Nutzer, 01.10.2026): Donnersbergkreis; (02.10.2026): Rhein-Pfalz-Kreis, Südwestpfalz. Weitere more!rubin-Systeme ohne OParl nur nach
   Rücksprache freischalten.
-- Subdomains folgen teils alten VG-Namen (Rockenhausen = VG Nordpfälzer Land) – `discover` findet die nicht.
+- Subdomains folgen teils alten VG-Namen (Rockenhausen = VG Nordpfälzer Land, Lauterecken = VG Lauterecken-Wolfstein mit
+  OParl aktiv) – `discover` findet die nicht. Links stehen meist auf der VG-Website unter „Bürgerinformation“.
 
 ## Scraper und Weiterleiter
 - `typ: "sessionnet"` in `endpoints.json` → `src/scrape/sessionnet.ts` statt OParl. Liest Kalender (`si0040`),
