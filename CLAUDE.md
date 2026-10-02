@@ -16,9 +16,12 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
 - Hosts mit robots.txt-Verbot (z. B. `*.sitzung-online.de`) nicht automatisiert abrufen, bevor das geklärt ist.
   Ausnahme auf ausdrückliche Entscheidung des Projektinhabers (01.10.2026): Kreis Kaiserslautern auf
   `sessionnet.owl-it.de` – nur dieser Pfad, 2 s Abstand (`intervallMs`), Grund im Feld `hinweis` der Quelle.
-  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`), Kreis Cochem-Zell (`/cochem-zell/bi/`), Stadt Bad Dürkheim (`/bad-duerkheim/BI/`), Stadt Trier (`gremieninfo.trier.de`) und VG Kirchheimbolanden
+  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`), Kreis Cochem-Zell (`/cochem-zell/bi/`), Stadt Bad Dürkheim (`/bad-duerkheim/BI/`), Stadt Grünstadt (`/gruenstadt/bi/`), Stadt Trier (`gremieninfo.trier.de`) und VG Kirchheimbolanden
   (`kirchheimbolanden.ris-portal.de`, robots.txt erlaubt nur Suchmaschinen) – Trier und Kirchheimbolanden über den Weiterleiter. Bei Einwänden des Betreibers sofort abschalten.
-  Andere owl-it-Kunden bleiben gesperrt.
+  **Grundsatz (Projektinhaber, 02.10.2026): Links auf Ratsinformationssysteme, die der Projektinhaber schickt, ohne Rückfrage
+  anbinden – auch bei robots.txt-Verbot** (2 s Abstand, Vermerk in `hinweis` und hier). Gilt nicht für technische Sperren
+  (Bot-Schutz/WAF wie MyraCloud oder rescaled): die werden nicht umgangen. Selbst gefundene Systeme mit robots.txt-Verbot
+  weiterhin nur nach Rückfrage; more!rubin-Systeme ohne OParl, deren Link der Projektinhaber schickt, ebenfalls ohne Rückfrage.
 - Technik: TypeScript, Node ≥ 22.13, eingebautes `node:sqlite`, `tsx`, `vitest`. Keine schweren Abhängigkeiten
   ohne Grund.
 
