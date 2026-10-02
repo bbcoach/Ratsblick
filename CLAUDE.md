@@ -130,7 +130,8 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Einladung teils nur in der Kalenderzeile; Links teils mit doppeltem Leerzeichen (`<a  href`).
   Mandanten: Manche Systeme führen mehrere Körperschaften (Filtermenü `smcfiltermenumandant`, Parameter `__cpanr`); mit
   `"mandanten": true` in `endpoints.json` liest der Scraper den Kalender je Mandant und legt je Mandant eine Körperschaft
-  an (VG Landstuhl: VG + 12 Ortsgemeinden/Stadt). Ohne `__cpanr` zeigt der Kalender nur den Standardmandanten (VG).
+  an (VG Landstuhl: VG + 12 Ortsgemeinden/Stadt; VG Kusel-Altenglan; VG Eisenberg auf `vgeisenberg.ris.itebo.de`: VG,
+  Stadt Eisenberg, Kerzenheim, Ramsen). Ohne `__cpanr` zeigt der Kalender nur den Standardmandanten (VG).
   `npm run sync -- --full --id …` lädt bei Scrapern alle Sitzungen im Fenster neu.
 - Kaiserslautern (`ris.kaiserslautern.de`) sperrt Zugriffe außerhalb Europas (GitHub Actions läuft in den USA) und
   schickt sein Zwischenzertifikat nicht mit. Lösung: Weiterleiter `relay/` bei Vercel in Frankfurt
