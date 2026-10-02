@@ -28,6 +28,9 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
   Hagenbach (`www.vg-hagenbach.sitzung-online.de/public/`, ALLRIS 4; der alte Name `www.hagenbach.…` existiert nicht mehr);
   sessionnet.owl-it.de – Birkenfeld, Ulmen, Hermeskeil, Schweich (`/schweich/BI/`), Trier-Land, Bodenheim (je mit Mandanten außer
   Trier-Land), danach per Suche Maifeld, Rhein-Mosel, Ruwer, Freinsheim; ris-portal.de über den Weiterleiter – Rüdesheim und Dahner Felsenland (`/web/ratsinformation/`), Bellheim, Hauenstein (`/`).
+  **Freigabe Landkreise (Projektinhaber, 02.10.2026)**, auch bei robots.txt-Verbot: Altenkirchen (rubin-api), Bad Kreuznach und
+  Germersheim (ALLRIS 4, sitzung-online), Bitburg-Prüm (ALLRIS.net, sitzung-online), Neuwied, Westerwaldkreis, Südliche Weinstraße
+  (SessionNet, owl-it), Vulkaneifel (SD.NET RIM ohne WAF, vorerst nur Kalenderexport `/termine/ics/kv`).
 - Technik: TypeScript, Node ≥ 22.13, eingebautes `node:sqlite`, `tsx`, `vitest`. Keine schweren Abhängigkeiten
   ohne Grund.
 
