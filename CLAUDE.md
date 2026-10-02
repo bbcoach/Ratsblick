@@ -16,7 +16,7 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
 - Hosts mit robots.txt-Verbot (z. B. `*.sitzung-online.de`) nicht automatisiert abrufen, bevor das geklärt ist.
   Ausnahme auf ausdrückliche Entscheidung des Projektinhabers (01.10.2026): Kreis Kaiserslautern auf
   `sessionnet.owl-it.de` – nur dieser Pfad, 2 s Abstand (`intervallMs`), Grund im Feld `hinweis` der Quelle.
-  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`), Kreis Cochem-Zell (`/cochem-zell/bi/`), Stadt Bad Dürkheim (`/bad-duerkheim/BI/`), Stadt Grünstadt (`/gruenstadt/bi/`), Stadt Trier (`gremieninfo.trier.de`) und VG Kirchheimbolanden
+  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`), Kreis Cochem-Zell (`/cochem-zell/bi/`), Stadt Bad Dürkheim (`/bad-duerkheim/BI/`), Stadt Grünstadt (`/gruenstadt/bi/`), Stadt Bingen (`www.bingen.sitzung-online.de/public/`, ALLRIS 4 wie Trier, direkt erreichbar), Stadt Trier (`gremieninfo.trier.de`) und VG Kirchheimbolanden
   (`kirchheimbolanden.ris-portal.de`, robots.txt erlaubt nur Suchmaschinen) – Trier und Kirchheimbolanden über den Weiterleiter. Bei Einwänden des Betreibers sofort abschalten.
   **Grundsatz (Projektinhaber, 02.10.2026): Links auf Ratsinformationssysteme, die der Projektinhaber schickt, ohne Rückfrage
   anbinden – auch bei robots.txt-Verbot** (2 s Abstand, Vermerk in `hinweis` und hier). Gilt nicht für technische Sperren
