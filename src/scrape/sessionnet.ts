@@ -103,7 +103,12 @@ export function parseMandanten(html: string): Mandant[] {
 
 /** Name für die Zuordnung zum Gemeindeverzeichnis („Sickingenstadt Landstuhl“ → „Stadt Landstuhl“). */
 export function mandantName(name: string): string {
-  const n = name.replace(/^\S*stadt\s+/i, 'Stadt ').replace(/^VG\s+/, 'Verbandsgemeinde ').trim();
+  const n = name
+    .replace(/^\S*stadt\s+/i, 'Stadt ')
+    .replace(/^VG\s+/, 'Verbandsgemeinde ')
+    // „Verbandsgemeindeverwaltung Trier-Land“ ist die VG; mit Zusatz („… (PV-Rat)“) ein anderes Gremium, bleibt
+    .replace(/^Verbandsgemeindeverwaltung\s+([^()]+)$/, 'Verbandsgemeinde $1')
+    .trim();
   // Bloße Ortsnamen (Schweich: „Bekond“, „Detzem“) sind Ortsgemeinden; Verbände, Räte u. Ä. bleiben, wie sie sind
   if (!/gemeinde|stadt|verband|zweck|rat\b|anstalt|a[öo]r|forst|kita|kinder|schul|werk|personal|\.\.\./i.test(n) && !/\s/.test(n.replace(/[-/]/g, ''))) {
     return `Ortsgemeinde ${n}`;

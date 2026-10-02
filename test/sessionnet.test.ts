@@ -135,6 +135,8 @@ describe('SessionNet: PHP-Variante (echte Seiten aus Koblenz, SessionNet 5.4.7)'
     expect(m).toContainEqual({ nr: '2', name: 'Ortsgemeinde Kindsbach' });
     expect(m.find((x) => x.nr === '15')?.name).toBe('Werksausschuss Nahwärme VG');
     expect(mandantName('Sickingenstadt Landstuhl')).toBe('Stadt Landstuhl');
+    expect(mandantName('Verbandsgemeindeverwaltung Trier-Land')).toBe('Verbandsgemeinde Trier-Land');
+    expect(mandantName('Verbandsgemeindeverwaltung Trier-Land (PV-Rat)')).toBe('Verbandsgemeindeverwaltung Trier-Land (PV-Rat)');
     expect(mandantName('Ortsgemeinde Bann')).toBe('Ortsgemeinde Bann');
     expect(mandantName('Bekond')).toBe('Ortsgemeinde Bekond');
     expect(mandantName('Stadt Schweich')).toBe('Stadt Schweich');
