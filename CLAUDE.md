@@ -117,7 +117,7 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Vorgänger-VGs Grünstadt-Land und Hettenleidelheim ohne Sitzungen). Weitere more!rubin-Systeme ohne OParl nur nach
   Rücksprache freischalten.
 - Subdomains folgen teils alten VG-Namen (Rockenhausen = VG Nordpfälzer Land, Lauterecken = VG Lauterecken-Wolfstein mit
-  OParl aktiv) – `discover` findet die nicht. Links stehen meist auf der VG-Website unter „Bürgerinformation“.
+  OParl aktiv; `vgloreley` = VG Loreley, OParl aktiv, aber ohne Vorlagen – auch die interne Schnittstelle liefert keine) – `discover` findet die nicht. Links stehen meist auf der VG-Website unter „Bürgerinformation“.
 
 ## Scraper und Weiterleiter
 - `typ: "sessionnet"` in `endpoints.json` → `src/scrape/sessionnet.ts` statt OParl. Liest Kalender (`si0040`),
