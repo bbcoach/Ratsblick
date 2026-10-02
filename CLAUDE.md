@@ -16,8 +16,8 @@ Start mit Rheinland-Pfalz. „Ratsblick“ ist ein Arbeitstitel.
 - Hosts mit robots.txt-Verbot (z. B. `*.sitzung-online.de`) nicht automatisiert abrufen, bevor das geklärt ist.
   Ausnahme auf ausdrückliche Entscheidung des Projektinhabers (01.10.2026): Kreis Kaiserslautern auf
   `sessionnet.owl-it.de` – nur dieser Pfad, 2 s Abstand (`intervallMs`), Grund im Feld `hinweis` der Quelle.
-  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`), Kreis Cochem-Zell (`/cochem-zell/bi/`), Stadt Bad Dürkheim (`/bad-duerkheim/BI/`), Stadt Grünstadt (`/gruenstadt/bi/`), Stadt Bingen (`www.bingen.sitzung-online.de/public/`, ALLRIS 4 wie Trier, direkt erreichbar), VG Winnweiler (`www.vg-winnweiler.sitzung-online.de/bi/`, ALLRIS.net), Stadt Trier (`gremieninfo.trier.de`) und VG Kirchheimbolanden
-  (`kirchheimbolanden.ris-portal.de`, robots.txt erlaubt nur Suchmaschinen) – Trier und Kirchheimbolanden über den Weiterleiter. Bei Einwänden des Betreibers sofort abschalten.
+  Ebenso (02.10.2026): VG Landstuhl (`/vglandstuhl/bi/`), Kreis Cochem-Zell (`/cochem-zell/bi/`), Stadt Bad Dürkheim (`/bad-duerkheim/BI/`), Stadt Grünstadt (`/gruenstadt/bi/`), Stadt Bingen (`www.bingen.sitzung-online.de/public/`, ALLRIS 4 wie Trier, direkt erreichbar), VG Winnweiler (`www.vg-winnweiler.sitzung-online.de/bi/`, ALLRIS.net), Stadt Trier (`gremieninfo.trier.de`) VG Kirchheimbolanden
+  (`kirchheimbolanden.ris-portal.de`, robots.txt erlaubt nur Suchmaschinen) und VG Bernkastel-Kues (`bernkastel-kues.ris-portal.de`, ebenso) – Trier und Kirchheimbolanden über den Weiterleiter. Bei Einwänden des Betreibers sofort abschalten.
   **Grundsatz (Projektinhaber, 02.10.2026): Links auf Ratsinformationssysteme, die der Projektinhaber schickt, ohne Rückfrage
   anbinden – auch bei robots.txt-Verbot** (2 s Abstand, Vermerk in `hinweis` und hier). Gilt nicht für technische Sperren
   (Bot-Schutz/WAF wie MyraCloud oder rescaled): die werden nicht umgangen. Selbst gefundene Systeme mit robots.txt-Verbot
@@ -92,7 +92,10 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Gremien aus der Filterliste von `/sitzungen` (nach Körperschaft gruppiert; Ort = Endung des Gremiumsnamens, „Verbandsgemeinde“
   → VG, ohne Ort → Gruppe davor), Kalender als JSON (`…&_RisSitzung_resource=loadSessions&_RisSitzung_year=&_RisSitzung_month=`,
   Monat ab 0), Sitzung `web/guest/sitzungen?sitzungId=` mit TOPs und Dokumenten (`singleDocument&_RisSitzung_schriftgutId=`, PDF).
-- Vorlagen haben keine eigene Seite: gebildet aus dem Dokument „Sitzungsvorlage (JJJJ/NNNN)“ am TOP. Ein System enthält
+- Portalpfad aus der Quell-URL: Kirchheimbolanden unter `/` (Sitzung `web/guest/sitzungen?sitzungId=`), Bernkastel-Kues unter
+  `/web/ratsinformation/` (Liste, Kalender und Sitzung dort). Bernkastel-Kues: 24 Körperschaften, 87 Sitzungen, 247 Vorlagen.
+- Vorlagen haben keine eigene Seite: gebildet aus dem Dokument „Sitzungsvorlage (JJJJ/NNNN)“ am TOP; in Bernkastel-Kues heißt es
+  nur „Sitzungsvorlage“ (keine Nummer im Portal) → Vorlage je Dokument (`#vorlage-dok-<id>`), ohne Nummer. Ein System enthält
   VG, Stadt und alle Ortsgemeinden (erster Lauf: 17 Körperschaften, 38 Sitzungen, 61 Vorlagen).
 
 ## more!rubin ohne OParl (geprüft an rockenhausen.gremien.info, 01.10.2026)

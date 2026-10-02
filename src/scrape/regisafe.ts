@@ -163,6 +163,10 @@ export async function syncRegisafe(
 ): Promise<SyncStats> {
   const log = opts.log ?? (() => {});
   const base = new URL(source.url).origin + '/';
+  // Portalpfad: Kirchheimbolanden direkt unter /, Bernkastel-Kues unter /web/ratsinformation/
+  const pfad = new URL(source.url).pathname.replace(/^\/+|\/+$/g, '');
+  const portal = pfad ? `${base}${pfad}/` : base;
+  const sitzungsSeite = pfad ? `${portal}sitzungen` : `${base}web/guest/sitzungen`;
   const jetzt = opts.now ?? new Date();
   const stats: SyncStats = { bodies: 0, organizations: 0, meetings: 0, agendaItems: 0, papers: 0, consultations: 0, files: 0 };
 
@@ -170,7 +174,7 @@ export async function syncRegisafe(
   db.prepare('UPDATE source SET vendor = ?, oparl_version = NULL WHERE id = ?').run('regisafe (Scraper)', source.id);
 
   // 1. Gremien und Körperschaften
-  const gremien = parseGremien(await client.getText(`${base}sitzungen`));
+  const gremien = parseGremien(await client.getText(`${portal}sitzungen`));
   const stadtorte = new Set(gremien.filter((g) => g.name.startsWith('Stadtrat ')).map((g) => g.ort));
   const vgName = source.name.replace(/^VG /, 'Verbandsgemeinde ');
   const bodyVon = (ort: string | null) => (ort ? `${base}#koerperschaft-${encodeURIComponent(ort)}` : `${base}#koerperschaft`);
@@ -196,7 +200,7 @@ export async function syncRegisafe(
   for (let i = -von; i <= bis; i++) {
     const d = new Date(Date.UTC(jetzt.getUTCFullYear(), jetzt.getUTCMonth() + i, 1));
     const url =
-      `${base}sitzungen?p_p_id=RisSitzung&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_cacheability=cacheLevelPage` +
+      `${portal}sitzungen?p_p_id=RisSitzung&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_cacheability=cacheLevelPage` +
       `&_RisSitzung_resource=loadSessions&_RisSitzung_year=${d.getUTCFullYear()}&_RisSitzung_month=${d.getUTCMonth()}` +
       `&_RisSitzung_day=1&_RisSitzung_filterGremiumIds=&_RisSitzung_filterTypeOfRisCalendarItems=&_RisSitzung_viewMode=month`;
     try {
@@ -214,7 +218,7 @@ export async function syncRegisafe(
   const vorlagen = new Map<string, { name: string; body: string; haupt: RegisafeDokument; weitere: RegisafeDokument[] }>();
   const vorlageId = (nr: string) => `${base}#vorlage-${nr}`;
   for (const t of termine.values()) {
-    const meetingId = `${base}web/guest/sitzungen?sitzungId=${t.sitzungId}`;
+    const meetingId = `${sitzungsSeite}?sitzungId=${t.sitzungId}`;
     const [datum, zeit] = t.start.split('T');
     const start = berlinIso(datum!, zeit?.slice(0, 5) || '00:00');
     if (!opts.alles && start < festVor && (vorhanden.get(meetingId) as { n: number }).n > 0) continue;
@@ -236,8 +240,9 @@ export async function syncRegisafe(
     }
     const sitzungsDateien: RegisafeDokument[] = [...s.dokumente];
     const agendaItem = s.tops.map((top, i) => {
-      const sv = top.dokumente.find((d) => vorlagenNummer(d));
-      const nr = sv ? vorlagenNummer(sv)! : null;
+      // Mit Nummer („Sitzungsvorlage (2026/0023)“, Kirchheimbolanden) oder ohne (Bernkastel-Kues): dann zählt das Dokument
+      const sv = top.dokumente.find((d) => vorlagenNummer(d)) ?? top.dokumente.find((d) => /^sitzungsvorlage$/i.test(d.typ));
+      const nr = sv ? (vorlagenNummer(sv) ?? `dok-${sv.id}`) : null;
       if (sv && nr) {
         const alt = vorlagen.get(nr);
         const weitere = top.dokumente.filter((d) => d !== sv);
@@ -289,7 +294,7 @@ export async function syncRegisafe(
     const paper = {
       id: paperId,
       name: v.name,
-      reference: nr,
+      reference: nr.startsWith('dok-') ? undefined : nr,
       date: rows[0]?.start?.slice(0, 10),
       paperType: 'Sitzungsvorlage',
       mainFile: datei(v.haupt),
