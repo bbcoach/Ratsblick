@@ -159,6 +159,44 @@ export function parseVorlage(html: string): AllrisVorlage {
   };
 }
 
+// ---------- Körperschaften aus Gremiumsnamen ----------
+/**
+ * Orte der Räte („Gemeinderat der Ortsgemeinde Aull“, „Ortsgemeinderat Wiltingen“, „Stadtrat der Stadt Diez“, „Stadtrat Konz“).
+ * Wert: true = Stadt.
+ */
+export function orteAusGremien(namen: Iterable<string>): Map<string, boolean> {
+  const orte = new Map<string, boolean>();
+  for (const n of namen) {
+    const m =
+      /^(?:Orts)?[Gg]emeinderat\s+(?:der\s+Ortsgemeinde\s+)?(.+)$/.exec(n.trim()) ?? /^(Stadtrat)\s+(?:der\s+Stadt\s+)?(.+)$/.exec(n.trim());
+    if (!m) continue;
+    const stadt = m[1] === 'Stadtrat';
+    const ort = (stadt ? m[2] : m[1])!.trim();
+    orte.set(ort, stadt || (orte.get(ort) ?? false));
+  }
+  return orte;
+}
+
+/**
+ * Ort, zu dem ein Gremium gehört, oder null für die Verbandsgemeinde. Erkennt den Ort am Ende („Jugend- und Kulturausschuss
+ * Wasserliesch“), nach „der Ortsgemeinde“/„der Stadt“, vor einem Bindestrich („Ortsbeirat Konz-Könen“) und abgekürzt
+ * („Bauausschuss OG Berg“ → „Berg (Pfalz)“). Alles mit „Verbandsgemeinde“ oder „VG“ gehört zur VG.
+ */
+export function ortAusGremium(name: string, orte: Map<string, boolean>): string | null {
+  const n = name.trim();
+  if (/Verbandsgemeinde|\bVG\b/.test(n)) return null;
+  const liste = [...orte.keys()].sort((a, b) => b.length - a.length);
+  const esc = (o: string) => o.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const treffer = liste.find((o) => new RegExp(`(?:^|\\s)${esc(o)}(?=$|[\\s,-])`).test(n));
+  if (treffer) return treffer;
+  const og = /\bOG\s+(\S+)/.exec(n)?.[1];
+  if (og) {
+    const passend = liste.filter((o) => o.split(/\s/)[0] === og);
+    if (passend.length === 1) return passend[0]!;
+  }
+  return null;
+}
+
 // ---------- Abgleich ----------
 export interface AllrisOptionen {
   monateZurueck?: number;
@@ -197,7 +235,7 @@ export async function syncAllris(
   upsertSource(db, source);
   db.prepare('UPDATE source SET vendor = ?, oparl_version = NULL WHERE id = ?').run('ALLRIS 4 (Scraper)', source.id);
   const bodyId = `${base}#koerperschaft`;
-  tx(db, () => upsertBody(db, source.id, { id: bodyId, name: source.name, shortName: source.id } as never));
+  tx(db, () => upsertBody(db, source.id, { id: bodyId, name: source.name.replace(/^VG /, 'Verbandsgemeinde '), shortName: source.id } as never));
   stats.bodies = 1;
 
   // 1. Kalender je Monat: Seite (setzt Sitzungs-Cookie), dann Ajax-Abruf der Tabelle
@@ -233,31 +271,54 @@ export async function syncAllris(
   }
   log(`  Kalender: ${eintraege.size} Sitzungen in ${von + bis + 1} Monaten`);
 
-  // 2. Sitzungen
-  const gremien = new Set<string>();
-  const vorlagen = new Set<string>();
+  // 2. Sitzungen laden
   const festVor = new Date(jetzt.getTime() - (opts.festNachTagen ?? 14) * 86_400_000).toISOString();
   const vorhanden = db.prepare('SELECT COUNT(*) AS n FROM agenda_item WHERE meeting_id = ?');
+  const geladen: Array<{ e: AllrisKalenderEintrag; s: AllrisSitzung; meetingId: string; start: string }> = [];
   for (const e of eintraege.values()) {
     const meetingId = `${base}to010?SILFDNR=${e.silfdnr}`;
     const start = berlinIso(e.datum, e.zeit ?? '00:00');
     if (!opts.alles && start < festVor && (vorhanden.get(meetingId) as { n: number }).n > 0) continue;
-    let s: AllrisSitzung;
     try {
-      s = parseSitzung(await client.getText(`${meetingId}&refresh=false`));
+      geladen.push({ e, s: parseSitzung(await client.getText(`${meetingId}&refresh=false`)), meetingId, start });
     } catch (err) {
       log(`    Sitzung ${e.silfdnr}: ${(err as Error).message}`);
-      continue;
     }
+  }
+
+  // 3. Körperschaften: mit `mandanten: true` je Ortsgemeinde/Stadt eine eigene, erkannt an den Gremiumsnamen
+  // (auch denen früherer Läufe), sonst alles bei der Quelle
+  const bekannteGremien = (db.prepare('SELECT o.name FROM organization o JOIN body b ON b.id = o.body_id WHERE b.source_id = ?').all(source.id) as Array<{
+    name: string | null;
+  }>).map((r) => r.name ?? '');
+  const orte = source.mandanten ? orteAusGremien([...bekannteGremien, ...geladen.map((g) => g.s.gremium ?? '')]) : new Map<string, boolean>();
+  const angelegt = new Set<string>([bodyId]);
+  const koerperschaftZu = (gremium: string | null): string => {
+    const ort = gremium && orte.size ? ortAusGremium(gremium, orte) : null;
+    if (!ort) return bodyId;
+    const id = `${base}#koerperschaft-${encodeURIComponent(ort)}`;
+    if (!angelegt.has(id)) {
+      angelegt.add(id);
+      tx(db, () => upsertBody(db, source.id, { id, name: `${orte.get(ort) ? 'Stadt' : 'Ortsgemeinde'} ${ort}`, shortName: ort } as never));
+      stats.bodies++;
+    }
+    return id;
+  };
+
+  // 4. Sitzungen speichern
+  const gremien = new Set<string>();
+  const vorlagen = new Map<string, string>(); // VOLFDNR → Körperschaft der ersten Sitzung
+  for (const { e, s, meetingId, start } of geladen) {
+    const body = koerperschaftZu(s.gremium);
     const orgId = s.grlfdnr ? `${base}gr020?GRLFDNR=${s.grlfdnr}` : null;
     if (orgId && s.gremium && !gremien.has(orgId)) {
       gremien.add(orgId);
-      tx(db, () => upsertOrganization(db, bodyId, { id: orgId, name: s.gremium, organizationType: 'Gremium' } as never));
+      tx(db, () => upsertOrganization(db, body, { id: orgId, name: s.gremium, organizationType: 'Gremium' } as never));
       stats.organizations++;
     }
     const agendaItem = s.tops.map((t, i) => {
       const paperId = t.vorlage ? `${base}vo020?VOLFDNR=${t.vorlage.volfdnr}` : null;
-      if (t.vorlage) vorlagen.add(t.vorlage.volfdnr);
+      if (t.vorlage && !vorlagen.has(t.vorlage.volfdnr)) vorlagen.set(t.vorlage.volfdnr, body);
       return {
         id: `${base}to020?TOLFDNR=${t.tolfdnr}`,
         number: t.nr,
@@ -283,12 +344,12 @@ export async function syncAllris(
       auxiliaryFile: s.dokumente.filter((d) => d !== einladung && d !== protokoll).map((d) => datei(base, d)),
       quelle: 'allris',
     } as unknown as OParlMeeting;
-    tx(db, () => upsertMeeting(db, bodyId, meeting, stats));
+    tx(db, () => upsertMeeting(db, body, meeting, stats));
     stats.meetings++;
   }
   log(`    Sitzungen: ${stats.meetings} gelesen`);
 
-  // 3. Vorlagen (bereits gespeicherte mit Text nicht erneut laden)
+  // 5. Vorlagen (bereits gespeicherte mit Text nicht erneut laden)
   const bekannt = db.prepare('SELECT raw FROM paper WHERE id = ?');
   const auftritte = db.prepare(
     `SELECT a.id AS ai, a.meeting_id AS mid, m.start, mo.organization_id AS org
@@ -296,7 +357,7 @@ export async function syncAllris(
      LEFT JOIN meeting_organization mo ON mo.meeting_id = m.id
      WHERE a.consultation_id LIKE ? ORDER BY m.start`,
   );
-  for (const volfdnr of vorlagen) {
+  for (const [volfdnr, vorlageBody] of vorlagen) {
     const paperId = `${base}vo020?VOLFDNR=${volfdnr}`;
     const alt = bekannt.get(paperId) as { raw: string } | undefined;
     const gespeichert = alt ? (JSON.parse(alt.raw).vorlage as AllrisVorlage | undefined) : undefined;
@@ -331,7 +392,7 @@ export async function syncAllris(
       vorlage: v,
       quelle: 'allris',
     } as unknown as OParlPaper;
-    tx(db, () => upsertPaper(db, bodyId, paper, stats));
+    tx(db, () => upsertPaper(db, vorlageBody, paper, stats));
     stats.papers++;
   }
   db.prepare('UPDATE source SET last_sync_at = ? WHERE id = ?').run(new Date().toISOString(), source.id);

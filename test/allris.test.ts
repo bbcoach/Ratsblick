@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { kalenderAjaxPfad, parseKalender, parseSitzung, parseVorlage } from '../src/scrape/allris.js';
+import { kalenderAjaxPfad, parseKalender, parseSitzung, parseVorlage, orteAusGremien, ortAusGremium } from '../src/scrape/allris.js';
 
 const seite = (f: string) => readFileSync(new URL(`./fixtures/allris/${f}`, import.meta.url), 'utf8');
 
@@ -41,5 +41,41 @@ describe('ALLRIS 4 (Trier)', () => {
     expect(v.text).toMatch(/^Beschlussvorschlag: Die Stadt Trier bekennt sich/);
     expect(v.text).toMatch(/Begründung: /);
     expect(v.text).not.toMatch(/Beratungsfolge/);
+  });
+});
+
+describe('ALLRIS 4: Körperschaft aus dem Gremiumsnamen', () => {
+  const namen = [
+    'Gemeinderat der Ortsgemeinde Aull',
+    'Stadtrat der Stadt Diez',
+    'Haupt- und Finanzausschuss der Stadt Diez',
+    'Bauausschuss der Ortsgemeinde Balduinstein',
+    'Gemeinderat der Ortsgemeinde Balduinstein',
+    'Haupt- und Finanzausschuss der Verbandsgemeinde Diez',
+    'Verbandsgemeinderat Diez',
+    'Ortsgemeinderat Wiltingen',
+    'Kinder-, Jugend- und Familienausschuss Wiltingen',
+    'Stadtrat Konz',
+    'Ortsbeirat Konz-Könen',
+    'Ortsgemeinderat Berg (Pfalz)',
+    'Bauausschuss OG Berg',
+    'Werks- und Bauausschuss VG Hagenbach',
+    'Forstverband Lahn-Aar',
+  ];
+  const orte = orteAusGremien(namen);
+  it('findet die Orte der Räte und erkennt Städte', () => {
+    expect([...orte]).toEqual([
+      ['Aull', false],
+      ['Diez', true],
+      ['Balduinstein', false],
+      ['Wiltingen', false],
+      ['Konz', true],
+      ['Berg (Pfalz)', false],
+    ]);
+  });
+  it('ordnet Ausschüsse ihrem Ort zu, VG-Gremien und Unklares der VG', () => {
+    expect(namen.map((n) => ortAusGremium(n, orte))).toEqual([
+      'Aull', 'Diez', 'Diez', 'Balduinstein', 'Balduinstein', null, null, 'Wiltingen', 'Wiltingen', 'Konz', 'Konz', 'Berg (Pfalz)', 'Berg (Pfalz)', null, null,
+    ]);
   });
 });
