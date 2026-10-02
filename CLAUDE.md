@@ -196,7 +196,10 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
 1. Kontakt im User-Agent ggf. auf eine E-Mail-Adresse umstellen (derzeit Repo-URL).
 2. Volltext aus `mainFile.text` in `file.text_extracted` übernehmen, Suche darüber.
 3. „Kurz erklärt“ automatisch erzeugen (statt von Hand).
-4. Benachrichtigungen fürs Themen-Abo (braucht kleinen Server für Web Push/E-Mail).
+4. Themen-Abo (zurückgestellt, Projektinhaber 02.10.2026): als gespeicherte Suche – Was (Thema oder Stichwort) × Wo (eigene
+   Gemeinde, VG, Nachbar-VGs, Landkreis, ganz RLP, Auswahl) × Welche (Vorlagen, TOPs, Beschlüsse mit Abstimmung); dazu
+   Vergleichsansicht „ein Thema, mehrere Räte“. Stufe 1 ohne Server (Suche über RLP, Abo lokal gespeichert, „neu seit letztem
+   Besuch“), Stufe 2 Benachrichtigungen (braucht kleinen Server für Web Push/E-Mail). Offen: Themenliste, Definition „Nachbar“.
 5. Vorlagentexte für Scraper-Quellen aus den PDFs gewinnen (für Suche und „Kurz erklärt“).
 6. Weitere Systeme: andere Anbieter (ALLRIS, SessionNet, Somacos) mit OParl suchen; bei „nicht freigeschaltet“
    ggf. Verwaltungen ansprechen; robots.txt-Frage bei sitzung-online.de klären.
