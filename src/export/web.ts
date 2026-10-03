@@ -113,7 +113,9 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
     const quelleUrl = urlVon.get(id) ?? snap.quelle.system;
     const ris = quelleUrl ? risStartseite(quelleUrl) : null;
     // Kalenderexport: der Anbieter stellt nur Termine bereit, Tagesordnungen und Vorlagen nur im eigenen RIS
-    const quelle = { ...snap.quelle, ris, ...(typVon.get(id) === 'ics' ? { nurTermine: true } : {}) };
+    const quelle = { ...snap.quelle, ris, ...(typVon.get(id) === 'ics' ? { nurTermine: true } : {}),
+      // Kein Ratsinformationssystem, sondern Seiten der Website (Protokolllisten, Politik-Modul): Links sprechen dann von der Website
+      ...(typVon.get(id) === 'protokolle' || typVon.get(id) === 'edith' ? { ohneRis: true } : {}) };
     writeFileSync(join(outDir, 'data', `${id}.json`), JSON.stringify({ ...snap, quelle, koerperschaften, vorlagen }));
     suche.push(...suchEintraege(qi, gebiet ?? null, gebietVonBody, snap.sitzungen, vorlagen));
 

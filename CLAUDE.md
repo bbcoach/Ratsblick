@@ -118,6 +118,11 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - Stadt Mayen (Link vom Projektinhaber, 03.10.2026): SessionNet 5.5 ASP `sessionnet.owl-it.de/mayen/bi/` (robots.txt „Disallow: /“, trotzdem
   angebunden, 2 s Abstand), ein Mandant. VG Kusel-Altenglan (erneut geschickt): das System führt nur 16 Mandanten, die übrigen 18
   Gemeinden (u. a. Altenglan, Kusel) sind dort nicht vertreten.
+- Stadt Kusel (Link vom Projektinhaber, 03.10.2026): kein RIS, sondern Listen von Sitzungsprotokollen (PDF) auf `stadt.kusel.de`
+  (Stadtrat 2018–2026, dazu Haupt-/Bau-/Finanzausschuss) → `typ: "protokolle"` (`src/scrape/protokolle.ts`, weitere Listenseiten in
+  `seiten`): je Protokoll eine abgeschlossene Sitzung mit dem PDF als Niederschrift, ohne Uhrzeit/TOPs; Fenster 2 Jahre. robots.txt erlaubt
+  Seiten und PDFs. Export `quelle.ohneRis` (auch edith/Thalfang): Links sprechen von „Website“ statt „Ratsinformationssystem“; Sitzungen ohne
+  Uhrzeit zeigen „Uhrzeit siehe Dokument“, vergangene ohne TOPs „keine einzelnen Tagesordnungspunkte“.
 - Unklar: Birkenfeld (kein RIS-Link gefunden). Mainz-Bingen: `www.landkreis-mainz-bingen.sitzung-online.de/bi/` (seit 02.10.2026).
 - Trier (ALLRIS 4, `typ: "allris"`, `src/scrape/allris.ts`, seit 02.10.2026): Kalender `si010?MM=&YY=` lädt die
   Tabelle per Wicket-Ajax (`si010?0-1.0-&MM=…`) mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch,

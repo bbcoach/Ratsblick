@@ -11,6 +11,7 @@ import { syncAllris } from './scrape/allris.js';
 import { syncAllrisNet } from './scrape/allrisnet.js';
 import { syncIcs } from './scrape/ics.js';
 import { syncEdith } from './scrape/edith.js';
+import { syncProtokolle } from './scrape/protokolle.js';
 import { syncRegisafe } from './scrape/regisafe.js';
 import { syncRubinApi } from './scrape/rubin.js';
 import { syncSessionNet } from './scrape/sessionnet.js';
@@ -177,7 +178,9 @@ async function main(): Promise<void> {
                   ? await syncIcs(db, client, s, { log })
                   : s.typ === 'edith'
                     ? await syncEdith(db, client, s, { log })
-                    : await syncSource(db, client, s, { full: values.full, log });
+                    : s.typ === 'protokolle'
+                      ? await syncProtokolle(db, client, s, { log })
+                      : await syncSource(db, client, s, { full: values.full, log });
       log(
         `✓ ${st.bodies} Körperschaften, ${st.organizations} Gremien, ${st.meetings} Sitzungen, ` +
           `${st.agendaItems} TOPs, ${st.papers} Vorlagen, ${st.consultations} Beratungen, ${st.files} Dateien ` +

@@ -27,7 +27,7 @@
   const uhr = (iso) => fmt(iso, { hour: '2-digit', minute: '2-digit' });
   const langDatum = (iso) => fmt(iso, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   // Quellen ohne Uhrzeit (nur Datum, z. B. edith) speichern 00:00 – dann auf die Einladung verweisen
-  const uhrText = (iso) => (uhr(iso) === '00:00' ? 'Uhrzeit laut Einladung' : `${uhr(iso)} Uhr`);
+  const uhrText = (iso) => (uhr(iso) === '00:00' ? 'Uhrzeit siehe Dokument' : `${uhr(iso)} Uhr`);
   const stand = (iso) => (iso ? `${datum(iso)}, ${uhr(iso)} Uhr` : 'unbekannt');
   const kurzName = (name) => String(name || '').replace(/^(Ortsgemeinde|Ortsbezirk|Verbandsgemeinde|Stadt) /, '');
   const gremiumKurz = (g) => String(g || '').replace(/\s+/g, ' ')
@@ -502,7 +502,7 @@
       ${gremien.length ? `<section><details class="gremien"><summary>Gremien (${gremien.length}) – mit dem Stern als Favorit merken</summary>
         <div class="list">${gremien.map((g) => `<div class="row static"><div class="body"><span class="title">${esc(gremiumKurz(g))}</span></div>${sternKnopf({ q: t.q, k: t.b, g, kn: x.k.get(t.b)?.name || '', ort: id })}</div>`).join('')}</div>
       </details></section>` : ''}
-      ${risLink(null, x.D.quelle.ris)}
+      ${risLink(null, x.D.quelle.ris, '', x.D.quelle.ohneRis)}
       <p class="stand">Abgleich mit ${esc(x.D.quelle.name)}: ${esc(stand(x.D.quelle.abgleich))}</p>`;
     sitzverteilung(t);
   }
@@ -619,12 +619,13 @@
   }, true);
 
   /** Link ins Original-Ratsinformationssystem: zur Einzelseite, sonst zur Startseite des RIS. */
-  function risLink(seite, startseite, was) {
+  function risLink(seite, startseite, was, ohneRis) {
     const url = seite || startseite;
     if (!url) return '';
-    const text = seite ? `${was} im Ratsinformationssystem öffnen` : 'Zum Ratsinformationssystem';
+    const system = ohneRis ? 'auf der Website' : 'im Ratsinformationssystem';
+    const text = seite ? `${was} ${system} öffnen` : ohneRis ? 'Zur Website der Kommune' : 'Zum Ratsinformationssystem';
     return `<section class="ris"><a class="btn ghost" href="${esc(url)}" target="_blank" rel="noopener">${esc(text)} ↗</a>
-      <p class="muted small">Dort finden Sie alle veröffentlichten Unterlagen, auch ältere Sitzungen und Vorlagen.</p></section>`;
+      <p class="muted small">${ohneRis ? 'Dort finden Sie die veröffentlichten Protokolle und Unterlagen, auch älterer Sitzungen.' : 'Dort finden Sie alle veröffentlichten Unterlagen, auch ältere Sitzungen und Vorlagen.'}</p></section>`;
   }
 
   function sitzungRow(m) {
@@ -663,9 +664,9 @@
             ${v ? `<button class="linkbtn" type="button" data-go="${esc(link('v', v.id))}">Vorlage <span class="mono">${esc(v.nr)}</span> ansehen${v.kurz ? ' · Kurz erklärt' : ''}</button>` : ''}
             ${t.beschluss ? `<details class="beschluss"><summary>Beschluss</summary><p>${esc(t.beschluss)}</p></details>` : ''}
           </div></div>`;
-        }).join('')}</div>` : x.D.quelle.nurTermine ? nurTermineHinweis(x) : '<div class="card empty">Die Tagesordnung ist noch nicht veröffentlicht.</div>'}
+        }).join('')}</div>` : x.D.quelle.nurTermine ? nurTermineHinweis(x) : m.start < now() ? `<div class="card empty">Zu dieser Sitzung liegen hier keine einzelnen Tagesordnungspunkte vor${docs.length ? ' – siehe Dokumente.' : '.'}</div>` : '<div class="card empty">Die Tagesordnung ist noch nicht veröffentlicht.</div>'}
       </section>
-      ${risLink(m.web, x.D.quelle.ris, 'Sitzung')}`;
+      ${risLink(m.web, x.D.quelle.ris, 'Sitzung', x.D.quelle.ohneRis)}`;
   }
 
   // ---------- Ansicht: Vorlage ----------
