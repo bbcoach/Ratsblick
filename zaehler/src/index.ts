@@ -62,7 +62,7 @@ export default {
     const url = new URL(request.url);
     const erlaubt = env.ERLAUBTE_HERKUNFT ?? STANDARD_HERKUNFT;
 
-    if (url.pathname === '/') return antwort(200, { ok: true, service: 'wahlheimat-zaehler' }, null);
+    if (url.pathname === '/') return antwort(200, { ok: true, service: 'wahlheimat-zaehler', lesetokenZeichen: (env.LESE_TOKEN ?? '').trim().length }, null);
 
     if (url.pathname === '/z') {
       if (request.method === 'OPTIONS') {
