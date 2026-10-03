@@ -392,7 +392,7 @@
     name: 'Ralph Arnold',
     anschrift: 'St. Norbert Straße 1a\n67677 Enkenbach-Alsenborn\nDeutschland',  // Zeilen mit \n trennen
     email: 'info@wahlheimat-rlp.de',
-    paypal: '',  // Link zum PayPal-Spendenbutton (z. B. https://www.paypal.com/donate/?hosted_button_id=… oder https://paypal.me/NAME/5); leer = Button wird nicht angezeigt
+    paypal: 'https://www.paypal.com/paypalme/RalphArnold973',  // PayPal.Me-Link des Betreibers; leer = Unterstützen-Button und PayPal-Absatz im Datenschutz entfallen
   };
   const ang = (v) => (v ? esc(v).replace(/\n/g, '<br>') : '<span class="fehlt">[wird ergänzt]</span>');
   const mail = () => (BETREIBER.email ? `<a href="mailto:${esc(BETREIBER.email)}">${esc(BETREIBER.email)}</a>` : ang(null));
