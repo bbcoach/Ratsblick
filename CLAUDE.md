@@ -127,6 +127,9 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   (VG, Stadt, 14 Ortsgemeinden + Zweckverbände), erster Lauf 82 Sitzungen, 167 Vorlagen.
 - VG Selters (Westerwald) (Link vom Projektinhaber, 03.10.2026): `selters-ww.gremien.info`, more!rubin mit aktivem OParl, 26 Körperschaften
   (alle, OParl = interne Schnittstelle), großes Archiv (2 106 Sitzungen, keine Vorlagen).
+- VG Thaleischweiler-Wallhalben (Link vom Projektinhaber, 03.10.2026): Website `vgtw.de` bettet more!rubin ein (Ergebnisliste nur per JS, ohne
+  sichtbare Adresse) → `vgtw.gremien.info` per Namensraten gefunden; OParl aktiv mit 27 Körperschaften (intern nur 25), 1 910 Sitzungen, 9 412 TOPs.
+  Tipp: bei Websites mit „integration-ris“ zuerst `<kürzel>.gremien.info/oparl/system` probieren.
 - Unklar: Birkenfeld (kein RIS-Link gefunden). Mainz-Bingen: `www.landkreis-mainz-bingen.sitzung-online.de/bi/` (seit 02.10.2026).
 - Trier (ALLRIS 4, `typ: "allris"`, `src/scrape/allris.ts`, seit 02.10.2026): Kalender `si010?MM=&YY=` lädt die
   Tabelle per Wicket-Ajax (`si010?0-1.0-&MM=…`) mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch,
