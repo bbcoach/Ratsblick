@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cleanText, dokumentUrl, entferneZwillinge, istDownload, ohneKopf, sessionnetKalender, webSeite } from '../src/export/snapshot.js';
+import { behalteSitzungsId, cleanText, dokumentUrl, entferneZwillinge, kalenderEintragLink, istDownload, ohneKopf, sessionnetKalender, webSeite } from '../src/export/snapshot.js';
 
 describe('Textauszug', () => {
   it('beginnt beim Sachverhalt statt beim Formularkopf', () => {
@@ -64,5 +64,26 @@ describe('entferneZwillinge', () => {
   it('lässt andere Adressen unverändert', () => {
     const ids = ['https://k.de/si0057.php?__ksinr=1', 'https://k.de/si0057.php?__ksinr=2'];
     expect(entferneZwillinge(ids)).toEqual(ids);
+  });
+});
+
+describe('Kalendereinträge und Zwillings-Verweise', () => {
+  it('verlinkt SessionNet-Kalendereinträge auf den Monat, mit Mandant', () => {
+    expect(kalenderEintragLink('https://sessionnet.owl-it.de/schweich/BI/si0040.asp#19-2026-08-31-haupt-und-finanzausschuss')).toBe(
+      'https://sessionnet.owl-it.de/schweich/BI/si0040.asp?__cjahr=2026&__cmonat=8&__canz=1&__cselect=0&__cpanr=19',
+    );
+    expect(kalenderEintragLink('https://buergerinfo.koblenz.de/si0040.php#2026-10-20-forstausschuss')).toBe(
+      'https://buergerinfo.koblenz.de/si0040.php?__cjahr=2026&__cmonat=10&__canz=1&__cselect=0',
+    );
+  });
+  it('verlinkt SD.NET-RIM-Termine auf die Terminliste', () => {
+    expect(kalenderEintragLink('https://vg-altenkirchen.ratsinfomanagement.net/termine#2024104862')).toBe('https://vg-altenkirchen.ratsinfomanagement.net/termine');
+    expect(kalenderEintragLink('https://x.de/andere#seite')).toBeNull();
+  });
+  it('lenkt Beratungen von der entfernten Zwillingsadresse auf die behaltene um', () => {
+    const da = new Set(['https://x.gremien.info/oparl/meeting/ni_A']);
+    expect(behalteSitzungsId('https://x.gremien.info/oparl/meeting/A', da)).toBe('https://x.gremien.info/oparl/meeting/ni_A');
+    expect(behalteSitzungsId('https://x.gremien.info/oparl/meeting/B', da)).toBe('https://x.gremien.info/oparl/meeting/B');
+    expect(behalteSitzungsId(null, da)).toBeNull();
   });
 });

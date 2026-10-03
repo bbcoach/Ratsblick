@@ -78,6 +78,13 @@ export function entferneZwillinge(ids: string[]): string[] {
   return ids.filter((id) => !mitPraefix.has(id));
 }
 
+/** Verweist eine Beratung auf die entfernte Zwillingsadresse (ohne `ni_`), zeigt sie auf die behaltene (mit `ni_`). */
+export function behalteSitzungsId(id: string | null, vorhanden: Set<string>): string | null {
+  if (!id || vorhanden.has(id)) return id;
+  const mit = id.replace(/(\/meeting\/|[?&]id=)(?!ni_)/, '$1ni_');
+  return vorhanden.has(mit) ? mit : id;
+}
+
 export function dokumentUrl(url: string | null): string | null {
   if (!url) return url;
   try {
@@ -104,6 +111,19 @@ export function sessionnetKalender(web: string, start: string): string | null {
   const t = /^(\d{4})-(\d{2})/.exec(start);
   if (!m || !t) return null;
   return `${m[1]}si0040.${m[2]}?__cjahr=${t[1]}&__cmonat=${Number(t[2])}&__canz=1&__cselect=0`;
+}
+
+/**
+ * Sitzungen ohne Einzelseite, die nur als Kalendereintrag existieren (Id mit `#…`):
+ *  - SessionNet-Kalender (`…/si0040.asp#<Mandant->JJJJ-MM-TT-…`): Kalender des Sitzungsmonats, bei Mandantensystemen mit `__cpanr`;
+ *  - SD.NET RIM (`…/termine#<Nr>`): Terminliste des Systems.
+ * Sonst null (die App verlinkt dann die Startseite).
+ */
+export function kalenderEintragLink(id: string): string | null {
+  const sn = /^(https?:\/\/.*\/)si0040\.(asp|php)#(?:(\d+)-)?(\d{4})-(\d{2})-\d{2}-/.exec(id);
+  if (sn) return `${sn[1]}si0040.${sn[2]}?__cjahr=${sn[4]}&__cmonat=${Number(sn[5])}&__canz=1&__cselect=0${sn[3] ? `&__cpanr=${sn[3]}` : ''}`;
+  const rim = /^(https?:\/\/[^/]+\/termine)#/.exec(id);
+  return rim ? rim[1]! : null;
 }
 
 export function art(name: string): string {
@@ -203,7 +223,9 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
     });
     const dateien = filesOf('meeting', mid);
     const einzelseite = webSeite(mid, JSON.parse(String(m.raw)) as { web?: unknown }, 'sitzung');
-    const kalender = einzelseite && tops.length === 0 && dateien.length === 0 ? sessionnetKalender(einzelseite, String(m.start ?? '')) : null;
+    const kalender = einzelseite
+      ? tops.length === 0 && dateien.length === 0 ? sessionnetKalender(einzelseite, String(m.start ?? '')) : null
+      : kalenderEintragLink(mid);
     return {
       id: mid,
       k: String(m.body_id),
@@ -221,6 +243,7 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
     };
   });
 
+  const sitzungIds = new Set(sitzungen.map((x) => x.id));
   const vorlagen = [...paperIds].map((pid) => {
     const p = db.prepare('SELECT * FROM paper WHERE id = ?').get(pid) as Row;
     const raw = JSON.parse(String(p.raw)) as { mainFile?: { text?: string } };
@@ -235,7 +258,7 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
       gremium: c.organization_id ? (gremien.get(String(c.organization_id)) ?? null) : null,
       rolle: s(c.role),
       entscheidend: c.authoritative === 1,
-      sitzung: s(c.meeting_id),
+      sitzung: behalteSitzungsId(s(c.meeting_id), sitzungIds),
       datum: s(c.start),
     }));
     return {

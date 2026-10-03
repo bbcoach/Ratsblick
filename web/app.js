@@ -255,20 +255,33 @@
 
   // ---------- Ansicht: Startseite (nur Suche) ----------
   const rang = { gemeinde: 0, kreisfrei: 0, vg: 1, kreis: 2, body: 3 };
+  /**
+   * Suchschlüssel in zwei Schreibweisen: [0] Umlaute als ae/oe/ue/ss („Müllheim“ → „muellheim“), [1] ohne Akzente („mullheim“).
+   * „St.“ und „Sankt“ gelten gleich, Bindestriche zählen wie Leerzeichen.
+   */
+  function suchSchluessel(roh) {
+    const grund = String(roh).toLowerCase().replace(/[-–]/g, ' ').replace(/\bst\.?(?=\s|$)/g, 'sankt').replace(/\s+/g, ' ').trim();
+    const ae = grund.replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+    const ohne = grund.replace(/ß/g, 'ss').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return [ae.normalize('NFD').replace(/[\u0300-\u036f]/g, ''), ohne];
+  }
   function suche(text) {
     const t = text.trim().toLowerCase();
     if (!t) return [];
     const plz = /^\d+$/.test(t);
+    const tk = suchSchluessel(t);
     const hits = [];
     for (const g of G.values()) {
       if (g.typ === 'kreisfrei') continue; // die Stadt selbst steht bei den Gemeinden
       let score = -1;
       if (plz) { if (g.typ === 'gemeinde' && (g.plz || '').startsWith(t)) score = 10; }
       else {
-        const name = g.name.toLowerCase(), kurz = kurzName(kreisKurz(g.name)).toLowerCase();
-        if (kurz === t) score = 40;
-        else if (kurz.startsWith(t)) score = 30;
-        else if (name.includes(t)) score = 20;
+        const nk = g._sk || (g._sk = { name: suchSchluessel(g.name), kurz: suchSchluessel(kurzName(kreisKurz(g.name))) });
+        // beide Schreibweisen prüfen: „Müllheim“ wird mit „Muellheim“ und mit „Mullheim“ gefunden
+        const treffer = (f) => tk.some((q, i) => f(nk.kurz[i], q));
+        if (treffer((k, q) => k === q)) score = 40;
+        else if (treffer((k, q) => k.startsWith(q))) score = 30;
+        else if (tk.some((q, i) => nk.name[i].includes(q))) score = 20;
       }
       if (score < 0) continue;
       hits.push({ g, score: score - rang[g.typ] * 2 + (hatDaten(g) ? 1 : 0) + Math.min((g.ew || 0) / 1e6, 0.5) });
@@ -524,13 +537,25 @@
     const vergangen = sitz.filter((m) => m.start < jetzt).reverse().slice(0, 6);
     const vorl = (x.vByK.get(t.b) || []).slice(0, 10);
     const gremien = gremienVon(sitz);
+    // VG-Ebene: auch die Sitzungen der Ortsgemeinden und der Stadt aus demselben System (das RIS zählt sie zur VG)
+    const andere = sel.key === 'vg' ? x.D.sitzungen.filter((m) => m.start >= jetzt && m.k !== t.b).sort((a, b) => a.start.localeCompare(b.start)) : [];
+    const knName = (m) => kurzName(x.k.get(m.k)?.name || '');
+    // Gemeinde/Stadt ohne eigene Termine, VG mit Terminen: darauf hinweisen
+    const vgEbene = eb.find((e) => e.key === 'vg' && !e.off && e.g.q === t.q);
+    const vgHinweis = !kommend.length && vgEbene && sel.key !== 'vg' && sel.key !== 'kreis'
+      ? x.D.sitzungen.filter((m) => m.start >= jetzt && m.k !== t.b).length : 0;
     $view.innerHTML = `${seg}${kopf}${SITZE_PLATZ}${nurTermineHinweis(x)}
       <section class="spalte"><h2>Nächste Sitzungen</h2>
-        ${kommend.length ? `<div class="list">${kommend.map(sitzungRow).join('')}</div>` : `<div class="card empty">Zurzeit sind keine künftigen Sitzungen eingetragen.${vergangen.length ? ` Die letzte war am ${fmt(vergangen[0].start, { day: 'numeric', month: 'long', year: 'numeric' })}.` : ''} Neue Termine erscheinen hier, sobald die Verwaltung sie im ${x.D.quelle.ohneRis ? 'Internetauftritt' : 'Ratsinformationssystem'} veröffentlicht.</div>`}
+        ${kommend.length ? `<div class="list">${kommend.map(sitzungRow).join('')}</div>` : `<div class="card empty">Zurzeit sind keine künftigen Sitzungen eingetragen.${vergangen.length ? ` Die letzte war am ${fmt(vergangen[0].start, { day: 'numeric', month: 'long', year: 'numeric' })}.` : ''} Neue Termine erscheinen hier, sobald die Verwaltung sie im ${x.D.quelle.ohneRis ? 'Internetauftritt' : 'Ratsinformationssystem'} veröffentlicht.${vgHinweis ? `<br><br>In der Verbandsgemeinde gibt es ${vgHinweis} künftige Sitzung${vgHinweis > 1 ? 'en' : ''} anderer Gemeinden. <button class="linkbtn" type="button" data-go="${esc(link('g', id, 'vg'))}">Zur Verbandsgemeinde</button>` : ''}</div>`}
       </section>
       ${x.D.quelle.nurTermine ? '' : `<section class="spalte"><h2>Neue Vorlagen</h2>
         ${vorl.length ? `<div class="list">${vorl.map(vorlageRow).join('')}</div>` : '<div class="card empty">Keine aktuellen Vorlagen.</div>'}
       </section>`}
+      ${andere.length ? `<section><h2>In den Gemeinden der Verbandsgemeinde</h2>
+        <p class="muted small">Sitzungen der Ortsgemeinden und der Stadt, die im selben Ratsinformationssystem geführt werden.</p>
+        <div class="list">${andere.slice(0, 8).map((m) => sitzungRow(m, knName(m))).join('')}</div>
+        ${andere.length > 8 ? `<details class="gremien"><summary>${andere.length - 8} weitere zeigen</summary><div class="list">${andere.slice(8, 80).map((m) => sitzungRow(m, knName(m))).join('')}</div></details>` : ''}
+      </section>` : ''}
       ${vergangen.length ? `<section><h2>Zuletzt getagt</h2><div class="list">${vergangen.map(sitzungRow).join('')}</div></section>` : ''}
       ${gremien.length ? `<section><details class="gremien"><summary>Gremien (${gremien.length}) – mit dem Stern als Favorit merken</summary>
         <div class="list">${gremien.map((g) => `<div class="row static"><div class="body"><span class="title">${esc(gremiumKurz(g))}</span></div>${sternKnopf({ q: t.q, k: t.b, g, kn: x.k.get(t.b)?.name || '', ort: id })}</div>`).join('')}</div>
@@ -665,9 +690,9 @@
       <p class="muted small">${ohneRis ? 'Dort finden Sie die veröffentlichten Protokolle und Unterlagen, auch älterer Sitzungen.' : 'Dort finden Sie alle veröffentlichten Unterlagen, auch ältere Sitzungen und Vorlagen.'}</p></section>`;
   }
 
-  function sitzungRow(m) {
+  function sitzungRow(m, kn) {
     const n = m.tops.length;
-    return `<button class="row" type="button" data-go="${esc(link('s', m.id))}">${dateBox(m.start)}<div class="body"><span class="title">${esc(gremiumKurz(m.gremien[0] || m.name || 'Sitzung'))}</span><span class="meta">${esc(uhrText(m.start))}${m.ort ? ' · ' + esc(ortKurz(m.ort)) : ''}</span><span class="meta">${statusPill(m)}${n ? `<span>${n} TOP${n > 1 ? 's' : ''}</span>` : ''}</span></div>${chev}</button>`;
+    return `<button class="row" type="button" data-go="${esc(link('s', m.id))}">${dateBox(m.start)}<div class="body"><span class="title">${esc(gremiumKurz(m.gremien[0] || m.name || 'Sitzung'))}</span><span class="meta">${kn ? esc(kn) + ' · ' : ''}${esc(uhrText(m.start))}${m.ort ? ' · ' + esc(ortKurz(m.ort)) : ''}</span><span class="meta">${statusPill(m)}${n ? `<span>${n} TOP${n > 1 ? 's' : ''}</span>` : ''}</span></div>${chev}</button>`;
   }
   function vorlageRow(v) {
     return `<button class="row" type="button" data-go="${esc(link('v', v.id))}"><div class="body"><span class="meta"><span class="mono">${esc(v.nr)}</span><span>${esc(datum(v.datum))}</span>${v.kurz ? '<span class="pill">Kurz erklärt</span>' : ''}</span><span class="title">${esc(v.name)}</span><span class="meta">${esc(v.art || '')}</span></div>${chev}</button>`;
@@ -717,6 +742,8 @@
     setTitle(kurzName(x.k.get(v.k)?.name));
     const docs = v.dateien.filter((f) => f.url);
     const steps = v.beratung.filter((b) => b.gremium || b.datum);
+    // Ohne eigene Vorlagenseite (more!rubin u. a.): die Seite der Sitzung verlinken, auf deren Tagesordnung die Vorlage steht
+    const ersatz = v.web ? null : steps.map((b) => b.sitzung && x.s.get(b.sitzung)).find((m) => m && m.web && !m.webKalender);
     const t = now();
     $view.innerHTML = `
       ${backLink}
@@ -738,7 +765,7 @@
       }).join('')}</ol></section>` : ''}
       ${v.text ? `<section><h2>Aus der Vorlage</h2><div class="card"><div class="excerpt" id="ex">${esc(v.text)}</div><button class="more" type="button" id="exb">Ganzen Auszug zeigen</button></div></section>` : ''}
       ${docs.length ? `<section><h2>Dokumente</h2><div class="list">${docs.map(docRow).join('')}</div>${dlHinweis(docs)}</section>` : ''}
-      ${risLink(v.web, x.D.quelle.ris, 'Vorlage')}`;
+      ${risLink(v.web || ersatz?.web, x.D.quelle.ris, ersatz && !v.web ? 'Sitzung mit dieser Vorlage' : 'Vorlage')}`;
     document.getElementById('exb')?.addEventListener('click', (e) => {
       const open = document.getElementById('ex').classList.toggle('open');
       e.target.textContent = open ? 'Auszug einklappen' : 'Ganzen Auszug zeigen';
