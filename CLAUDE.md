@@ -136,6 +136,8 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   Hamm (Sieg), Ransbach-Baumbach, Waldfischbach-Burgalben, Pellenz, Mendig, Vallendar, Weißenthurm, Jockgrim (andere Anbieter, Links nötig).
 - VG Waldfischbach-Burgalben (Link vom Projektinhaber, 03.10.2026): `vg-wabu.gremien.info` (Kürzel mit Bindestrich: `vg-<kürzel>`), more!rubin ohne
   OParl → `rubin-api`, 10 Körperschaften, 29 Sitzungen, 59 Vorlagen.
+- VG Hamm (Sieg) (Link vom Projektinhaber, 03.10.2026): SessionNet 5.5 ASP `sessionnet.owl-it.de/hamm-sieg/bi/` (robots.txt „Disallow: /“, trotzdem
+  angebunden, 2 s Abstand), Mandanten: VG + 12 Ortsgemeinden.
 - Unklar: Birkenfeld (kein RIS-Link gefunden). Mainz-Bingen: `www.landkreis-mainz-bingen.sitzung-online.de/bi/` (seit 02.10.2026).
 - Trier (ALLRIS 4, `typ: "allris"`, `src/scrape/allris.ts`, seit 02.10.2026): Kalender `si010?MM=&YY=` lädt die
   Tabelle per Wicket-Ajax (`si010?0-1.0-&MM=…`) mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch,
