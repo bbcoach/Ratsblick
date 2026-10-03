@@ -13,7 +13,7 @@ render() { # quelle größe ziel
 }
 render icon.svg 512 icon-512.png
 render icon.svg 192 icon-192.png
-render icon-maskable.svg 180 apple-touch-icon.png
+render icon-apple.svg 180 apple-touch-icon.png
 render icon-maskable.svg 512 icon-maskable-512.png
 rm -rf "$tmp"
 echo "PNG-Icons geschrieben"
