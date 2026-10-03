@@ -72,4 +72,10 @@ describe('Zähler-Worker', () => {
     const r = await worker.fetch(new Request('https://z.example/lesen', { headers: { authorization: 'Bearer ' } }), { DB: db } as unknown as Env);
     expect(r.status).toBe(401);
   });
+  it('ignoriert Leerzeichen und Zeilenumbruch am Token', async () => {
+    const { db } = fakeDb();
+    const env = { DB: db, LESE_TOKEN: 'geheim\n' } as unknown as Env;
+    const r = await worker.fetch(new Request('https://z.example/lesen', { headers: { authorization: 'Bearer geheim' } }), env);
+    expect(r.status).toBe(200);
+  });
 });

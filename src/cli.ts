@@ -115,7 +115,7 @@ async function main(): Promise<void> {
     let zugriffe: Zugriffe | ZugriffeFehler | null = null;
     if (process.env.ZAEHLER_URL && process.env.ZAEHLER_LESETOKEN) {
       try {
-        zugriffe = await holeZugriffe({ url: process.env.ZAEHLER_URL, token: process.env.ZAEHLER_LESETOKEN });
+        zugriffe = await holeZugriffe({ url: process.env.ZAEHLER_URL, token: process.env.ZAEHLER_LESETOKEN.trim() });
         console.log(`Zugriffe: ${zugriffe.dreissig} Seitenaufrufe in 30 Tagen`);
       } catch (err) {
         zugriffe = { fehler: (err as Error).message };

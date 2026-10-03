@@ -79,8 +79,8 @@ export default {
     }
 
     if (url.pathname === '/lesen') {
-      const token = env.LESE_TOKEN ?? '';
-      const gegeben = (request.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '');
+      const token = (env.LESE_TOKEN ?? '').trim();
+      const gegeben = (request.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '').trim();
       if (!token || !gleich(gegeben, token)) return antwort(401, { fehler: 'nicht berechtigt' }, null);
       const tage = Math.min(MAX_TAGE, Math.max(1, Number(url.searchParams.get('tage')) || 30));
       const ab = berlinTag(new Date(Date.now() - (tage - 1) * 86_400_000));
