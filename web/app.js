@@ -650,8 +650,12 @@
   }
   function docRow(f) {
     const label = f.rolle !== 'auxiliary' && rolleLabel[f.rolle] ? rolleLabel[f.rolle] : f.name;
-    return `<a class="doc" href="${esc(f.url)}" target="_blank" rel="noopener"><span class="ico">${f.seite ? 'WEB' : 'PDF'}</span><span class="body"><span>${esc(label)}</span><span class="muted small">${esc(f.rolle === 'auxiliary' ? 'Anlage' : f.name)}</span></span>${chev}</a>`;
+    return `<a class="doc" href="${esc(f.url)}" target="_blank" rel="noopener"><span class="ico">${f.seite ? 'WEB' : 'PDF'}</span><span class="body"><span>${esc(label)}</span><span class="muted small">${esc(f.rolle === 'auxiliary' ? 'Anlage' : f.name)}${f.dl ? ' · wird heruntergeladen' : ''}</span></span>${chev}</a>`;
   }
+  /** Hinweis unter der Dokumentenliste, wenn das System die Dateien nur als Download liefert */
+  const dlHinweis = (docs) => (docs.some((f) => f.dl)
+    ? '<p class="muted small dlhinweis">Dieses Ratsinformationssystem liefert Dokumente nur als Download. Auf dem Handy öffnet sich danach Ihre PDF-App, oder Sie finden die Datei im Download-Ordner.</p>'
+    : '');
 
   // ---------- Ansicht: Sitzung ----------
   function vSitzung(x, id) {
@@ -667,7 +671,7 @@
         <p>${esc(langDatum(m.start))}, ${esc(uhrText(m.start))}${m.ende && m.status === 'durchgeführt' ? ' bis ' + esc(uhr(m.ende)) + ' Uhr' : ''}</p>
         ${m.ort ? `<p class="muted">${esc(m.ort)}</p>` : ''}
       </section>
-      ${docs.length ? `<section><h2>Dokumente</h2><div class="list">${docs.map(docRow).join('')}</div></section>` : ''}
+      ${docs.length ? `<section><h2>Dokumente</h2><div class="list">${docs.map(docRow).join('')}</div>${dlHinweis(docs)}</section>` : ''}
       <section><h2>Tagesordnung</h2>
         ${m.tops.length ? `<div class="list">${m.tops.map((t) => {
           const v = t.vorlage && x.v.get(t.vorlage);
@@ -709,7 +713,7 @@
         return `<li class="${done ? 'done' : ''}"><span class="body"><span style="font-weight:600">${esc(gremiumKurz(b.gremium || 'Gremium'))}</span><span class="meta">${b.datum ? esc(datum(b.datum)) : 'Termin offen'}${b.entscheidend ? '<span class="pill">entscheidet</span>' : b.rolle ? `<span>${esc(b.rolle)}</span>` : ''}${done ? '' : '<span class="pill plain">anstehend</span>'}</span>${m ? `<button class="linkbtn small" type="button" data-go="${esc(link('s', m.id))}">Zur Sitzung</button>` : ''}</span></li>`;
       }).join('')}</ol></section>` : ''}
       ${v.text ? `<section><h2>Aus der Vorlage</h2><div class="card"><div class="excerpt" id="ex">${esc(v.text)}</div><button class="more" type="button" id="exb">Ganzen Auszug zeigen</button></div></section>` : ''}
-      ${docs.length ? `<section><h2>Dokumente</h2><div class="list">${docs.map(docRow).join('')}</div></section>` : ''}
+      ${docs.length ? `<section><h2>Dokumente</h2><div class="list">${docs.map(docRow).join('')}</div>${dlHinweis(docs)}</section>` : ''}
       ${risLink(v.web, x.D.quelle.ris, 'Vorlage')}`;
     document.getElementById('exb')?.addEventListener('click', (e) => {
       const open = document.getElementById('ex').classList.toggle('open');

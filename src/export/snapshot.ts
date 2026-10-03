@@ -20,6 +20,8 @@ interface FileRef {
   rolle: string;
   url: string | null;
   seite?: boolean;
+  /** Das System liefert die Datei als Download (Content-Disposition: attachment) – nicht im Browser anzeigbar. */
+  dl?: boolean;
 }
 
 type Row = Record<string, unknown>;
@@ -59,6 +61,27 @@ export function webSeite(id: string, raw: { web?: unknown }, art: 'sitzung' | 'v
   // ALLRIS 4 (Trier, Bingen): ohne refresh=false leitet die Seite teils auf die Anmeldung um
   if (/\/(to010|vo020)$/.test(u.pathname) && !u.searchParams.has('refresh')) return `${id}&refresh=false`;
   return id;
+}
+
+/**
+ * Dokument-Links: more!rubin liefert PDFs von `/api.php?document_type_id=…` nur dann im Browser (inline), wenn `inline=1`
+ * dabeisteht – sonst kommt `Content-Disposition: attachment` und Android lädt die Datei nur herunter (gemessen 03.10.2026,
+ * Emmelshausen/Donnersberg: attachment → mit `&inline=1` inline). Für alle more!rubin-Quellen anwenden.
+ */
+export function dokumentUrl(url: string | null): string | null {
+  if (!url) return url;
+  try {
+    const u = new URL(url);
+    if (u.hostname.endsWith('.gremien.info') && u.pathname === '/api.php' && u.searchParams.has('document_type_id') && !u.searchParams.has('inline')) {
+      return `${url}${url.includes('?') ? '&' : '?'}inline=1`;
+    }
+  } catch { /* keine gültige Adresse: unverändert lassen */ }
+  return url;
+}
+
+/** SessionNet liefert `getfile.asp|php` immer als Download (gemessen in Kusel-Altenglan und Koblenz); `inline` ändert daran nichts. */
+export function istDownload(url: string | null): boolean {
+  return !!url && /\/getfile\.(asp|php)\?/.test(url);
 }
 
 /**
@@ -111,7 +134,8 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
     ).map((f) => ({
       name: String(f.name ?? 'Dokument'),
       rolle: String(f.role),
-      url: s(f.access_url),
+      url: dokumentUrl(s(f.access_url)),
+      ...(istDownload(s(f.access_url)) ? { dl: true } : {}),
       // Verweis auf eine Webseite statt auf ein PDF (Kalenderexport: Tagesordnung im RIS)
       ...(f.mime_type === 'text/html' ? { seite: true } : {}),
     }));

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cleanText, ohneKopf, sessionnetKalender, webSeite } from '../src/export/snapshot.js';
+import { cleanText, dokumentUrl, istDownload, ohneKopf, sessionnetKalender, webSeite } from '../src/export/snapshot.js';
 
 describe('Textauszug', () => {
   it('beginnt beim Sachverhalt statt beim Formularkopf', () => {
@@ -38,5 +38,19 @@ describe('sessionnetKalender', () => {
   it('lässt andere Systeme unberührt', () => {
     expect(sessionnetKalender('https://x.gremien.info/meeting?id=1', '2026-10-29T17:00:00+01:00')).toBeNull();
     expect(sessionnetKalender('https://x.de/bi/to010?SILFDNR=1', '2026-10-29T17:00:00+01:00')).toBeNull();
+  });
+});
+
+describe('Dokument-Links', () => {
+  it('hängt bei more!rubin-PDFs inline=1 an, damit sie im Browser statt als Download öffnen', () => {
+    expect(dokumentUrl('https://emmelshausen.gremien.info/api.php?document_type_id=4&id=69')).toBe('https://emmelshausen.gremien.info/api.php?document_type_id=4&id=69&inline=1');
+    expect(dokumentUrl('https://montabaur.gremien.info/api.php?id=69&inline=true&document_type_id=4')).toBe('https://montabaur.gremien.info/api.php?id=69&inline=true&document_type_id=4');
+    expect(dokumentUrl('https://ratsinfo.vgka.de/bi/getfile.asp?id=1&type=do')).toBe('https://ratsinfo.vgka.de/bi/getfile.asp?id=1&type=do');
+    expect(dokumentUrl(null)).toBeNull();
+  });
+  it('erkennt SessionNet-Downloads', () => {
+    expect(istDownload('https://ratsinfo.vgka.de/bi/getfile.asp?id=1&type=do')).toBe(true);
+    expect(istDownload('https://buergerinfo.koblenz.de/getfile.php?id=3&type=do')).toBe(true);
+    expect(istDownload('https://x.gremien.info/api.php?document_type_id=4')).toBe(false);
   });
 });
