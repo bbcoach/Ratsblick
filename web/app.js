@@ -392,6 +392,7 @@
     name: 'Ralph Arnold',
     anschrift: 'St. Norbert Straße 1a\n67677 Enkenbach-Alsenborn\nDeutschland',  // Zeilen mit \n trennen
     email: 'info@wahlheimat-rlp.de',
+    paypal: '',  // Link zum PayPal-Spendenbutton (z. B. https://www.paypal.com/donate/?hosted_button_id=… oder https://paypal.me/NAME/5); leer = Button wird nicht angezeigt
   };
   const ang = (v) => (v ? esc(v).replace(/\n/g, '<br>') : '<span class="fehlt">[wird ergänzt]</span>');
   const mail = () => (BETREIBER.email ? `<a href="mailto:${esc(BETREIBER.email)}">${esc(BETREIBER.email)}</a>` : ang(null));
@@ -433,7 +434,7 @@
         <h4>3. Speicher auf Ihrem Gerät</h4>
         <p>Die App speichert im Speicher Ihres Browsers (<em>localStorage</em>) Ihre Favoriten, die zuletzt gewählte Kommune und die Einstellungen der Themensuche, außerdem App-Dateien und den zuletzt geladenen Datenstand für die Nutzung ohne Verbindung. Diese Angaben verlassen Ihr Gerät nicht und werden nicht an uns übertragen. Sie dienen ausschließlich Funktionen, die Sie selbst nutzen (§ 25 Abs. 2 Nr. 2 TDDDG); eine Einwilligung ist dafür nicht erforderlich. Sie können sie jederzeit löschen, indem Sie die Websitedaten in Ihrem Browser entfernen.</p>
         <h4>4. Links zu Ratsinformationssystemen</h4>
-        <p>Wenn Sie einen Link zu einem Ratsinformationssystem oder Dokument antippen, verbindet sich Ihr Browser direkt mit dem Server der jeweiligen Kommune bzw. ihres Anbieters. Dafür gelten deren Datenschutzhinweise.</p>
+        <p>Wenn Sie einen Link zu einem Ratsinformationssystem oder Dokument antippen, verbindet sich Ihr Browser direkt mit dem Server der jeweiligen Kommune bzw. ihres Anbieters. Dafür gelten deren Datenschutzhinweise.${BETREIBER.paypal ? ` Dasselbe gilt für den freiwilligen Unterstützen-Button auf der Info-Seite: Erst wenn Sie ihn antippen, wechseln Sie zu PayPal (PayPal (Europe) S.à r.l. et Cie, S.C.A., Luxemburg); vorher werden keine Daten an PayPal übertragen. Bei einer Zahlung erhalten wir nur die Angaben, die PayPal uns dazu mitteilt (etwa Name, Betrag und Zeitpunkt), und verwenden sie nur zur Abwicklung und Dokumentation (Art. 6 Abs. 1 lit. b und c DSGVO). Es gelten die Datenschutzhinweise von PayPal.` : ''}</p>
         <h4>5. Personenbezogene Angaben in Ratsunterlagen</h4>
         <p>Wahlheimat gibt öffentlich bekannt gemachte Informationen aus den Ratsinformationssystemen wieder, darunter Titel von Tagesordnungspunkten und Vorlagen, in denen Namen vorkommen können. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (öffentliches Interesse an nachvollziehbarer Kommunalpolitik). Sie können dem jederzeit widersprechen (Art. 21 DSGVO); wir prüfen das und entfernen die Angaben.</p>
         <h4>6. Kontakt per E-Mail</h4>
@@ -448,12 +449,20 @@
   function vInfo() {
     setTitle('Info');
     const zeile = (art, text) => `<button class="row" type="button" data-go="${esc(link(art))}"><div class="body"><span class="title">${esc(TEXTSEITEN[art]().titel)}</span><span class="meta">${esc(text)}</span></div>${chev}</button>`;
+    const spende = `<section class="card spende" aria-labelledby="spende-t">
+        <h4 id="spende-t">Guter Rat ist nicht teuer – für dich.</h4>
+        <p>Für mich allerdings schon. Demokratie und Transparenz gehören zusammen. Großes fängt oft im Kleinen an, deshalb soll Wahlheimat wachsen. Das ist kostspielig und zeitintensiv: Alles hier wird in meiner Freizeit gepflegt, gewartet und weiterentwickelt. Auch in Zeiten von KI müssen Entscheidungen getroffen, abgewogen und gestaltet werden – und das ist aufwendig.</p>
+        <p>Wenn du möchtest, dass Projekte wie dieses weitergeführt werden können, tippe auf den Button und hilf mit, Demokratie erlebbar und transparent zu machen. <strong>5 € sind für dich nicht viel, machen unser Land aber zu einem besseren Ort.</strong></p>
+        ${BETREIBER.paypal ? `<a class="btn spendenknopf" href="${esc(BETREIBER.paypal)}" target="_blank" rel="noopener">Mit PayPal unterstützen</a>` : ''}
+        <p class="muted small">Freiwillige Unterstützung eines privaten Projekts; keine Spendenbescheinigung. Du verlässt dafür die App und wechselst zu PayPal.</p>
+      </section>`;
     $view.innerHTML = `<section class="hero"><h3>Info</h3><p class="muted small">Wahlheimat ist ein unabhängiges Angebot – kein Angebot des Landes oder der Kommunen.</p></section>
       <div class="list">
         ${zeile('ueber', 'Was Wahlheimat ist, woher die Daten kommen, Kontakt')}
         ${zeile('impressum', 'Anbieterkennzeichnung')}
         ${zeile('datenschutz', 'Keine Cookies, kein Tracking – die Einzelheiten')}
       </div>
+      ${spende}
       <p class="stand">Datenstand ${esc(stand(INDEX.erstellt))}</p>`;
   }
 

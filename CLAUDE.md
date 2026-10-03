@@ -274,6 +274,7 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
   Stand 02.10.2026: 2 453 Räte (2 288 Gemeinderäte, davon 1 546 Mehrheitswahl; 129 VG-Räte, 24 Kreistage, 12 Stadträte kreisfreier
   Städte unter dem Kreisschlüssel). Gemeinden mit neuem Schlüssel nach der Wahl über den Namen (Obergeckler; Niedergeckler entfällt).
   Farben: übliche Parteifarben, Wählergruppen #2a9d8f/#a0522d/#6a5acd (mit dem dataviz-Validator geprüft), danach grau.
+- Unterstützen-Block (seit 03.10.2026) auf der Info-Seite (`vInfo`, Text vom Projektinhaber, Du-Form): „Guter Rat ist nicht teuer – für dich.“ mit PayPal-Button. Der Link steht in `BETREIBER.paypal` (app.js); solange er leer ist, erscheint der Block ohne Button und der PayPal-Absatz im Datenschutz fehlt. Hinweis „keine Spendenbescheinigung“ (privates Projekt, nicht gemeinnützig).
 - Rechtliches (seit 02.10.2026): Seiten `#/ueber`, `#/impressum`, `#/datenschutz` (`TEXTSEITEN` in web/app.js), erreichbar über den
   vierten Reiter „Info“ (`#/info`, Übersicht); keine Fußzeile auf Start-/Favoritenseite (Projektinhaber). Betreiberangaben nur in `BETREIBER` (app.js) pflegen (eingetragen 03.10.2026: Ralph Arnold, Enkenbach-Alsenborn, info@wahlheimat-rlp.de); fehlende erscheinen als „[wird ergänzt]“.
   Kein Cookie-Banner nötig (keine Cookies/Tracking; localStorage nur für Nutzerfunktionen, § 25 Abs. 2 Nr. 2 TDDDG). Schriften liegen
