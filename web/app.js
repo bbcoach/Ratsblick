@@ -9,7 +9,7 @@
 
   // Eigener Seitenaufruf-Zähler (Cloudflare Worker, siehe zaehler/README.md). Leer = aus (keine Anfrage, Datenschutz-Absatz erscheint nicht).
   // Einschalten erst nach rechtlicher Prüfung: Adresse des Workers eintragen, z. B. 'https://wahlheimat-zaehler.<konto>.workers.dev/z'.
-  const ZAEHLER = '';
+  const ZAEHLER = 'https://wahlheimat-zaehler.ralph-arnold.workers.dev/z';
 
   const store = {
     get(k, d) { try { const v = localStorage.getItem('ratsblick:' + k); return v ? JSON.parse(v) : d; } catch { return d; } },
