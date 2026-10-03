@@ -59,6 +59,12 @@ describe('Zuordnung zu Gebietskörperschaften', () => {
     expect(r.get('071415010')).toBe('neu');
   });
 
+  it('erkennt „Verbandsgemeindeverwaltung X“ als die Verbandsgemeinde X', () => {
+    expect(vergleiche('Verbandsgemeindeverwaltung Montabaur', 'Verbandsgemeinde Montabaur')).toBe(2);
+    const r = zuordnen(g, '071435004', [{ id: 'v1', name: 'Verbandsgemeindeverwaltung Montabaur' }]);
+    expect(r.get('071435004')).toBe('v1');
+  });
+
   it('ordnet Systeme einer einzelnen Stadt direkt zu', () => {
     const r = zuordnen(g, '07143048', [{ id: 's1', name: 'Stadtverwaltung Montabaur' }]);
     expect(Object.fromEntries(r)).toEqual({ '07143048': 's1' });

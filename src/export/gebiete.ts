@@ -12,7 +12,7 @@ export interface Koerperschaft {
   name: string;
 }
 
-const PRAEFIX = /^(ortsgemeinde|verbandsgemeinde|gemeindeverwaltung|gemeinde|stadtverwaltung|stadt|landkreis|kreisverwaltung|kreis)\s+/;
+const PRAEFIX = /^(ortsgemeinde|verbandsgemeindeverwaltung|verbandsgemeinde|gemeindeverwaltung|gemeinde|stadtverwaltung|stadt|landkreis|kreisverwaltung|kreis)\s+/;
 
 export function tokens(name: string): string[] {
   return name
