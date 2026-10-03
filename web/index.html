@@ -94,19 +94,21 @@ button { font: inherit; color: inherit; }
   display: flex; align-items: center; gap: 8px; padding: calc(10px + env(safe-area-inset-top, 0px)) max(16px, (100% - var(--w)) / 2 + 16px) 10px; min-height: 54px;
 }
 .logo { display: flex; align-items: center; gap: 9px; color: inherit; text-decoration: none; flex: none; padding: 4px 6px 4px 0; border-radius: 8px; }
-.logo img { width: 32px; height: 32px; flex: none; border-radius: 8px; box-shadow: 0 0 0 1.5px rgba(255,255,255,.3); }
-.logo .wm { display: flex; flex-direction: column; font-family: "Nunito", var(--font-body), sans-serif; font-size: 20px; line-height: 1; letter-spacing: .06em; text-transform: uppercase; font-weight: 300; }
+.logo { --ico: 30px; }
+.logo img { width: var(--ico); height: var(--ico); flex: none; border-radius: 8px; box-shadow: 0 0 0 1.5px rgba(255,255,255,.3); }
+/* Oberkante der Versalien und Unterkante des Streifens schließen bündig mit dem Icon ab (Nunito: Versalienhöhe .705 em → line-height .752 setzt Oberkante an den Boxrand, Grundlinie an .705 em) */
+.logo .wm { display: flex; flex-direction: column; justify-content: space-between; height: var(--ico); font-family: "Nunito", var(--font-body), sans-serif; font-size: 24px; line-height: .752; letter-spacing: .06em; text-transform: uppercase; font-weight: 300; }
 .logo .wm b { font-weight: 900; }
 .logo .wm .rlp { color: #f2c230; font-size: .54em; letter-spacing: .14em; margin-left: .35em; }
 /* Streifen: je Wort ein Abschnitt (gleicher Text unsichtbar als Breitenmaß), Farben laufen ineinander: Schwarz unter WAHL, Rot unter HEIMAT, Gold unter RLP */
-.logo .wm .bars { display: flex; margin-top: 5px; height: 4px; border-radius: 2px; overflow: hidden; user-select: none; }
+.logo .wm .bars { display: flex; height: 4px; border-radius: 2px; overflow: hidden; user-select: none; }
 .logo .wm .bars i { font-style: normal; color: transparent; height: 4px; overflow: hidden; }
 /* Mischtöne an den Wortgrenzen: Schwarz→Rot #6b1414, Rot→Gold #e4752c; je Wort ein reiner Kern */
 .logo .wm .bars .k { font-weight: 900; background: linear-gradient(90deg, #000 0 68%, #6b1414); }
 .logo .wm .bars .r { font-weight: 300; background: linear-gradient(90deg, #6b1414, #d62828 28%, #d62828 66%, #e4752c); }
 .logo .wm .bars .g { font-size: .54em; letter-spacing: .14em; padding-left: .35em; background: linear-gradient(90deg, #e4752c, #f2c230 45%); }
 .logo:active { opacity: .75; }
-@media (max-width: 360px) { .logo .wm { font-size: 16px; } .logo img { width: 28px; height: 28px; } .logo { gap: 7px; } }
+@media (max-width: 360px) { .logo { --ico: 26px; gap: 7px; } .logo .wm { font-size: 18px; } }
 .ctx { flex: 1; min-width: 0; text-align: right; font-size: 14px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; font-weight: 500; }
 .backlink { justify-self: start; display: inline-flex; align-items: center; gap: 2px; background: none; border: 0; padding: 4px 8px 4px 0; color: var(--accent); font-weight: 600; cursor: pointer; font-size: 15px; }
 
