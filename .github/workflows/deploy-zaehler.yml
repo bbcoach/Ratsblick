@@ -29,7 +29,7 @@ jobs:
       - name: Datenbank anlegen oder finden
         run: |
           npx --yes wrangler@3 d1 create wahlheimat-zaehler || true
-          ID=$(npx --yes wrangler@3 d1 info wahlheimat-zaehler --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).uuid))')
+          ID=$(npx --yes wrangler@3 d1 list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const l=JSON.parse(s.slice(s.indexOf("[")));const d=l.find(x=>x.name==="wahlheimat-zaehler");console.log(d?d.uuid:"")})')
           test -n "$ID"
           sed -i "s/__D1_ID__/$ID/" wrangler.toml
       - name: Tabelle anlegen
