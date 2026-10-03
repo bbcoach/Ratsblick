@@ -5,7 +5,7 @@
  * Keine IP-Adresse, kein Hash, keine Kennung, keine Cookies, kein Verweis, kein User-Agent wird gespeichert.
  *
  *   POST /z       Text-Body = Seitenart (z. B. /g/07134005/vg), von wahlheimat-rlp.de per sendBeacon
- *   GET  /lesen   Auswertung der letzten Tage, nur mit Bearer-Token (Secret LESE_TOKEN)
+ *   GET  /lesen   Auswertung der letzten Tage, nur mit „Bearer <SHA-256-Hex des Lese-Tokens>“ (Secret LESE_TOKEN)
  */
 
 // Minimale Typen für D1 (reicht für diesen Worker, ohne @cloudflare/workers-types)
@@ -49,6 +49,12 @@ function antwort(status: number, koerper: unknown, herkunft: string | null): Res
   return new Response(koerper === null ? null : JSON.stringify(koerper), { status, headers: h });
 }
 
+/** SHA-256 des Tokens als Hex (reines ASCII, damit Umlaute und Sonderzeichen im Token nicht an der Header-Kodierung scheitern). */
+export async function tokenHash(token: string): Promise<string> {
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token.trim()));
+  return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 /** Vergleich in konstanter Zeit, damit das Token nicht über die Antwortzeit erraten werden kann. */
 function gleich(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
@@ -62,7 +68,7 @@ export default {
     const url = new URL(request.url);
     const erlaubt = env.ERLAUBTE_HERKUNFT ?? STANDARD_HERKUNFT;
 
-    if (url.pathname === '/') return antwort(200, { ok: true, service: 'wahlheimat-zaehler', lesetokenZeichen: (env.LESE_TOKEN ?? '').trim().length }, null);
+    if (url.pathname === '/') return antwort(200, { ok: true, service: 'wahlheimat-zaehler' }, null);
 
     if (url.pathname === '/z') {
       if (request.method === 'OPTIONS') {
@@ -81,7 +87,7 @@ export default {
     if (url.pathname === '/lesen') {
       const token = (env.LESE_TOKEN ?? '').trim();
       const gegeben = (request.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '').trim();
-      if (!token || !gleich(gegeben, token)) return antwort(401, { fehler: 'nicht berechtigt' }, null);
+      if (!token || !gleich(gegeben, await tokenHash(token))) return antwort(401, { fehler: 'nicht berechtigt' }, null);
       const tage = Math.min(MAX_TAGE, Math.max(1, Number(url.searchParams.get('tage')) || 30));
       const ab = berlinTag(new Date(Date.now() - (tage - 1) * 86_400_000));
       const proTag = await env.DB.prepare('SELECT tag, SUM(n) AS n FROM zaehler WHERE tag >= ? GROUP BY tag ORDER BY tag').bind(ab).all<{ tag: string; n: number }>();

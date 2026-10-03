@@ -6,7 +6,7 @@ Nur Aufrufe von `https://wahlheimat-rlp.de` werden gezählt, Bots verworfen, Pfa
 (nie Suchbegriffe oder Sitzungs-/Vorlagen-IDs). Aufbewahrung 400 Tage (täglicher Cron).
 
 - `POST /z` – Text-Body = Seitenart (die App sendet per `sendBeacon`)
-- `GET /lesen?tage=30` – Auswertung, nur mit `Authorization: Bearer <LESE_TOKEN>`; das Admin-Dashboard ruft das beim Bauen ab
+- `GET /lesen?tage=30` – Auswertung, nur mit `Authorization: Bearer <SHA-256-Hex des LESE_TOKEN>` (Hash, damit Umlaute/Sonderzeichen im Token nicht an der Header-Kodierung scheitern); das Admin-Dashboard ruft das beim Bauen ab
 
 Kostenloser Tarif reicht (D1: 100 000 geschriebene Zeilen/Tag; je Aufruf wird eine Zeile erhöht).
 

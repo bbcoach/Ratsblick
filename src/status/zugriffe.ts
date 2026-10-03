@@ -1,8 +1,10 @@
 /**
  * Seitenaufrufe aus dem eigenen Zähler (Cloudflare Worker `zaehler/`, Auswertung über `GET /lesen`).
- * Wird nur beim Bauen des Admin-Dashboards abgerufen (Lese-Token als Secret), nie im Browser der Nutzer.
+ * Wird nur beim Bauen des Admin-Dashboards abgerufen (Lese-Token als Secret; gesendet wird sein SHA-256-Hash), nie im Browser der Nutzer.
  * Gezählt werden Seitenaufrufe, keine Personen: der Zähler kennt weder IP noch Kennung.
  */
+import { createHash } from 'node:crypto';
+
 export interface ZaehlerConfig {
   /** Adresse des Workers, z. B. https://wahlheimat-zaehler.<konto>.workers.dev */
   url: string;
@@ -24,7 +26,7 @@ export interface ZugriffeFehler {
 
 export async function holeZugriffe(cfg: ZaehlerConfig, jetzt = new Date(), f: typeof fetch = fetch): Promise<Zugriffe> {
   const basis = cfg.url.replace(/\/+$/, '');
-  const res = await f(`${basis}/lesen?tage=30`, { headers: { authorization: `Bearer ${cfg.token}`, accept: 'application/json' } });
+  const res = await f(`${basis}/lesen?tage=30`, { headers: { authorization: `Bearer ${createHash('sha256').update(cfg.token.trim()).digest('hex')}`, accept: 'application/json' } });
   if (!res.ok) throw new Error(`Zähler: HTTP ${res.status}`);
   const d = (await res.json()) as { tage?: Array<{ tag: string; n: number }>; seiten?: Array<{ pfad: string; n: number }> };
   const proTag = new Map((d.tage ?? []).map((t) => [t.tag, t.n]));

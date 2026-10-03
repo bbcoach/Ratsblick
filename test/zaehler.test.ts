@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import worker, { gueltigerPfad, type Env } from '../zaehler/src/index.js';
+import worker, { gueltigerPfad, tokenHash, type Env } from '../zaehler/src/index.js';
 
 /** Minimale D1-Attrappe: zählt je (tag, pfad). */
 function fakeDb() {
@@ -60,8 +60,8 @@ describe('Zähler-Worker', () => {
     const env = { DB: db, LESE_TOKEN: 'geheim' } as unknown as Env;
     await worker.fetch(post('/themen'), env);
     expect((await worker.fetch(new Request('https://z.example/lesen'), env)).status).toBe(401);
-    expect((await worker.fetch(new Request('https://z.example/lesen', { headers: { authorization: 'Bearer falsch' } }), env)).status).toBe(401);
-    const ok = await worker.fetch(new Request('https://z.example/lesen?tage=7', { headers: { authorization: 'Bearer geheim' } }), env);
+    expect((await worker.fetch(new Request('https://z.example/lesen', { headers: { authorization: 'Bearer ' + (await tokenHash('falsch')) } }), env)).status).toBe(401);
+    const ok = await worker.fetch(new Request('https://z.example/lesen?tage=7', { headers: { authorization: 'Bearer ' + (await tokenHash('geheim')) } }), env);
     expect(ok.status).toBe(200);
     const d = (await ok.json()) as { tage: Array<{ n: number }>; seiten: Array<{ pfad: string }> };
     expect(d.tage[0]!.n).toBe(1);
@@ -75,7 +75,16 @@ describe('Zähler-Worker', () => {
   it('ignoriert Leerzeichen und Zeilenumbruch am Token', async () => {
     const { db } = fakeDb();
     const env = { DB: db, LESE_TOKEN: 'geheim\n' } as unknown as Env;
-    const r = await worker.fetch(new Request('https://z.example/lesen', { headers: { authorization: 'Bearer geheim' } }), env);
+    const r = await worker.fetch(new Request('https://z.example/lesen', { headers: { authorization: 'Bearer ' + (await tokenHash('geheim')) } }), env);
     expect(r.status).toBe(200);
+  });
+  it('funktioniert auch mit Umlauten und Leerzeichen im Token', async () => {
+    const { db } = fakeDb();
+    const satz = 'Mein Gemeinderat wählt im Oktober – größer geht’s nicht';
+    const env = { DB: db, LESE_TOKEN: satz } as unknown as Env;
+    const ok = await worker.fetch(new Request('https://z.example/lesen', { headers: { authorization: 'Bearer ' + (await tokenHash(satz)) } }), env);
+    expect(ok.status).toBe(200);
+    const roh = await worker.fetch(new Request('https://z.example/lesen', { headers: { authorization: 'Bearer ' + satz.replace(/[^\x00-\x7f]/g, '?') } }), env);
+    expect(roh.status).toBe(401);
   });
 });

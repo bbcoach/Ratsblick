@@ -71,7 +71,7 @@ describe('Zugriffe (eigener Zähler)', () => {
     const aufrufe: string[] = [];
     const f = (async (url: string, init: { headers: Record<string, string> }) => {
       aufrufe.push(url);
-      expect(init.headers.authorization).toBe('Bearer geheim');
+      expect(init.headers.authorization).toBe('Bearer ' + (await import('node:crypto')).createHash('sha256').update('geheim').digest('hex'));
       return { ok: true, status: 200, json: async () => ({ tage: [{ tag: '2026-10-03', n: 12 }, { tag: '2026-10-02', n: 6 }, { tag: '2026-09-20', n: 5 }], seiten: [{ pfad: '/g/07134005/vg', n: 9 }] }) };
     }) as unknown as typeof fetch;
     const z = await holeZugriffe({ url: 'https://z.example.workers.dev/', token: 'geheim' }, new Date('2026-10-03T15:00:00Z'), f);

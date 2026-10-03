@@ -39,4 +39,4 @@ jobs:
       - name: Lese-Token setzen
         env:
           LESE_TOKEN: ${{ secrets.ZAEHLER_LESETOKEN }}
-        run: printf '%s' "$LESE_TOKEN" | tr -d '[:space:]' | npx --yes wrangler@3 secret put LESE_TOKEN
+        run: printf '%s' "$LESE_TOKEN" | npx --yes wrangler@3 secret put LESE_TOKEN
