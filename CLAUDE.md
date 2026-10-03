@@ -123,6 +123,8 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   `seiten`): je Protokoll eine abgeschlossene Sitzung mit dem PDF als Niederschrift, ohne Uhrzeit/TOPs; Fenster 2 Jahre. robots.txt erlaubt
   Seiten und PDFs. Export `quelle.ohneRis` (auch edith/Thalfang): Links sprechen von „Website“ statt „Ratsinformationssystem“; Sitzungen ohne
   Uhrzeit zeigen „Uhrzeit siehe Dokument“, vergangene ohne TOPs „keine einzelnen Tagesordnungspunkte“.
+- VG Traben-Trarbach (Link vom Projektinhaber, 03.10.2026): `vgtt.gremien.info` (more!rubin, OParl nicht aktiv) → `rubin-api`, 23 Körperschaften
+  (VG, Stadt, 14 Ortsgemeinden + Zweckverbände), erster Lauf 82 Sitzungen, 167 Vorlagen.
 - Unklar: Birkenfeld (kein RIS-Link gefunden). Mainz-Bingen: `www.landkreis-mainz-bingen.sitzung-online.de/bi/` (seit 02.10.2026).
 - Trier (ALLRIS 4, `typ: "allris"`, `src/scrape/allris.ts`, seit 02.10.2026): Kalender `si010?MM=&YY=` lädt die
   Tabelle per Wicket-Ajax (`si010?0-1.0-&MM=…`) mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch,
