@@ -1,0 +1,16 @@
+name = "wahlheimat-zaehler"
+main = "src/index.ts"
+compatibility_date = "2024-09-01"
+
+# Kostenloser Tarif: keine eigene Domain nötig, Adresse wahlheimat-zaehler.<konto>.workers.dev
+[[d1_databases]]
+binding = "DB"
+database_name = "wahlheimat-zaehler"
+database_id = "__D1_ID__"   # setzt der Workflow beim Veröffentlichen
+
+# Täglich alte Zeilen löschen
+[triggers]
+crons = ["17 3 * * *"]
+
+[vars]
+ERLAUBTE_HERKUNFT = "https://wahlheimat-rlp.de"

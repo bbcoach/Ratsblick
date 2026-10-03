@@ -111,12 +111,12 @@ async function main(): Promise<void> {
     if (passwort.length < 16) throw new Error('ADMIN_PASSWORT ist zu kurz (mindestens 16 Zeichen, besser ein langer Satz)');
     const ziel = `${values.out ?? 'dist/admin'}/index.html`;
     mkdirSync(dirname(ziel), { recursive: true });
-    // Zugriffszahlen (optional): GOATCOUNTER_URL = Adresse der Seite, GOATCOUNTER_TOKEN = API-Token mit Leserecht
+    // Zugriffszahlen (optional): ZAEHLER_URL = Adresse des Zähler-Workers, ZAEHLER_LESETOKEN = Lese-Token
     let zugriffe: Zugriffe | ZugriffeFehler | null = null;
-    if (process.env.GOATCOUNTER_URL && process.env.GOATCOUNTER_TOKEN) {
+    if (process.env.ZAEHLER_URL && process.env.ZAEHLER_LESETOKEN) {
       try {
-        zugriffe = await holeZugriffe({ url: process.env.GOATCOUNTER_URL, token: process.env.GOATCOUNTER_TOKEN });
-        console.log(`Zugriffe: ${zugriffe.dreissig} Besucher in 30 Tagen`);
+        zugriffe = await holeZugriffe({ url: process.env.ZAEHLER_URL, token: process.env.ZAEHLER_LESETOKEN });
+        console.log(`Zugriffe: ${zugriffe.dreissig} Seitenaufrufe in 30 Tagen`);
       } catch (err) {
         zugriffe = { fehler: (err as Error).message };
         console.log(`Zugriffe nicht abrufbar: ${(err as Error).message}`);

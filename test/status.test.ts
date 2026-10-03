@@ -65,36 +65,32 @@ describe('Admin-Seite', () => {
   });
 });
 
-describe('Zugriffe (GoatCounter)', () => {
-  it('liest Besucher je Tag, Seiten und Verweise und rechnet 7/30 Tage', async () => {
+describe('Zugriffe (eigener Zähler)', () => {
+  it('liest die Auswertung und rechnet 7/30 Tage nach Berliner Datum', async () => {
     const { holeZugriffe } = await import('../src/status/zugriffe.js');
     const aufrufe: string[] = [];
     const f = (async (url: string, init: { headers: Record<string, string> }) => {
       aufrufe.push(url);
       expect(init.headers.authorization).toBe('Bearer geheim');
-      const antwort = url.includes('stats/total')
-        ? { stats: [{ day: '2026-10-03', daily: 12 }, { day: '2026-10-02', hourly: [1, 2, 3] }, { day: '2026-09-20', daily: 5 }] }
-        : url.includes('stats/hits') ? { hits: [{ path: '/g/07134005/vg', count: 9 }] } : { stats: [{ name: 'Direkt', count: 4 }, { name: '', count: 1 }] };
-      return { ok: true, status: 200, json: async () => antwort };
+      return { ok: true, status: 200, json: async () => ({ tage: [{ tag: '2026-10-03', n: 12 }, { tag: '2026-10-02', n: 6 }, { tag: '2026-09-20', n: 5 }], seiten: [{ pfad: '/g/07134005/vg', n: 9 }] }) };
     }) as unknown as typeof fetch;
-    const z = await holeZugriffe({ url: 'https://x.goatcounter.com/count', token: 'geheim' }, new Date('2026-10-03T15:00:00Z'), f);
-    expect(aufrufe[0]).toContain('https://x.goatcounter.com/api/v0/stats/total?start=2026-09-04T00');
+    const z = await holeZugriffe({ url: 'https://z.example.workers.dev/', token: 'geheim' }, new Date('2026-10-03T15:00:00Z'), f);
+    expect(aufrufe[0]).toBe('https://z.example.workers.dev/lesen?tage=30');
     expect(z.heute).toBe(12);
     expect(z.sieben).toBe(18);
     expect(z.dreissig).toBe(23);
     expect(z.tage).toHaveLength(30);
-    expect(z.seiten).toEqual([{ pfad: '/g/07134005/vg', besucher: 9 }]);
-    expect(z.verweise).toEqual([{ name: 'Direkt', besucher: 4 }]);
+    expect(z.seiten).toEqual([{ pfad: '/g/07134005/vg', aufrufe: 9 }]);
   });
   it('meldet HTTP-Fehler verständlich', async () => {
     const { holeZugriffe } = await import('../src/status/zugriffe.js');
     const f = (async () => ({ ok: false, status: 401, json: async () => ({}) })) as unknown as typeof fetch;
-    await expect(holeZugriffe({ url: 'https://x.goatcounter.com', token: 'falsch' }, new Date(), f)).rejects.toThrow('HTTP 401');
+    await expect(holeZugriffe({ url: 'https://z.example', token: 'falsch' }, new Date(), f)).rejects.toThrow('HTTP 401');
   });
   it('das Dashboard zeigt Zugriffe oder den Fehler', async () => {
     const d = db();
     const st = baueStatus(d, [{ id: 'a', name: 'Quelle A' }]);
-    expect(dashboardHtml(st, { fehler: 'GoatCounter stats/total: HTTP 401' })).toContain('HTTP 401');
+    expect(dashboardHtml(st, { fehler: 'Zähler: HTTP 401' })).toContain('HTTP 401');
     expect(dashboardHtml(st, null)).toContain('"zd"');
   });
 });
