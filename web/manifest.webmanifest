@@ -3,9 +3,11 @@
   "short_name": "Wahlheimat",
   "description": "Sitzungen, Tagesordnungen und Vorlagen aus den Ratsinformationssystemen in Rheinland-Pfalz",
   "lang": "de",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "categories": ["news", "government", "politics"],
   "background_color": "#f6f4f4",
   "theme_color": "#7b2736",
   "icons": [
