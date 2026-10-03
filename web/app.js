@@ -408,13 +408,8 @@
         <p>Die Sitzverteilung der Räte stammt aus den Ergebnissen der Kommunalwahl 2024 des ${extern('https://www.wahlen.rlp.de/kommunalwahlen/ergebnisse-1', 'Landeswahlleiters Rheinland-Pfalz')}.</p>
         <h4>Ohne Gewähr</h4>
         <p>Wir geben uns Mühe, alles vollständig und richtig darzustellen. Fehler beim Übernehmen oder Zuordnen lassen sich aber nicht ausschließen. <strong>Maßgeblich ist immer das Ratsinformationssystem der Kommune</strong> – jede Sitzung und Vorlage ist dorthin verlinkt.</p>
-        <h4>Für Kommunen und Betreiber</h4>
-        <p>Sie betreiben ein Ratsinformationssystem und möchten nicht, dass es hier abgerufen wird, oder haben einen anderen Hinweis? Schreiben Sie uns an ${mail()} – wir reagieren umgehend und schalten den Abruf auf Wunsch sofort ab.</p>
-        <h4>Namen in Tagesordnungen</h4>
-        <p>Tagesordnungen und Vorlagen können Namen von Personen enthalten, etwa bei Bauanträgen. Wenn Sie hier genannt werden und das entfernt haben möchten, melden Sie sich bitte unter ${mail()}.</p>
         <h4>Urheberrecht</h4>
-        <p>Vorlagen, Beschlüsse und Bekanntmachungen sind in der Regel amtliche Werke (§ 5 UrhG). Die Rechte an Dokumenten bleiben bei den jeweiligen Stellen. Das Logo ist eine eigene Gestaltung und kein Hoheitszeichen des Landes.</p>
-        <p class="muted small">Quelltext: ${extern('https://github.com/bbcoach/Ratsblick', 'github.com/bbcoach/Ratsblick')}</p>`,
+        <p>Vorlagen, Beschlüsse und Bekanntmachungen sind in der Regel amtliche Werke (§ 5 UrhG). Die Rechte an Dokumenten bleiben bei den jeweiligen Stellen. Das Logo ist eine eigene Gestaltung und kein Hoheitszeichen des Landes.</p>`,
     }),
     impressum: () => ({
       titel: 'Impressum',
