@@ -115,6 +115,9 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   angebunden, 2 s Abstand), außerhalb Europas Verbindungsabbruch → Weiterleiter (seit 19:45 UTC mit neuer Host-Liste deployt).
 - Stadt Wittlich (Link vom Projektinhaber, 03.10.2026): Website `wittlich.de` bettet more!rubin ein, `stadt-wittlich.gremien.info` mit
   aktivem OParl (eine Körperschaft „Stadtverwaltung Wittlich“, großes Archiv: 1 339 Sitzungen, 4 075 Vorlagen; Export nur aktuelles Fenster).
+- Stadt Mayen (Link vom Projektinhaber, 03.10.2026): SessionNet 5.5 ASP `sessionnet.owl-it.de/mayen/bi/` (robots.txt „Disallow: /“, trotzdem
+  angebunden, 2 s Abstand), ein Mandant. VG Kusel-Altenglan (erneut geschickt): das System führt nur 16 Mandanten, die übrigen 18
+  Gemeinden (u. a. Altenglan, Kusel) sind dort nicht vertreten.
 - Unklar: Birkenfeld (kein RIS-Link gefunden). Mainz-Bingen: `www.landkreis-mainz-bingen.sitzung-online.de/bi/` (seit 02.10.2026).
 - Trier (ALLRIS 4, `typ: "allris"`, `src/scrape/allris.ts`, seit 02.10.2026): Kalender `si010?MM=&YY=` lädt die
   Tabelle per Wicket-Ajax (`si010?0-1.0-&MM=…`) mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch,
