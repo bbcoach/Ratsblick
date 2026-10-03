@@ -87,7 +87,7 @@ async function main(): Promise<void> {
     const r = buildWeb(openDb(values.db!), values.out ?? 'dist');
     console.log(
       `Web-App: ${r.quellen} Quellen, ${r.gebiete} Gebietskörperschaften mit eigenen Daten, ` +
-        `${r.gemeindenMitDaten} von ${r.gemeinden} Gemeinden mit Daten (selbst oder über die VG) → ${values.out ?? 'dist'}`,
+        `${r.gemeindenEigen} von ${r.gemeinden} Gemeinden mit eigenen Daten, weitere ${r.gemeindenMitDaten - r.gemeindenEigen} nur über die VG → ${values.out ?? 'dist'}`,
     );
     return;
   }

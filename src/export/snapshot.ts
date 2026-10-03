@@ -68,6 +68,16 @@ export function webSeite(id: string, raw: { web?: unknown }, art: 'sitzung' | 'v
  * dabeisteht – sonst kommt `Content-Disposition: attachment` und Android lädt die Datei nur herunter (gemessen 03.10.2026,
  * Emmelshausen/Donnersberg: attachment → mit `&inline=1` inline). Für alle more!rubin-Quellen anwenden.
  */
+/**
+ * more!rubin liefert dieselbe Sitzung unter zwei Adressen: `…/meeting/ni_2026-GR_024-122` und `…/meeting/2026-GR_024-122`
+ * (bzw. `meeting?id=ni_…`). Beide haben dieselben Inhalte; behalten wird die mit `ni_` (die Adresse, die auch die Webseite verwendet).
+ */
+export function entferneZwillinge(ids: string[]): string[] {
+  const ohnePraefix = (id: string) => id.replace(/(\/meeting\/|[?&]id=)ni_/, '$1');
+  const mitPraefix = new Set(ids.filter((id) => ohnePraefix(id) !== id).map(ohnePraefix));
+  return ids.filter((id) => !mitPraefix.has(id));
+}
+
 export function dokumentUrl(url: string | null): string | null {
   if (!url) return url;
   try {
@@ -170,7 +180,7 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
   }
 
   // Vorlagen, die auf den ausgewählten Tagesordnungen stehen, gehören mit in die Momentaufnahme.
-  const sitzungen = [...meetingIds].map((mid) => {
+  const sitzungen = entferneZwillinge([...meetingIds]).map((mid) => {
     const m = db.prepare('SELECT * FROM meeting WHERE id = ?').get(mid) as Row;
     const orgs = all('SELECT organization_id FROM meeting_organization WHERE meeting_id = ?', mid).map((r) =>
       String(r.organization_id),

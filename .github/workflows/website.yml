@@ -5,6 +5,7 @@ name: Website
 
 on:
   push:
+    tags-ignore: ['**']   # das Release „db-backup“ legt ein Tag an, das keinen Bau auslösen soll
   schedule:
     - cron: '23 */6 * * *'
   workflow_dispatch:
@@ -13,12 +14,16 @@ on:
         description: 'Daten neu abgleichen'
         type: boolean
         default: true
+      backup:
+        description: 'Datenbank jetzt verschlüsselt sichern (sonst wöchentlich sonntags)'
+        type: boolean
+        default: false
       quellen:
         description: 'Nur diese Quellen abgleichen (IDs aus data/endpoints.json, durch Leerzeichen getrennt; leer = alle aktiven)'
         default: ''
 
 permissions:
-  contents: read
+  contents: write    # Release „db-backup“ für die verschlüsselte Datenbank-Sicherung
   pages: write
   id-token: write
   issues: write      # Warn-Issue bei auffälligen Quellen (E-Mail über GitHub)
@@ -83,6 +88,23 @@ jobs:
         with:
           path: data/ratsblick.sqlite
           key: ratsblick-db-${{ github.run_id }}
+
+      # Wöchentliche (sonntags, erster Lauf des Tages) oder manuelle Sicherung, verschlüsselt als Release-Asset „db-backup“.
+      # Braucht das Secret BACKUP_PASSWORT (langer Satz); ohne Secret wird übersprungen. Wiederherstellen: scripts/db-backup.sh.
+      - name: Datenbank-Backup
+        if: steps.sync.outcome != 'skipped' || inputs.backup
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BACKUP_PASSWORT: ${{ secrets.BACKUP_PASSWORT }}
+          EREIGNIS: ${{ github.event_name }}
+          MANUELL: ${{ inputs.backup }}
+        run: |
+          if [ -z "$BACKUP_PASSWORT" ]; then echo "Kein Secret BACKUP_PASSWORT – Backup übersprungen"; exit 0; fi
+          if [ "$EREIGNIS" = schedule ]; then
+            if [ "$(date -u +%u)" != 7 ] || [ "$(date -u +%-H)" -ge 6 ]; then echo "Kein Backup-Tag (nur sonntags, erster Lauf)"; exit 0; fi
+          elif [ "$MANUELL" != true ]; then echo "Backup nicht angefordert"; exit 0; fi
+          bash scripts/db-backup.sh
 
       - name: Quellenstatus auswerten
         run: npm run status -- --warnungen warnungen.md

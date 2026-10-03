@@ -276,11 +276,12 @@
     return hits.sort((a, b) => b.score - a.score || a.g.name.localeCompare(b.g.name, 'de')).slice(0, 8).map((h) => h.g);
   }
   function gebietRow(g) {
-    return `<button class="row" type="button" data-go="${esc(link('g', g.id))}"><div class="body"><span class="title">${esc(anzeigeName(g))}</span><span class="meta">${esc(untertitel(g))}</span></div>${hatDaten(g) ? '' : '<span class="pill plain">ohne Daten</span>'}${chev}</button>`;
+    return `<button class="row" type="button" data-go="${esc(link('g', g.id))}"><div class="body"><span class="title">${esc(anzeigeName(g))}</span><span class="meta">${esc(untertitel(g))}</span></div>${g.q ? '' : hatDaten(g) ? '<span class="pill plain">über VG/Kreis</span>' : '<span class="pill plain">ohne Daten</span>'}${chev}</button>`;
   }
   function vWahl() {
     setTitle('');
     const gemeinden = INDEX.gemeinden.length;
+    const eigen = INDEX.gemeinden.filter(([id]) => G.get(id)?.q).length;
     const mitDaten = INDEX.gemeinden.filter(([id]) => hatDaten(G.get(id))).length;
     $view.innerHTML = `
       <div class="home">
@@ -295,7 +296,7 @@
           <input id="q" type="search" inputmode="search" enterkeyhint="search" placeholder="Kommune oder Postleitzahl" value="${esc(q)}" aria-label="Kommune oder Postleitzahl">
         </form>
         <div id="hits"></div>
-        <p class="coverage">Alle ${fmtZahl(gemeinden)} Gemeinden in Rheinland-Pfalz · Sitzungsdaten für ${fmtZahl(mitDaten)} davon<br>Datenstand ${esc(stand(INDEX.erstellt))}</p>
+        <p class="coverage">${fmtZahl(gemeinden)} Gemeinden in Rheinland-Pfalz · eigene Sitzungsdaten für ${fmtZahl(eigen)}${mitDaten > eigen ? `, bei weiteren ${fmtZahl(mitDaten - eigen)} nur über die Verbandsgemeinde oder den Kreis` : ''}<br>Datenstand ${esc(stand(INDEX.erstellt))}</p>
       </div>`;
     const input = document.getElementById('q');
     const $hits = document.getElementById('hits');

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cleanText, dokumentUrl, istDownload, ohneKopf, sessionnetKalender, webSeite } from '../src/export/snapshot.js';
+import { cleanText, dokumentUrl, entferneZwillinge, istDownload, ohneKopf, sessionnetKalender, webSeite } from '../src/export/snapshot.js';
 
 describe('Textauszug', () => {
   it('beginnt beim Sachverhalt statt beim Formularkopf', () => {
@@ -52,5 +52,17 @@ describe('Dokument-Links', () => {
     expect(istDownload('https://ratsinfo.vgka.de/bi/getfile.asp?id=1&type=do')).toBe(true);
     expect(istDownload('https://buergerinfo.koblenz.de/getfile.php?id=3&type=do')).toBe(true);
     expect(istDownload('https://x.gremien.info/api.php?document_type_id=4')).toBe(false);
+  });
+});
+
+describe('entferneZwillinge', () => {
+  it('behält bei more!rubin-Zwillingen nur die Adresse mit ni_', () => {
+    const ids = ['https://x.gremien.info/oparl/meeting/ni_2026-GR_1', 'https://x.gremien.info/oparl/meeting/2026-GR_1', 'https://x.gremien.info/oparl/meeting/2026-GR_2'];
+    expect(entferneZwillinge(ids)).toEqual(['https://x.gremien.info/oparl/meeting/ni_2026-GR_1', 'https://x.gremien.info/oparl/meeting/2026-GR_2']);
+    expect(entferneZwillinge(['https://y.gremien.info/meeting?id=ni_5', 'https://y.gremien.info/meeting?id=5'])).toEqual(['https://y.gremien.info/meeting?id=ni_5']);
+  });
+  it('lässt andere Adressen unverändert', () => {
+    const ids = ['https://k.de/si0057.php?__ksinr=1', 'https://k.de/si0057.php?__ksinr=2'];
+    expect(entferneZwillinge(ids)).toEqual(ids);
   });
 });
