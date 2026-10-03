@@ -98,7 +98,12 @@ button { font: inherit; color: inherit; }
 .logo .wm { display: flex; flex-direction: column; font-family: "Sora", var(--font-body), sans-serif; font-size: 19px; line-height: 1; letter-spacing: .08em; text-transform: uppercase; font-weight: 300; }
 .logo .wm b { font-weight: 800; }
 .logo .wm .rlp { color: #f2c230; font-size: .54em; letter-spacing: .14em; margin-left: .35em; }
-.logo .wm .tri { display: block; height: 3px; margin-top: 5px; border-radius: 2px; background: linear-gradient(90deg, #000 0 33%, #d62828 33% 66%, #f2c230 66%); }
+/* Streifen: je Wort ein Abschnitt (gleicher Text unsichtbar als Breitenmaß), Farben laufen ineinander: Schwarz unter WAHL, Rot unter HEIMAT, Gold unter RLP */
+.logo .wm .bars { display: flex; margin-top: 5px; height: 3px; border-radius: 2px; overflow: hidden; user-select: none; }
+.logo .wm .bars i { font-style: normal; color: transparent; height: 3px; overflow: hidden; }
+.logo .wm .bars .k { font-weight: 800; background: linear-gradient(90deg, #000 0 55%, #d62828); }
+.logo .wm .bars .r { font-weight: 300; background: linear-gradient(90deg, #d62828 0 55%, #f2c230); }
+.logo .wm .bars .g { font-size: .54em; letter-spacing: .14em; padding-left: .35em; background: #f2c230; }
 .logo:active { opacity: .75; }
 @media (max-width: 360px) { .logo .wm { font-size: 15.5px; } .logo img { width: 28px; height: 28px; } .logo { gap: 7px; } }
 .ctx { flex: 1; min-width: 0; text-align: right; font-size: 14px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; font-weight: 500; }
@@ -301,7 +306,7 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
   <header class="bar">
     <a class="logo" href="#/" id="home" aria-label="Wahlheimat – zur Startseite">
       <img src="icons/icon.svg" alt="" width="32" height="32">
-      <span class="wm"><span><b>Wahl</b>heimat<b class="rlp">RLP</b></span><span class="tri"></span></span>
+      <span class="wm"><span><b>Wahl</b>heimat<b class="rlp">RLP</b></span><span class="bars" aria-hidden="true"><i class="k">Wahl</i><i class="r">heimat</i><i class="g">RLP</i></span></span>
     </a>
     <p class="ctx" id="title"></p>
   </header>
