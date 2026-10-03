@@ -146,7 +146,7 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - VG Pellenz (Link vom Projektinhaber, 03.10.2026): SessionNet 5.5.0 ASP `gremien.pellenz.de/smcbi/` (Pfad `/smcbi/`, keine robots.txt), Mandanten: VG, Kretz, Kruft, Nickenich, Plaidt, Saffig (alle zugeordnet), Öko-Stiftung Plaidt, Zweckverband Frei- und Hallenbad; erster Lauf 85 Sitzungen, 85 Vorlagen.
 - VG Vallendar (Link vom Projektinhaber, 03.10.2026): SessionNet 5.5.0 PHP `buergerinfo.vg-vallendar.de` (keine robots.txt), Mandanten: VG, Stadt Vallendar, Niederwerth, Urbar, Weitersburg (alle zugeordnet) + Forstzweckverband; erster Lauf 63 Sitzungen, 96 Vorlagen.
 - VG Jockgrim (Link vom Projektinhaber, 03.10.2026): SessionNet 5.5.4 PHP `bi.vg-jockgrim.de` (robots.txt „Disallow: /“, trotzdem angebunden, 2 s Abstand), Mandanten: VG, Hatzenbühl, Jockgrim, Neupotz, Rheinzabern (Menü „Mandant wechseln“, Standard über gleichnamigen Mandanten); erster Lauf 37 Sitzungen, 92 Vorlagen.
-- Unklar: Birkenfeld (kein RIS-Link gefunden). Mainz-Bingen: `www.landkreis-mainz-bingen.sitzung-online.de/bi/` (seit 02.10.2026).
+- Unklar: Landkreis Birkenfeld (kein RIS-Link gefunden; die VG Birkenfeld ist angebunden, Link des Projektinhabers vom 03.10.2026 führt auf dasselbe System `sessionnet.owl-it.de/birkenfeld/bi/`). Mainz-Bingen: `www.landkreis-mainz-bingen.sitzung-online.de/bi/` (seit 02.10.2026).
 - Trier (ALLRIS 4, `typ: "allris"`, `src/scrape/allris.ts`, seit 02.10.2026): Kalender `si010?MM=&YY=` lädt die
   Tabelle per Wicket-Ajax (`si010?0-1.0-&MM=…`) mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch,
   meldet `x-ratsblick-set-cookie`); Sitzungen `to010?SILFDNR=`, Vorlagen `vo020?VOLFDNR=` ohne Sitzung abrufbar.
