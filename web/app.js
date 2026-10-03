@@ -7,6 +7,10 @@
   const $toast = document.getElementById('toast');
   const $offline = document.getElementById('offline');
 
+  // Reichweitenmessung mit GoatCounter. Leer = aus (kein Skript, keine Anfrage, Datenschutz-Absatz erscheint nicht).
+  // Einschalten: Adresse der Zähl-Schnittstelle eintragen, z. B. 'https://wahlheimat.goatcounter.com/count'.
+  const ZAEHLER = '';
+
   const store = {
     get(k, d) { try { const v = localStorage.getItem('ratsblick:' + k); return v ? JSON.parse(v) : d; } catch { return d; } },
     set(k, v) { try { localStorage.setItem('ratsblick:' + k, JSON.stringify(v)); } catch {} },
@@ -110,6 +114,24 @@
     if (location.hash === '#/' || location.hash === '') route(); else location.hash = '#/';
   });
   window.addEventListener('hashchange', () => route());
+
+  // Reichweitenmessung (nur wenn ZAEHLER gesetzt): meldet je Seitenwechsel nur die Art der App-Seite, nie Suchbegriffe oder Sitzungs-/Vorlagen-IDs
+  function starteZaehler() {
+    if (!ZAEHLER) return;
+    window.goatcounter = { no_onload: true, endpoint: ZAEHLER };
+    const pfad = () => {
+      const r = parse();
+      if (r.v === 'g' && r.a) return '/g/' + r.a + (r.b ? '/' + r.b : '');
+      return '/' + (r.v || '');
+    };
+    const zaehle = () => { try { window.goatcounter.count({ path: pfad(), title: pfad() }); } catch {} };
+    const sk = document.createElement('script');
+    sk.async = true;
+    sk.src = 'https://gc.zgo.at/count.js';
+    sk.dataset.goatcounter = ZAEHLER;
+    sk.onload = () => { zaehle(); window.addEventListener('hashchange', zaehle); };
+    document.head.appendChild(sk);
+  }
   document.querySelectorAll('.tabs button').forEach((b) => b.addEventListener('click', () => {
     depth = 0;
     const tab = b.dataset.tab;
@@ -425,14 +447,18 @@
     }),
     datenschutz: () => ({
       titel: 'Datenschutz',
-      html: `<p class="lead">Kurz gesagt: Wahlheimat braucht keine Anmeldung, setzt keine Cookies, verwendet kein Tracking und keine Analyse- oder Werbedienste. Was Sie sich merken, bleibt auf Ihrem Gerät.</p>
+      html: `<p class="lead">${ZAEHLER
+          ? 'Kurz gesagt: Wahlheimat braucht keine Anmeldung, setzt keine Cookies, legt keine Profile an und zeigt keine Werbung. Gezählt wird nur anonym, wie oft App-Seiten aufgerufen werden (Abschnitt 3a). Was Sie sich merken, bleibt auf Ihrem Gerät.'
+          : 'Kurz gesagt: Wahlheimat braucht keine Anmeldung, setzt keine Cookies, verwendet kein Tracking und keine Analyse- oder Werbedienste. Was Sie sich merken, bleibt auf Ihrem Gerät.'}</p>
         <h4>1. Verantwortlich</h4>
         <p>${ang(BETREIBER.name)}, ${ang(BETREIBER.anschrift)}, E-Mail: ${mail()}</p>
         <h4>2. Bereitstellung der Website (Hosting)</h4>
         <p>Die Website liegt bei GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA). Beim Aufruf verarbeitet GitHub technisch notwendige Daten wie IP-Adresse, Zeitpunkt, abgerufene Datei und Browser-Kennung, um die Seite auszuliefern und vor Missbrauch zu schützen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer sicheren, funktionierenden Website). GitHub ist nach dem EU-US Data Privacy Framework zertifiziert. Einzelheiten: ${extern('https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement', 'Datenschutzerklärung von GitHub')}.</p>
-        <p>Schriften und alle übrigen Bestandteile der App werden von dieser Website selbst geladen, nicht von Dritten.</p>
+        <p>Schriften und alle übrigen Bestandteile der App werden von dieser Website selbst geladen, nicht von Dritten${ZAEHLER ? ' (einzige Ausnahme: das Zählskript, siehe 3a)' : ''}.</p>
         <h4>3. Speicher auf Ihrem Gerät</h4>
         <p>Die App speichert im Speicher Ihres Browsers (<em>localStorage</em>) Ihre Favoriten, die zuletzt gewählte Kommune und die Einstellungen der Themensuche, außerdem App-Dateien und den zuletzt geladenen Datenstand für die Nutzung ohne Verbindung. Diese Angaben verlassen Ihr Gerät nicht und werden nicht an uns übertragen. Sie dienen ausschließlich Funktionen, die Sie selbst nutzen (§ 25 Abs. 2 Nr. 2 TDDDG); eine Einwilligung ist dafür nicht erforderlich. Sie können sie jederzeit löschen, indem Sie die Websitedaten in Ihrem Browser entfernen.</p>
+        ${ZAEHLER ? `<h4>3a. Reichweitenmessung (GoatCounter)</h4>
+        <p>Um zu verstehen, wie Wahlheimat genutzt wird, zählen wir Seitenaufrufe mit GoatCounter (Martin Tournoij, Irland; Betrieb auf Servern der Hetzner Online GmbH in Finnland und Deutschland). Dafür lädt Ihr Browser ein kleines Skript von gc.zgo.at und meldet bei jedem Seitenwechsel, welche Art von App-Seite aufgerufen wurde (zum Beispiel eine Kommune, nie Ihre Suchbegriffe), dazu die Verweisseite, Browser und Betriebssystem in groben Kategorien, die Bildschirmbreite, die Sprache und – aus der IP-Adresse abgeleitet – das Land. Nach Angaben des Anbieters werden dabei weder Ihre IP-Adresse noch die vollständige Browserkennung noch eine Nutzerkennung gespeichert, und es wird nichts auf Ihrem Gerät abgelegt; ausgewertet wird nur in Summen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer bedarfsgerechten Weiterentwicklung). Sie können der Messung widersprechen (Art. 21 DSGVO), etwa indem Sie Skripte für diese Seite blockieren oder uns schreiben. Weitere Angaben: ${extern('https://www.goatcounter.com/privacy', 'Datenschutzerklärung von GoatCounter')}.</p>` : ''}
         <h4>4. Links zu Ratsinformationssystemen</h4>
         <p>Wenn Sie einen Link zu einem Ratsinformationssystem oder Dokument antippen, verbindet sich Ihr Browser direkt mit dem Server der jeweiligen Kommune bzw. ihres Anbieters. Dafür gelten deren Datenschutzhinweise.${BETREIBER.paypal ? ` Dasselbe gilt für den freiwilligen Unterstützen-Button auf der Info-Seite: Erst wenn Sie ihn antippen, wechseln Sie zu PayPal (PayPal (Europe) S.à r.l. et Cie, S.C.A., Luxemburg); vorher werden keine Daten an PayPal übertragen. Bei einer Zahlung erhalten wir nur die Angaben, die PayPal uns dazu mitteilt (etwa Name, Betrag und Zeitpunkt), und verwenden sie nur zur Abwicklung und Dokumentation (Art. 6 Abs. 1 lit. b und c DSGVO). Es gelten die Datenschutzhinweise von PayPal.` : ''}</p>
         <h4>5. Personenbezogene Angaben in Ratsunterlagen</h4>
@@ -460,7 +486,7 @@
       <div class="list">
         ${zeile('ueber', 'Was Wahlheimat ist, woher die Daten kommen, Kontakt')}
         ${zeile('impressum', 'Anbieterkennzeichnung')}
-        ${zeile('datenschutz', 'Keine Cookies, kein Tracking – die Einzelheiten')}
+        ${zeile('datenschutz', ZAEHLER ? 'Keine Cookies, keine Profile – die Einzelheiten' : 'Keine Cookies, kein Tracking – die Einzelheiten')}
       </div>
       ${spende}
       <p class="stand">Datenstand ${esc(stand(INDEX.erstellt))}</p>`;
@@ -838,6 +864,7 @@
   getJson('data/index.json').then((idx) => {
     ladeIndex(idx);
     route();
+    starteZaehler();
   }).catch((err) => {
     $view.innerHTML = `<div class="card empty">Die Daten konnten nicht geladen werden (${esc(err.message)}). Prüfen Sie die Verbindung und laden Sie die Seite neu.</div>`;
   });

@@ -1,4 +1,5 @@
 import type { Status } from './status.js';
+import type { Zugriffe, ZugriffeFehler } from './zugriffe.js';
 
 /**
  * Verschlüsselte Admin-Seite für GitHub Pages: Das Dashboard (HTML mit eingebetteten Daten) wird mit einem Passwort
@@ -72,8 +73,9 @@ document.getElementById('f').addEventListener('submit',async(e)=>{
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 /** Das eigentliche Dashboard (wird verschlüsselt ausgeliefert). */
-export function dashboardHtml(status: Status): string {
+export function dashboardHtml(status: Status, zugriffe: Zugriffe | ZugriffeFehler | null = null): string {
   const daten = JSON.stringify(status).replace(/</g, '\\u003c');
+  const zdaten = JSON.stringify(zugriffe).replace(/</g, '\\u003c');
   const z = status.zusammenfassung;
   return `<!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -103,9 +105,10 @@ label{font-size:13px;display:flex;align-items:center;gap:6px}
 <h2>Alle Quellen</h2>
 <div class="c"><input type="search" id="q" placeholder="Quelle suchen …" aria-label="Quelle suchen"><label><input type="checkbox" id="nur"> nur Auffällige</label></div>
 <div class="sc"><table class="t"><thead><tr id="h"></tr></thead><tbody id="b"></tbody></table></div>
-<h2>Zugriffe</h2><div class="z">Zugriffszahlen sind noch nicht eingerichtet.</div>
+<h2>Zugriffe</h2><div id="z" class="z">Zugriffszahlen sind noch nicht eingerichtet.</div>
 </main>
 <script type="application/json" id="d">${daten}</script>
+<script type="application/json" id="zd">${zdaten}</script>
 <script>
 const S=JSON.parse(document.getElementById('d').textContent);
 const e=(s)=>String(s??'').replace(/[&<>"]/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -128,5 +131,14 @@ function zeichne(){
 document.getElementById('h').addEventListener('click',(ev)=>{const i=ev.target.dataset.i;if(i===undefined)return;const k=sp[i][1];if(k===sort)asc=!asc;else{sort=k;asc=false;}zeichne();});
 document.getElementById('q').addEventListener('input',zeichne);document.getElementById('nur').addEventListener('change',zeichne);
 zeichne();
+const Z=JSON.parse(document.getElementById('zd').textContent);
+if(Z&&Z.fehler){document.getElementById('z').textContent='Zugriffszahlen konnten nicht abgerufen werden: '+Z.fehler;}
+else if(Z){
+  const mx=Math.max(1,...Z.tage.map((t)=>t.besucher)),bw=100/Z.tage.length;
+  const balken=Z.tage.map((t,i)=>'<rect x="'+(i*bw+0.4).toFixed(2)+'" y="'+(40-t.besucher/mx*40).toFixed(1)+'" width="'+(bw-0.8).toFixed(2)+'" height="'+(t.besucher/mx*40).toFixed(1)+'" fill="currentColor"><title>'+t.tag+': '+t.besucher+'</title></rect>').join('');
+  const liste=(a,k)=>a.length?'<table class="t"><tbody>'+a.map((x)=>'<tr><td>'+e(x[k])+'</td><td class="n">'+x.besucher+'</td></tr>').join('')+'</tbody></table>':'<div class="m">noch keine Daten</div>';
+  document.getElementById('z').className='';
+  document.getElementById('z').innerHTML='<div class="k"><div><b>'+Z.heute+'</b>heute</div><div><b>'+Z.sieben+'</b>7 Tage</div><div><b>'+Z.dreissig+'</b>30 Tage</div></div><div class="m">Besucher je Tag (30 Tage)</div><svg viewBox="0 0 100 40" preserveAspectRatio="none" style="width:100%;height:80px;color:var(--a)">'+balken+'</svg><div class="m">Besucher = einzigartige Besuche je Tag und Seite, keine Personen.</div><h2>Meistgenutzte App-Seiten</h2>'+liste(Z.seiten,'pfad')+'<h2>Verweisseiten</h2>'+liste(Z.verweise,'name');
+}
 </script></body></html>`;
 }

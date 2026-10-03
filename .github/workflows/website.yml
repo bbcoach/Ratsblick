@@ -93,6 +93,9 @@ jobs:
       - name: Admin-Dashboard
         env:
           ADMIN_PASSWORT: ${{ secrets.ADMIN_PASSWORT }}
+          # Zugriffszahlen (optional): Variable GOATCOUNTER_URL (z. B. https://wahlheimat.goatcounter.com), Secret GOATCOUNTER_TOKEN
+          GOATCOUNTER_URL: ${{ vars.GOATCOUNTER_URL }}
+          GOATCOUNTER_TOKEN: ${{ secrets.GOATCOUNTER_TOKEN }}
         run: npm run admin -- --out dist/admin
 
       # Auffälligkeiten (Fehler, veraltet, leer, Einbruch) als Issue: GitHub schickt dir dazu eine E-Mail.

@@ -17,6 +17,7 @@ import { syncRegisafe } from './scrape/regisafe.js';
 import { syncRubinApi } from './scrape/rubin.js';
 import { syncSessionNet } from './scrape/sessionnet.js';
 import { baueStatus, schreibeLog, warnungenMarkdown } from './status/status.js';
+import { holeZugriffe, type Zugriffe, type ZugriffeFehler } from './status/zugriffe.js';
 import { dashboardHtml, huelle, verschluessele } from './status/admin.js';
 import { gespeicherteAdresse, leereQuelle, syncSource, type SourceRecord } from './sync/sync.js';
 
@@ -110,7 +111,18 @@ async function main(): Promise<void> {
     if (passwort.length < 16) throw new Error('ADMIN_PASSWORT ist zu kurz (mindestens 16 Zeichen, besser ein langer Satz)');
     const ziel = `${values.out ?? 'dist/admin'}/index.html`;
     mkdirSync(dirname(ziel), { recursive: true });
-    writeFileSync(ziel, huelle(await verschluessele(dashboardHtml(st), passwort)));
+    // Zugriffszahlen (optional): GOATCOUNTER_URL = Adresse der Seite, GOATCOUNTER_TOKEN = API-Token mit Leserecht
+    let zugriffe: Zugriffe | ZugriffeFehler | null = null;
+    if (process.env.GOATCOUNTER_URL && process.env.GOATCOUNTER_TOKEN) {
+      try {
+        zugriffe = await holeZugriffe({ url: process.env.GOATCOUNTER_URL, token: process.env.GOATCOUNTER_TOKEN });
+        console.log(`Zugriffe: ${zugriffe.dreissig} Besucher in 30 Tagen`);
+      } catch (err) {
+        zugriffe = { fehler: (err as Error).message };
+        console.log(`Zugriffe nicht abrufbar: ${(err as Error).message}`);
+      }
+    }
+    writeFileSync(ziel, huelle(await verschluessele(dashboardHtml(st, zugriffe), passwort)));
     console.log(`Admin-Seite (verschlüsselt) → ${ziel}`);
     return;
   }
