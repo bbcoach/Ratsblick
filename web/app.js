@@ -525,7 +525,7 @@
     const gremien = gremienVon(sitz);
     $view.innerHTML = `${seg}${kopf}${SITZE_PLATZ}${nurTermineHinweis(x)}
       <section class="spalte"><h2>Nächste Sitzungen</h2>
-        ${kommend.length ? `<div class="list">${kommend.map(sitzungRow).join('')}</div>` : '<div class="card empty">Zurzeit sind keine Sitzungen angekündigt.</div>'}
+        ${kommend.length ? `<div class="list">${kommend.map(sitzungRow).join('')}</div>` : `<div class="card empty">Zurzeit sind keine künftigen Sitzungen eingetragen.${vergangen.length ? ` Die letzte war am ${fmt(vergangen[0].start, { day: 'numeric', month: 'long', year: 'numeric' })}.` : ''} Neue Termine erscheinen hier, sobald die Verwaltung sie im ${x.D.quelle.ohneRis ? 'Internetauftritt' : 'Ratsinformationssystem'} veröffentlicht.</div>`}
       </section>
       ${x.D.quelle.nurTermine ? '' : `<section class="spalte"><h2>Neue Vorlagen</h2>
         ${vorl.length ? `<div class="list">${vorl.map(vorlageRow).join('')}</div>` : '<div class="card empty">Keine aktuellen Vorlagen.</div>'}
