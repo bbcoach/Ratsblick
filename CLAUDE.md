@@ -241,7 +241,7 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
   Städte unter dem Kreisschlüssel). Gemeinden mit neuem Schlüssel nach der Wahl über den Namen (Obergeckler; Niedergeckler entfällt).
   Farben: übliche Parteifarben, Wählergruppen #2a9d8f/#a0522d/#6a5acd (mit dem dataviz-Validator geprüft), danach grau.
 - Rechtliches (seit 02.10.2026): Seiten `#/ueber`, `#/impressum`, `#/datenschutz` (`TEXTSEITEN` in web/app.js), erreichbar über den
-  vierten Reiter „Info“ (`#/info`, Übersicht); keine Fußzeile auf Start-/Favoritenseite (Projektinhaber). Betreiberangaben nur in `BETREIBER` (app.js) eintragen – fehlende erscheinen als „[wird ergänzt]“.
+  vierten Reiter „Info“ (`#/info`, Übersicht); keine Fußzeile auf Start-/Favoritenseite (Projektinhaber). Betreiberangaben nur in `BETREIBER` (app.js) pflegen (eingetragen 03.10.2026: Ralph Arnold, Enkenbach-Alsenborn, info@wahlheimat-rlp.de); fehlende erscheinen als „[wird ergänzt]“.
   Kein Cookie-Banner nötig (keine Cookies/Tracking; localStorage nur für Nutzerfunktionen, § 25 Abs. 2 Nr. 2 TDDDG). Schriften liegen
   in `web/fonts/` (keine Google-Fonts-Abrufe, LG München 2022); App lädt nichts von fremden Servern. Design bewusst nicht wie rlp.de
   (keine Verwechslung mit einem Landesangebot), Unabhängigkeit auf „Über Wahlheimat“ und im Impressum.

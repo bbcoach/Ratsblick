@@ -389,9 +389,9 @@
   // ---------- Über Wahlheimat, Impressum, Datenschutz ----------
   // Angaben zum Betreiber – nur hier eintragen; fehlende Angaben erscheinen als „[wird ergänzt]“
   const BETREIBER = {
-    name: null,       // Vor- und Nachname
-    anschrift: null,  // ladungsfähige Anschrift, Zeilen mit \n trennen
-    email: null,      // Kontaktadresse
+    name: 'Ralph Arnold',
+    anschrift: 'St. Norbert Straße 1a\n67677 Enkenbach-Alsenborn\nDeutschland',  // Zeilen mit \n trennen
+    email: 'info@wahlheimat-rlp.de',
   };
   const ang = (v) => (v ? esc(v).replace(/\n/g, '<br>') : '<span class="fehlt">[wird ergänzt]</span>');
   const mail = () => (BETREIBER.email ? `<a href="mailto:${esc(BETREIBER.email)}">${esc(BETREIBER.email)}</a>` : ang(null));
