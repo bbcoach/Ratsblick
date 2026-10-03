@@ -138,6 +138,7 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   OParl → `rubin-api`, 10 Körperschaften, 29 Sitzungen, 59 Vorlagen.
 - VG Hamm (Sieg) (Link vom Projektinhaber, 03.10.2026): SessionNet 5.5 ASP `sessionnet.owl-it.de/hamm-sieg/bi/` (robots.txt „Disallow: /“, trotzdem
   angebunden, 2 s Abstand), Mandanten: VG + 12 Ortsgemeinden.
+- VG Ransbach-Baumbach (Link vom Projektinhaber, 03.10.2026): der Link `ratsinfo.ransbach-baumbach.de` ist das Anmeldeportal für Mandatsträger (nicht abgerufen); öffentlich ist SessionNet 5.4.8 PHP `buergerinfo.ransbach-baumbach.de` (robots.txt „Disallow: /“, trotzdem angebunden, 2 s Abstand), Mandanten: VG, Stadt, 10 Ortsgemeinden, AÖR, 2 Zweckverbände; erster Lauf 63 Sitzungen, 17 Vorlagen.
 - Unklar: Birkenfeld (kein RIS-Link gefunden). Mainz-Bingen: `www.landkreis-mainz-bingen.sitzung-online.de/bi/` (seit 02.10.2026).
 - Trier (ALLRIS 4, `typ: "allris"`, `src/scrape/allris.ts`, seit 02.10.2026): Kalender `si010?MM=&YY=` lädt die
   Tabelle per Wicket-Ajax (`si010?0-1.0-&MM=…`) mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch,
