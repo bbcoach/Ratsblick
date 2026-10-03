@@ -61,6 +61,18 @@ export function webSeite(id: string, raw: { web?: unknown }, art: 'sitzung' | 'v
   return id;
 }
 
+/**
+ * SessionNet: Sitzungen ohne veröffentlichte Tagesordnung und ohne Unterlagen haben im RIS keine Einzelseite
+ * (Kaiserslautern: „Zum Öffnen des Vorgangs fehlt die Berechtigung“, Fehlercode 1104; Landau leitet um). Dann verlinken wir
+ * stattdessen den Kalender des Sitzungsmonats im selben System. Andere Systeme: null (Einzelseite bleibt).
+ */
+export function sessionnetKalender(web: string, start: string): string | null {
+  const m = /^(https?:\/\/.*\/)si005[67]\.(asp|php)\?/.exec(web);
+  const t = /^(\d{4})-(\d{2})/.exec(start);
+  if (!m || !t) return null;
+  return `${m[1]}si0040.${m[2]}?__cjahr=${t[1]}&__cmonat=${Number(t[2])}&__canz=1&__cselect=0`;
+}
+
 export function art(name: string): string {
   if (name.startsWith('Ortsgemeinde')) return 'Ortsgemeinde';
   if (name.startsWith('Ortsbezirk')) return 'Ortsbezirk';
@@ -155,10 +167,14 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
         beschluss: cleanText(raw.resolutionFile?.text ?? raw.result, 700),
       };
     });
+    const dateien = filesOf('meeting', mid);
+    const einzelseite = webSeite(mid, JSON.parse(String(m.raw)) as { web?: unknown }, 'sitzung');
+    const kalender = einzelseite && tops.length === 0 && dateien.length === 0 ? sessionnetKalender(einzelseite, String(m.start ?? '')) : null;
     return {
       id: mid,
       k: String(m.body_id),
-      web: webSeite(mid, JSON.parse(String(m.raw)) as { web?: unknown }, 'sitzung'),
+      web: kalender ?? einzelseite,
+      ...(kalender ? { webKalender: true } : {}),
       name: s(m.name),
       start: s(m.start),
       ende: s(m.end),
@@ -167,7 +183,7 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
       abgesagt: m.cancelled === 1,
       gremien: orgs.map((o) => gremien.get(o) ?? o),
       tops,
-      dateien: filesOf('meeting', mid),
+      dateien,
     };
   });
 

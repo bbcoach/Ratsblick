@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cleanText, ohneKopf, webSeite } from '../src/export/snapshot.js';
+import { cleanText, ohneKopf, sessionnetKalender, webSeite } from '../src/export/snapshot.js';
 
 describe('Textauszug', () => {
   it('beginnt beim Sachverhalt statt beim Formularkopf', () => {
@@ -25,5 +25,18 @@ describe('Textauszug', () => {
     expect(webSeite('https://vgog.ratsinfomanagement.net/termine#2024102912', {}, 'sitzung')).toBeNull();
     expect(webSeite('https://gremieninfo.trier.de/public/to010?SILFDNR=1', {}, 'sitzung')).toBe('https://gremieninfo.trier.de/public/to010?SILFDNR=1&refresh=false');
     expect(webSeite('https://www.vg-winnweiler.sitzung-online.de/bi/to010.asp?SILFDNR=2', {}, 'sitzung')).toBe('https://www.vg-winnweiler.sitzung-online.de/bi/to010.asp?SILFDNR=2');
+  });
+});
+
+describe('sessionnetKalender', () => {
+  it('ersetzt die Sitzungsseite durch den Monatskalender desselben Systems', () => {
+    expect(sessionnetKalender('https://ris.kaiserslautern.de/buergerinfo/si0057.asp?__ksinr=2370', '2026-10-29T17:00:00+01:00'))
+      .toBe('https://ris.kaiserslautern.de/buergerinfo/si0040.asp?__cjahr=2026&__cmonat=10&__canz=1&__cselect=0');
+    expect(sessionnetKalender('https://x.de/bi/si0056.php?__ksinr=9', '2026-03-02T09:00:00+01:00'))
+      .toBe('https://x.de/bi/si0040.php?__cjahr=2026&__cmonat=3&__canz=1&__cselect=0');
+  });
+  it('lässt andere Systeme unberührt', () => {
+    expect(sessionnetKalender('https://x.gremien.info/meeting?id=1', '2026-10-29T17:00:00+01:00')).toBeNull();
+    expect(sessionnetKalender('https://x.de/bi/to010?SILFDNR=1', '2026-10-29T17:00:00+01:00')).toBeNull();
   });
 });

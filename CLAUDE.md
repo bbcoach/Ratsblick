@@ -281,6 +281,7 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
   in `web/fonts/` (keine Google-Fonts-Abrufe, LG München 2022); App lädt nichts von fremden Servern. Design bewusst nicht wie rlp.de
   (keine Verwechslung mit einem Landesangebot), Unabhängigkeit auf „Über Wahlheimat“ und im Impressum.
 - App-Dateien lädt der Service Worker zuerst aus dem Netz (Cache nur offline); neue Version kurz nach dem Start → automatisch neu laden.
+- SessionNet-Sitzungen ohne Tagesordnung und ohne Unterlagen (seit 03.10.2026): die Einzelseite `si0057`/`si0056` ist im RIS nicht öffentlich (Kaiserslautern: „Zum Öffnen des Vorgangs fehlt die Berechtigung“, Code 1104) → Export verlinkt den Monatskalender `si0040…?__cjahr=&__cmonat=` (`sessionnetKalender` in snapshot.ts, Feld `webKalender`), die App zeigt „Kalender im Ratsinformationssystem öffnen“ mit Erklärung. Gilt für alle SessionNet-Quellen mit leerer Sitzung; nicht an jedem System geprüft.
 - Links ins Original-RIS (seit 02.10.2026): je Quelle `quelle.ris` (Startseite, `risStartseite`), je Sitzung/Vorlage `web`
   (`webSeite` in `src/export/snapshot.ts`: OParl-`web`, sonst Seitenadresse der Scraper; more!rubin-Sitzungen `/meeting?id=`
   ohne `ni_`; ALLRIS 4 mit `&refresh=false`; ohne verlässliche Einzelseite → null, die App verlinkt dann die Startseite).

@@ -628,10 +628,14 @@
   }, true);
 
   /** Link ins Original-Ratsinformationssystem: zur Einzelseite, sonst zur Startseite des RIS. */
-  function risLink(seite, startseite, was, ohneRis) {
+  function risLink(seite, startseite, was, ohneRis, kalender) {
     const url = seite || startseite;
     if (!url) return '';
     const system = ohneRis ? 'auf der Website' : 'im Ratsinformationssystem';
+    if (kalender && seite) {
+      return `<section class="ris"><a class="btn ghost" href="${esc(seite)}" target="_blank" rel="noopener">Kalender ${system} öffnen ↗</a>
+      <p class="muted small">Für diese Sitzung gibt es dort noch keine eigene Seite – das System zeigt sie erst, wenn die Tagesordnung veröffentlicht ist. Im Kalender sehen Sie den Termin.</p></section>`;
+    }
     const text = seite ? `${was} ${system} öffnen` : ohneRis ? 'Zur Website der Kommune' : 'Zum Ratsinformationssystem';
     return `<section class="ris"><a class="btn ghost" href="${esc(url)}" target="_blank" rel="noopener">${esc(text)} ↗</a>
       <p class="muted small">${ohneRis ? 'Dort finden Sie die veröffentlichten Protokolle und Unterlagen, auch älterer Sitzungen.' : 'Dort finden Sie alle veröffentlichten Unterlagen, auch ältere Sitzungen und Vorlagen.'}</p></section>`;
@@ -675,7 +679,7 @@
           </div></div>`;
         }).join('')}</div>` : x.D.quelle.nurTermine ? nurTermineHinweis(x) : m.start < now() ? `<div class="card empty">Zu dieser Sitzung liegen hier keine einzelnen Tagesordnungspunkte vor${docs.length ? ' – siehe Dokumente.' : '.'}</div>` : '<div class="card empty">Die Tagesordnung ist noch nicht veröffentlicht.</div>'}
       </section>
-      ${risLink(m.web, x.D.quelle.ris, 'Sitzung', x.D.quelle.ohneRis)}`;
+      ${risLink(m.web, x.D.quelle.ris, 'Sitzung', x.D.quelle.ohneRis, m.webKalender)}`;
   }
 
   // ---------- Ansicht: Vorlage ----------
