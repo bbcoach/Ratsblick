@@ -34,7 +34,7 @@ nachtModus();
 <style>
 /* Schriften liegen auf dem eigenen Server (keine Abrufe bei Google; SIL Open Font License, siehe fonts/LIZENZ.txt) */
 @font-face { font-family: "Public Sans"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(fonts/public-sans-latin.woff2) format("woff2"); }
-@font-face { font-family: "Sora"; font-style: normal; font-weight: 300 800; font-display: swap; src: url(fonts/sora-latin.woff2) format("woff2"); }
+@font-face { font-family: "Nunito"; font-style: normal; font-weight: 200 900; font-display: swap; src: url(fonts/nunito-latin.woff2) format("woff2"); }
 @font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/ibm-plex-mono-400-latin.woff2) format("woff2"); }
 @font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/ibm-plex-mono-500-latin.woff2) format("woff2"); }
 html, body { margin: 0; }
@@ -95,17 +95,18 @@ button { font: inherit; color: inherit; }
 }
 .logo { display: flex; align-items: center; gap: 9px; color: inherit; text-decoration: none; flex: none; padding: 4px 6px 4px 0; border-radius: 8px; }
 .logo img { width: 32px; height: 32px; flex: none; border-radius: 8px; box-shadow: 0 0 0 1.5px rgba(255,255,255,.3); }
-.logo .wm { display: flex; flex-direction: column; font-family: "Sora", var(--font-body), sans-serif; font-size: 19px; line-height: 1; letter-spacing: .08em; text-transform: uppercase; font-weight: 300; }
-.logo .wm b { font-weight: 800; }
+.logo .wm { display: flex; flex-direction: column; font-family: "Nunito", var(--font-body), sans-serif; font-size: 20px; line-height: 1; letter-spacing: .06em; text-transform: uppercase; font-weight: 300; }
+.logo .wm b { font-weight: 900; }
 .logo .wm .rlp { color: #f2c230; font-size: .54em; letter-spacing: .14em; margin-left: .35em; }
 /* Streifen: je Wort ein Abschnitt (gleicher Text unsichtbar als Breitenmaß), Farben laufen ineinander: Schwarz unter WAHL, Rot unter HEIMAT, Gold unter RLP */
-.logo .wm .bars { display: flex; margin-top: 5px; height: 3px; border-radius: 2px; overflow: hidden; user-select: none; }
-.logo .wm .bars i { font-style: normal; color: transparent; height: 3px; overflow: hidden; }
-.logo .wm .bars .k { font-weight: 800; background: linear-gradient(90deg, #000 0 55%, #d62828); }
-.logo .wm .bars .r { font-weight: 300; background: linear-gradient(90deg, #d62828 0 55%, #f2c230); }
-.logo .wm .bars .g { font-size: .54em; letter-spacing: .14em; padding-left: .35em; background: #f2c230; }
+.logo .wm .bars { display: flex; margin-top: 5px; height: 4px; border-radius: 2px; overflow: hidden; user-select: none; }
+.logo .wm .bars i { font-style: normal; color: transparent; height: 4px; overflow: hidden; }
+/* Mischtöne an den Wortgrenzen: Schwarz→Rot #6b1414, Rot→Gold #e4752c; je Wort ein reiner Kern */
+.logo .wm .bars .k { font-weight: 900; background: linear-gradient(90deg, #000 0 68%, #6b1414); }
+.logo .wm .bars .r { font-weight: 300; background: linear-gradient(90deg, #6b1414, #d62828 28%, #d62828 66%, #e4752c); }
+.logo .wm .bars .g { font-size: .54em; letter-spacing: .14em; padding-left: .35em; background: linear-gradient(90deg, #e4752c, #f2c230 45%); }
 .logo:active { opacity: .75; }
-@media (max-width: 360px) { .logo .wm { font-size: 15.5px; } .logo img { width: 28px; height: 28px; } .logo { gap: 7px; } }
+@media (max-width: 360px) { .logo .wm { font-size: 16px; } .logo img { width: 28px; height: 28px; } .logo { gap: 7px; } }
 .ctx { flex: 1; min-width: 0; text-align: right; font-size: 14px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; font-weight: 500; }
 .backlink { justify-self: start; display: inline-flex; align-items: center; gap: 2px; background: none; border: 0; padding: 4px 8px 4px 0; color: var(--accent); font-weight: 600; cursor: pointer; font-size: 15px; }
 

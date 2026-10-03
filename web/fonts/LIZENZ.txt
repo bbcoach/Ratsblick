@@ -1,7 +1,7 @@
 Schriften in diesem Ordner (Teilmenge „latin“, Stand 02.10.2026):
 
 - Public Sans – Copyright 2015 The Public Sans Project Authors (https://github.com/uswds/public-sans)
-- Sora (Wortmarke) – Copyright 2019 The Sora Project Authors (https://github.com/sora-xor/sora-font)
+- Nunito (Wortmarke) – Copyright 2014 The Nunito Project Authors (https://github.com/googlefonts/nunito)
 - IBM Plex Mono – Copyright © 2017 IBM Corp. (https://github.com/IBM/plex)
 
 Alle lizenziert unter der SIL Open Font License, Version 1.1: https://openfontlicense.org
