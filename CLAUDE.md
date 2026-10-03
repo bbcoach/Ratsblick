@@ -3,7 +3,7 @@
 ## Ziel
 Ein einheitliches Portal (Website und später App), das nach Eingabe der eigenen Kommune die öffentlichen
 Inhalte der Ratsinformationssysteme (RIS) zeigt: Sitzungen, Tagesordnungen, Vorlagen, Beschlüsse.
-Start mit Rheinland-Pfalz. Name seit 02.10.2026: **„Wahlheimat“**, Slogan „Guter Rat ist nicht mehr teuer“ (vorher Arbeitstitel
+Start mit Rheinland-Pfalz. Name seit 02.10.2026: **„Wahlheimat“**, Slogan „Guter Rat ist nicht teuer“ (bis 03.10.2026 „…nicht mehr teuer“; Überschriften der App persönlich: „Was beschließt mein Gemeinderat?“; vorher Arbeitstitel
 „Ratsblick“ – Name ist durch ein Projekt unter ratsblick.de belegt). Interne Bezeichner (Repo, `localStorage`-Schlüssel
 `ratsblick:*`, Cache-Namen, Weiterleiter-Header `x-ratsblick-*`, Quell-IDs) bleiben unverändert, damit nichts verloren geht.
 
@@ -142,6 +142,7 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - VG Weißenthurm (Link vom Projektinhaber, 03.10.2026): SessionNet 5.5.3 ASP `sessionnet.owl-it.de/verbandsgemeindeweissenthurm/bi/` (robots.txt „Disallow: /“, trotzdem angebunden, 2 s Abstand), Mandanten: VG + 7 Gemeinden (alle zugeordnet); erster Lauf 76 Sitzungen, 144 Vorlagen.
 - VG Mendig (Link vom Projektinhaber, 03.10.2026): SessionNet 5.5.1 ASP `buergerinfo.mendig.de` (keine robots.txt), Mandanten: VG, Stadt Mendig, Bell, Rieden, Thür, Volkesfeld (alle zugeordnet) + 4 Zweckverbände; erster Lauf 45 Sitzungen, 50 Vorlagen.
 - VG Rennerod (Link vom Projektinhaber, 03.10.2026): der Link `ratsinfo-vg-rennerod.digitalfabrix.de` ist das Anmeldeportal für Mandatsträger (SessionNet „ri“, nicht abgerufen); öffentlich ist SessionNet 5.4.5 ASP `buergerinfo-vg-rennerod.digitalfabrix.de` (keine robots.txt; `digitalfabrix.de` löst jeden Namen auf, 503 = unbekannt), Mandanten: VG, Stadt Rennerod, 22 Ortsgemeinden (alle zugeordnet) + 2 Zweckverbände; erster Lauf nur 10 Sitzungen, 34 TOPs, keine Vorlagen (`client.rlpdirekt.de` auf der VG-Website ist nur das Bürgerservice-Portal des Landes, kein RIS).
+- Stadt Remagen (Link vom Projektinhaber, 03.10.2026): SessionNet 5.5.3 PHP `www.remagen-ratsinformation.de/bi/` (ein Mandant, robots.txt fehlt), erster Lauf 22 Sitzungen, 78 Vorlagen.
 - Unklar: Birkenfeld (kein RIS-Link gefunden). Mainz-Bingen: `www.landkreis-mainz-bingen.sitzung-online.de/bi/` (seit 02.10.2026).
 - Trier (ALLRIS 4, `typ: "allris"`, `src/scrape/allris.ts`, seit 02.10.2026): Kalender `si010?MM=&YY=` lädt die
   Tabelle per Wicket-Ajax (`si010?0-1.0-&MM=…`) mit Sitzungs-Cookie (Weiterleiter reicht `x-ratsblick-cookie` durch,
@@ -233,7 +234,7 @@ Entwürfe „Ratsblick – Kernansichten“ (Claude Design): Kommune wählen →
 (Ebenen-Umschalter Gemeinde/VG/Landkreis, nächste Sitzungen, neue Vorlagen) → Vorlage im Detail
 („Kurz erklärt“ in einfacher Sprache, als automatisch erstellt gekennzeichnet, Beratungsfolge, Dokumente)
 → Themen-Abo (Themen, Stichwort, eigene Straße, Push/E-Mail).
-Name in der App: „Wahlheimat RLP“ (Kopfzeile, „RLP“ in Gold), Slogan „Guter Rat ist nicht mehr teuer.“ auf der Startseite; vorher „Ratsblick RLP“.
+Name in der App: „Wahlheimat RLP“ (Kopfzeile, „RLP“ in Gold), Slogan „Guter Rat ist nicht teuer.“ auf der Startseite; vorher „Ratsblick RLP“.
 Stil: ruhig und behördennah, Akzent Weinrot #7B2736 (vorher Blau #1F4E79), Schrift Public Sans, Vorlagennummern in IBM Plex Mono.
 Logo (seit 02.10.2026): Umriss von Rheinland-Pfalz in Schwarz-Rot-Gold (diagonale Bänder, versetzte Füllung, weißer Umriss)
 mit Lupe auf Weinrot; Kopfzeile „Wahlheimat **RLP**“ mit „RLP“ in Gold #F2C230. Eigene Zeichnung aus offenen Grenzdaten

@@ -1,6 +1,6 @@
 # Wahlheimat (vormals Ratsblick) – Datenebene
 
-*Guter Rat ist nicht mehr teuer.*
+*Guter Rat ist nicht teuer.*
 
 Wahlheimat soll die öffentlichen Inhalte kommunaler Ratsinformationssysteme an einem Ort zugänglich machen.
 Dieses Repository enthält den ersten Baustein: Es liest Daten über die Standardschnittstelle **OParl**

@@ -267,9 +267,9 @@
       <div class="home">
         ${installCard()}
         <section class="hero">
-          <p class="slogan">Guter Rat ist nicht mehr teuer.</p>
-          <h3>Was beschließt Ihr Gemeinderat?</h3>
-          <p class="lead">Sitzungen, Tagesordnungen und Vorlagen Ihrer Kommune – verständlich an einem Ort.</p>
+          <p class="slogan">Guter Rat ist nicht teuer.</p>
+          <h3>Was beschließt mein Gemeinderat?</h3>
+          <p class="lead">Sitzungen, Tagesordnungen und Vorlagen meiner Kommune – verständlich an einem Ort.</p>
         </section>
         <form class="searchbox" id="sf" role="search" autocomplete="off">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
@@ -755,7 +755,7 @@
     const filter = gebietsfilter();
     if (!filter.some((f) => f.key === zustand.ort)) zustand.ort = 'alle';
     $view.innerHTML = `
-      <section class="hero"><h3>Was wird zu Ihrem Thema beraten?</h3>
+      <section class="hero"><h3>Was wird zu meinem Thema beraten?</h3>
         <p class="muted small">Vorlagen und Tagesordnungspunkte aller angebundenen Räte – in Ihrer Kommune, im Kreis oder in ganz Rheinland-Pfalz.</p></section>
       <form class="searchbox" id="tf" role="search" autocomplete="off">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
