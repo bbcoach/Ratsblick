@@ -249,16 +249,17 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
 .ris .btn { justify-self: stretch; }
 .ris p { margin: 0; text-align: center; }
 /* Sitzverteilung: Halbkreis mit 2px Fugen in Flächenfarbe, Liste mit Zahlen daneben */
-.sitz { padding: 14px; display: grid; gap: 12px; }
+.sitz { padding: 14px; display: grid; gap: 12px; min-width: 0; max-width: 100%; }
 .sitz svg { width: 100%; max-width: 240px; justify-self: center; display: block; }
-.sitz-oben { display: grid; gap: 10px; }
+.sitz-oben { display: grid; gap: 10px; min-width: 0; }
 @media (min-width: 560px) { .sitz-oben { grid-template-columns: 240px 1fr; align-items: center; gap: 18px; } }
 .sitz-kurz { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 14px; justify-content: center; }
 @media (min-width: 560px) { .sitz-kurz { justify-content: flex-start; } }
-.sitz-kurz li { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; max-width: 100%; }
-.sitz-kurz li span { overflow: hidden; text-overflow: ellipsis; }
+.sitz-kurz li { display: inline-flex; align-items: baseline; gap: 6px; max-width: 100%; min-width: 0; }
+.sitz-kurz li span { min-width: 0; overflow-wrap: anywhere; }
+.sitz-kurz li b { flex: none; }
 .sitz-kurz li.aktiv { text-decoration: underline; }
-.sitz-kurz i { flex: none; width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+.sitz-kurz i { flex: none; width: 10px; height: 10px; border-radius: 3px; background: var(--c); align-self: flex-start; margin-top: .45em; }
 .sitz-mehr summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: 14px; }
 .sitz-mehr[open] summary { margin-bottom: 8px; }
 .sitz-mehr { display: grid; gap: 8px; }
@@ -267,14 +268,15 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
 .sitz svg:has(.aktiv) path:not(.aktiv) { opacity: .35; }
 .sitz .summe { text-anchor: middle; font-size: 22px; font-weight: 700; fill: var(--fg); }
 .sitz .summe-l { text-anchor: middle; font-size: 10px; fill: var(--muted); }
-.sitzliste { display: grid; grid-template-columns: 1fr auto auto auto; font-size: 14px; }
+.sitzliste { display: grid; grid-template-columns: minmax(7em, 1fr) auto auto auto; font-size: 14px; }
+@media (max-width: 380px) { .sitzliste { font-size: 13px; } .sitzliste > div > span + span { padding-left: 8px; } }
 .sitzliste > div > span + span { padding-left: 14px; }
 .sitzliste > div { display: contents; }
 .sitzliste > div > span { padding: 5px 0; border-top: 1px solid var(--line); }
 .sitzliste .kopf > span { border-top: 0; font-size: 12px; color: var(--muted); padding-top: 0; }
 .sitzliste .zeile.aktiv > span { background: var(--accent-soft); }
-.sitzliste .zeile > span:first-child { display: flex; gap: 8px; align-items: center; min-width: 0; overflow-wrap: anywhere; }
-.sitzliste i { flex: none; width: 12px; height: 12px; border-radius: 3px; background: var(--c); }
+.sitzliste .zeile > span:first-child { display: flex; gap: 8px; align-items: flex-start; min-width: 0; overflow-wrap: break-word; hyphens: auto; }
+.sitzliste i { flex: none; width: 12px; height: 12px; border-radius: 3px; background: var(--c); margin-top: .3em; }
 .sitzliste .zahl { text-align: right; font-variant-numeric: tabular-nums; }
 .sitzliste .zeile .zahl:nth-child(2) { font-weight: 700; }
 .sitzliste .neu { font-size: 12px; }
