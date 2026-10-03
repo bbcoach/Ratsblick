@@ -37,6 +37,7 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
+  if (url.pathname.startsWith('/admin')) return; // verschlüsselte Admin-Seite: immer direkt aus dem Netz, nie aus dem Cache
   if (url.pathname.includes('/data/')) {
     e.respondWith(networkFirst(req));
     return;

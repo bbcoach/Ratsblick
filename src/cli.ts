@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { parseArgs } from 'node:util';
 import { openDb } from './db/index.js';
 import { relayConfigAusUmgebung, relayFetch } from './net/relay.js';
@@ -15,6 +16,8 @@ import { syncProtokolle } from './scrape/protokolle.js';
 import { syncRegisafe } from './scrape/regisafe.js';
 import { syncRubinApi } from './scrape/rubin.js';
 import { syncSessionNet } from './scrape/sessionnet.js';
+import { baueStatus, schreibeLog, warnungenMarkdown } from './status/status.js';
+import { dashboardHtml, huelle, verschluessele } from './status/admin.js';
 import { gespeicherteAdresse, leereQuelle, syncSource, type SourceRecord } from './sync/sync.js';
 
 const USAGE = `Ratsblick – Datenebene
@@ -26,6 +29,8 @@ const USAGE = `Ratsblick – Datenebene
                                       Momentaufnahme einer Quelle als JSON (für Prototypen)
   npm run web -- --out dist           Web-App mit Daten aller Quellen bauen (GitHub Pages)
   npm run discover                    gremien.info-Systeme zu allen Kommunen im Gemeindeverzeichnis suchen
+  npm run status -- --warnungen w.md  Quellenstatus ausgeben, Auffälligkeiten als Markdown (leer = alles in Ordnung)
+  npm run admin -- --out dist/admin   verschlüsseltes Admin-Dashboard (Passwort in ADMIN_PASSWORT; ohne Passwort: übersprungen)
 
 Optionen:
   --id <id>          nur diese Quelle (mehrfach möglich)
@@ -56,11 +61,12 @@ async function main(): Promise<void> {
       interval: { type: 'string', default: '1000' },
       'budget-min': { type: 'string' },
       out: { type: 'string' },
+      warnungen: { type: 'string' },
       help: { type: 'boolean', short: 'h', default: false },
     },
   });
   const cmd = positionals[0];
-  if (values.help || !cmd || !['probe', 'sync', 'snapshot', 'web', 'discover'].includes(cmd)) {
+  if (values.help || !cmd || !['probe', 'sync', 'snapshot', 'web', 'discover', 'status', 'admin'].includes(cmd)) {
     console.log(USAGE);
     process.exitCode = cmd && !values.help ? 1 : 0;
     return;
@@ -82,6 +88,30 @@ async function main(): Promise<void> {
       `Web-App: ${r.quellen} Quellen, ${r.gebiete} Gebietskörperschaften mit eigenen Daten, ` +
         `${r.gemeindenMitDaten} von ${r.gemeinden} Gemeinden mit Daten (selbst oder über die VG) → ${values.out ?? 'dist'}`,
     );
+    return;
+  }
+
+  if (cmd === 'status' || cmd === 'admin') {
+    const db = openDb(values.db!);
+    const quellen = loadSources().filter((q) => q.status === 'aktiv').map((q) => ({ id: q.id, name: q.name, typ: q.typ ?? 'oparl', ebene: q.ebene ?? undefined }));
+    const st = baueStatus(db, quellen);
+    const z = st.zusammenfassung;
+    console.log(`Quellenstatus: ${z.quellen} Quellen, ${z.ok} in Ordnung, ${z.warnung} Warnung, ${z.fehler} Fehler; ${z.sitzungen} Sitzungen, ${z.vorlagen} Vorlagen`);
+    for (const w of st.warnungen) console.log(`  ! ${w.id}: ${w.text}`);
+    if (cmd === 'status') {
+      if (values.warnungen) writeFileSync(values.warnungen, warnungenMarkdown(st));
+      return;
+    }
+    const passwort = process.env.ADMIN_PASSWORT;
+    if (!passwort) {
+      console.log('ADMIN_PASSWORT nicht gesetzt – Admin-Seite wird nicht erzeugt.');
+      return;
+    }
+    if (passwort.length < 16) throw new Error('ADMIN_PASSWORT ist zu kurz (mindestens 16 Zeichen, besser ein langer Satz)');
+    const ziel = `${values.out ?? 'dist/admin'}/index.html`;
+    mkdirSync(dirname(ziel), { recursive: true });
+    writeFileSync(ziel, huelle(await verschluessele(dashboardHtml(st), passwort)));
+    console.log(`Admin-Seite (verschlüsselt) → ${ziel}`);
     return;
   }
 
@@ -181,6 +211,7 @@ async function main(): Promise<void> {
                     : s.typ === 'protokolle'
                       ? await syncProtokolle(db, client, s, { log })
                       : await syncSource(db, client, s, { full: values.full, log });
+      schreibeLog(db, s.id, { ok: true, dauerS: Math.round((Date.now() - t0) / 1000) });
       log(
         `✓ ${st.bodies} Körperschaften, ${st.organizations} Gremien, ${st.meetings} Sitzungen, ` +
           `${st.agendaItems} TOPs, ${st.papers} Vorlagen, ${st.consultations} Beratungen, ${st.files} Dateien ` +
@@ -188,6 +219,7 @@ async function main(): Promise<void> {
       );
     } catch (err) {
       log(`✗ ${(err as Error).message}`);
+      schreibeLog(db, s.id, { ok: false, fehler: (err as Error).message, dauerS: Math.round((Date.now() - t0) / 1000) });
       process.exitCode = 1;
     }
   }

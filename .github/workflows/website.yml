@@ -21,6 +21,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  issues: write      # Warn-Issue bei auffälligen Quellen (E-Mail über GitHub)
 
 concurrency:
   group: website
@@ -83,7 +84,41 @@ jobs:
           path: data/ratsblick.sqlite
           key: ratsblick-db-${{ github.run_id }}
 
+      - name: Quellenstatus auswerten
+        run: npm run status -- --warnungen warnungen.md
+
       - run: npm run web -- --out dist
+
+      # Verschlüsseltes Dashboard unter /admin/ (Passwort im Secret ADMIN_PASSWORT; ohne Secret wird nichts erzeugt)
+      - name: Admin-Dashboard
+        env:
+          ADMIN_PASSWORT: ${{ secrets.ADMIN_PASSWORT }}
+        run: npm run admin -- --out dist/admin
+
+      # Auffälligkeiten (Fehler, veraltet, leer, Einbruch) als Issue: GitHub schickt dir dazu eine E-Mail.
+      # Neues Issue bei erster Auffälligkeit, Kommentar bei Änderung, Schließen wenn wieder alles in Ordnung ist.
+      - name: Warnung per Issue
+        if: steps.sync.outcome != 'skipped'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create quellenstatus --color B60205 --description "Automatische Warnung zum Quellenstatus" 2>/dev/null || true
+          nr=$(gh issue list --label quellenstatus --state open --json number --jq '.[0].number // empty')
+          if [ -s warnungen.md ]; then
+            neu=$(head -1 warnungen.md | tr -d '\r')
+            if [ -z "$nr" ]; then
+              gh issue create --label quellenstatus --title "Quellenstatus: Auffälligkeiten" --body-file warnungen.md
+            else
+              alt=$(gh issue view "$nr" --json body --jq .body | head -1 | tr -d '\r')
+              if [ "$alt" != "$neu" ]; then
+                gh issue edit "$nr" --body-file warnungen.md
+                gh issue comment "$nr" --body "Die Auffälligkeiten haben sich geändert – aktuelle Liste in der Beschreibung."
+              fi
+            fi
+          elif [ -n "$nr" ]; then
+            gh issue close "$nr" --comment "Alle Quellen sind wieder in Ordnung."
+          fi
 
       - uses: actions/upload-pages-artifact@v3
         with:

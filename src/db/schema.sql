@@ -142,3 +142,17 @@ CREATE TABLE IF NOT EXISTS sync_state (
   modified_since TEXT NOT NULL,
   PRIMARY KEY (body_id, list)
 );
+
+-- Protokoll jedes Abgleichs je Quelle (für Status-Dashboard und Warnungen)
+CREATE TABLE IF NOT EXISTS sync_log (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  source_id  TEXT NOT NULL,
+  at         TEXT NOT NULL,
+  ok         INTEGER NOT NULL,
+  error      TEXT,
+  dauer_s    INTEGER,
+  sitzungen  INTEGER,                              -- Stand nach dem Abgleich
+  kuenftig   INTEGER,
+  vorlagen   INTEGER
+);
+CREATE INDEX IF NOT EXISTS sync_log_quelle ON sync_log (source_id, id);

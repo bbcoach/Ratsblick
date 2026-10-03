@@ -12,6 +12,8 @@
     "sync": "node --disable-warning=ExperimentalWarning --import tsx src/cli.ts sync",
     "snapshot": "node --disable-warning=ExperimentalWarning --import tsx src/cli.ts snapshot",
     "web": "node --disable-warning=ExperimentalWarning --import tsx src/cli.ts web",
+    "status": "node --disable-warning=ExperimentalWarning --import tsx src/cli.ts status",
+    "admin": "node --disable-warning=ExperimentalWarning --import tsx src/cli.ts admin",
     "sitze": "node --disable-warning=ExperimentalWarning --import tsx scripts/sitzverteilung.ts",
     "discover": "node --disable-warning=ExperimentalWarning --import tsx src/cli.ts discover",
     "typecheck": "tsc --noEmit",
