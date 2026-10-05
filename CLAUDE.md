@@ -266,7 +266,7 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
   aktuellen Datenstand (`data/suche.json`, beim Bauen aus den Momentaufnahmen, `suchEintraege` in `src/export/web.ts`; ~4 MB,
   ~0,7 MB übertragen, wird erst im Reiter geladen). Themen als Begriffslisten (`THEMEN` in `web/app.js`, Teilwörter mit
   ausgeschriebenen Umlauten, „^“ = Wortanfang), dazu Stichwort und Ort (ganz RLP, Gemeinde/VG/Kreis der gewählten Kommune,
-  Favoriten). KI-Zusammenfassungen vom Projektinhaber verworfen (zu teuer).
+  Favoriten, seit 05.10.2026 auch „Anderen Ort suchen …“: Suchfeld mit `suche()`, gewählter Ort bleibt als Eintrag in der Liste, `zustand.gewaehlt`). KI-Zusammenfassungen vom Projektinhaber verworfen (zu teuer).
 - Leere „Nächste Sitzungen“ (seit 03.10.2026): Hinweis „keine künftigen Sitzungen eingetragen“ mit Datum der letzten Sitzung und Erklärung, dass die Verwaltung Termine erst kurz vor der Sitzung einträgt (Anlass: VG/Stadt Kirchheimbolanden, im RIS nur Ortsgemeinden mit künftigen Terminen; Abruf nach Kalender geprüft, App stimmt).
 - Quellen mit `typ: "ics"` (nur Termine; Ramstein-Miesenbach, Oberes Glantal, Wallmerod, Altenkirchen-Flammersfeld) tragen im Export
   `quelle.nurTermine`; die App zeigt dann auf Kommunen- und Sitzungsseite einen freundlichen Hinweis, dass Tagesordnungen und

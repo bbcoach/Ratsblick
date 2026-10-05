@@ -905,12 +905,16 @@
     return SUCHE;
   }
   // Gebiete für den Ortsfilter: die gewählte Kommune mit VG und Kreis, dazu die Favoriten
-  function gebietsfilter() {
+  function gebietsfilter(gewaehlt) {
     const opt = [{ key: 'alle', label: 'Ganz Rheinland-Pfalz' }];
     const g = kommune && G.get(kommune);
     if (g) for (const e of ebenen(g)) if (!e.off && e.g && e.g.typ !== 'body') opt.push({ key: 'g:' + e.g.id, label: anzeigeName(e.g), id: e.g.id });
     const favs = favoriten().filter((f) => f.typ === 'gebiet' && G.has(f.id));
     if (favs.length) opt.push({ key: 'fav', label: 'Meine Favoriten', ids: favs.map((f) => f.id) });
+    // frei gesuchter Ort (noch nicht in der Liste)
+    const gw = gewaehlt && G.get(gewaehlt);
+    if (gw && !opt.some((o) => o.key === 'g:' + gw.id)) opt.push({ key: 'g:' + gw.id, label: anzeigeName(gw), id: gw.id });
+    opt.push({ key: 'suche', label: 'Anderen Ort suchen …' });
     return opt;
   }
   // Liegt die Gebietskörperschaft „gebiet“ in „ziel“ (gleich, oder Gemeinde/VG im Kreis bzw. Gemeinde in der VG)?
@@ -924,8 +928,8 @@
   async function vThemen() {
     setTitle('Themen');
     const zustand = store.get('themensuche', { thema: '', text: '', ort: 'alle' });
-    const filter = gebietsfilter();
-    if (!filter.some((f) => f.key === zustand.ort)) zustand.ort = 'alle';
+    const filter = gebietsfilter(zustand.gewaehlt);
+    if (!filter.some((f) => f.key === zustand.ort) || zustand.ort === 'suche') zustand.ort = 'alle';
     $view.innerHTML = `
       <section class="hero"><h1>Was wird zu meinem Thema beraten?</h1>
         <p class="muted small">Vorlagen und Tagesordnungspunkte aller angebundenen Räte – in Ihrer Kommune, im Kreis oder in ganz Rheinland-Pfalz.</p></section>
@@ -935,6 +939,7 @@
       </form>
       <div class="chips" role="group" aria-label="Themen">${Object.keys(THEMEN).map((t) => `<button type="button" class="chip" data-thema="${esc(t)}" aria-pressed="${zustand.thema === t}">${esc(t)}</button>`).join('')}</div>
       <section class="field"><label for="tort">Wo</label><select id="tort">${filter.map((f) => `<option value="${esc(f.key)}" ${f.key === zustand.ort ? 'selected' : ''}>${esc(f.label)}</option>`).join('')}</select></section>
+      <section class="field" id="ortsuche" hidden><label for="tos">Ort, Verbandsgemeinde oder Kreis</label><input id="tos" type="search" enterkeyhint="search" placeholder="z. B. Enkenbach oder Kusel" aria-label="Ort suchen"><div id="oh" class="list suggest"></div></section>
       <div id="treffer"><div class="card empty">Lade Suchverzeichnis …</div></div>`;
     let S;
     try { S = await sucheLaden(); } catch (err) {
@@ -972,7 +977,27 @@
       $view.querySelectorAll('[data-thema]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.thema === zustand.thema)));
       zeigen();
     }));
-    document.getElementById('tort').addEventListener('change', (e) => { zustand.ort = e.target.value; zeigen(); });
+    const $sel = document.getElementById('tort');
+    const $os = document.getElementById('ortsuche');
+    const $tos = document.getElementById('tos');
+    const $oh = document.getElementById('oh');
+    $sel.addEventListener('change', (e) => {
+      if (e.target.value === 'suche') { $os.hidden = false; $tos.focus(); return; }
+      $os.hidden = true; zustand.ort = e.target.value; zeigen();
+    });
+    $tos.addEventListener('input', () => {
+      const hits = suche($tos.value);
+      $oh.innerHTML = !$tos.value.trim() ? '' : hits.length
+        ? hits.map((g) => `<button class="row" type="button" data-ort="${esc(g.id)}"><div class="body"><span class="title">${esc(anzeigeName(g))}</span><span class="meta">${esc(untertitel(g))}</span></div></button>`).join('')
+        : '<div class="card empty">Kein Ort gefunden.</div>';
+    });
+    $oh.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-ort]');
+      if (!b) return;
+      zustand.gewaehlt = b.dataset.ort; zustand.ort = 'g:' + b.dataset.ort;
+      store.set('themensuche', zustand);
+      vThemen();
+    });
     zeigen();
   }
 
