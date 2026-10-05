@@ -966,7 +966,15 @@
           <div class="list">${zeige.map((e) => `<button class="row" type="button" data-go="${esc(link(e.art === 0 ? 'v' : 's', e.id))}"><div class="body">
             <span class="meta">${e.art === 0 ? `<span class="pill plain">Vorlage</span>${e.nr ? `<span class="mono">${esc(e.nr)}</span>` : ''}` : '<span class="pill plain">Tagesordnung</span>'}${e.datum ? `<span>${esc(datum(e.datum))}</span>` : ''}</span>
             <span class="title">${esc(e.titel)}</span><span class="meta">${esc(ort(e))}</span></div>${chev}</button>`).join('')}</div>`
-        : '<div class="card empty">Keine Treffer im aktuellen Datenstand.</div>';
+        : `<div class="card empty">Keine Treffer im aktuellen Datenstand.${hinweisOhneEigeneDaten(f)}</div>`;
+    };
+    // Ort ohne eigene Sitzungsdaten: auf VG bzw. Kreis verweisen, wo die Sitzungen liegen können
+    const hinweisOhneEigeneDaten = (f) => {
+      const g = f && f.id && G.get(f.id);
+      if (!g || g.q || g.typ === 'vg' || g.typ === 'kreis') return '';
+      const eltern = G.get(g.vg) || G.get(g.kreis);
+      if (!hatDaten(g) || !eltern) return `<br><br>Für ${esc(anzeigeName(g))} liegen noch keine Sitzungsdaten vor.`;
+      return `<br><br>Für ${esc(anzeigeName(g))} gibt es keine eigenen Sitzungsdaten – die Sitzungen stehen bei ${esc(anzeigeName(eltern))}. <button type="button" class="btn ghost" data-ort="${esc(eltern.id)}">Dort suchen</button>`;
     };
     const input = document.getElementById('tq');
     let warte;
@@ -991,13 +999,15 @@
         ? hits.map((g) => `<button class="row" type="button" data-ort="${esc(g.id)}"><div class="body"><span class="title">${esc(anzeigeName(g))}</span><span class="meta">${esc(untertitel(g))}</span></div></button>`).join('')
         : '<div class="card empty">Kein Ort gefunden.</div>';
     });
-    $oh.addEventListener('click', (e) => {
+    const ortWahl = (e) => {
       const b = e.target.closest('[data-ort]');
       if (!b) return;
       zustand.gewaehlt = b.dataset.ort; zustand.ort = 'g:' + b.dataset.ort;
       store.set('themensuche', zustand);
       vThemen();
-    });
+    };
+    $oh.addEventListener('click', ortWahl);
+    document.getElementById('treffer').addEventListener('click', ortWahl);
     zeigen();
   }
 
