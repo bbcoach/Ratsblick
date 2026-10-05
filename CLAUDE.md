@@ -118,6 +118,12 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
 - Stadt Mayen (Link vom Projektinhaber, 03.10.2026): SessionNet 5.5 ASP `sessionnet.owl-it.de/mayen/bi/` (robots.txt „Disallow: /“, trotzdem
   angebunden, 2 s Abstand), ein Mandant. VG Kusel-Altenglan (erneut geschickt): das System führt nur 16 Mandanten, die übrigen 18
   Gemeinden (u. a. Altenglan, Kusel) sind dort nicht vertreten.
+- VG Rüdesheim, Ortsgemeinden (05.10.2026, selbst gefunden, auf Zustimmung des Projektinhabers angebunden): die Website `vg-ruedesheim.de` hat einen Sitzungskalender mit
+  iCalendar-Export (`/kalender/sitzungskalender/event.ics?weekends=false&tagMode=ALL`, Anbieter IONAS) mit den Gemeinderatssitzungen der Ortsgemeinden
+  („Sitzung des Gemeinderates X“, Einladungstext mit Tagesordnung in DESCRIPTION, derzeit nur 7 Termine, nur Zeitraum um heute) → zweite Quelle `vg-ruedesheim-termine`
+  (`typ: "ics"`, `mandanten`), gleiches `gebiet` wie `vg-ruedesheim`; die VG bleibt bei der ris-portal-Quelle (erste Quelle nach Name gewinnt in `daten`), die Ortsgemeinden
+  kommen aus dem Kalender. robots.txt der Seite nicht lesbar (Verbindungsabbruch). Wie Hachenburg (9 fehlende) und Nastätten (13): deren Systeme führen die übrigen Ortsgemeinden nicht, die Zuordnung ist korrekt.
+  Daun (`daun.gremien.info`) und Kastellaun enthalten keine bzw. nur 3 Ortsgemeinden.
 - Stadt Kusel (Link vom Projektinhaber, 03.10.2026): kein RIS, sondern Listen von Sitzungsprotokollen (PDF) auf `stadt.kusel.de`
   (Stadtrat 2018–2026, dazu Haupt-/Bau-/Finanzausschuss) → `typ: "protokolle"` (`src/scrape/protokolle.ts`, weitere Listenseiten in
   `seiten`): je Protokoll eine abgeschlossene Sitzung mit dem PDF als Niederschrift, ohne Uhrzeit/TOPs; Fenster 2 Jahre. robots.txt erlaubt

@@ -40,3 +40,12 @@ describe('Kalenderexport (iCalendar)', () => {
     expect(orteAusTiteln(['Ortsgemeinderat Berod b. W.']).ort('Rechnungsprüfungsausschuss Berod b. W.')).toBe('Berod b. W.');
   });
 });
+
+describe('Sitzungskalender der VG Rüdesheim', () => {
+  it('ordnet „Sitzung des Gemeinderates X“ der Ortsgemeinde zu', () => {
+    const z = orteAusTiteln(['Sitzung des Gemeinderates Spall', 'Sitzung des Gemeinderates St. Katharinen']);
+    expect(z.ort('Sitzung des Gemeinderates Spall')).toBe('Spall');
+    expect(z.ort('Sitzung des Gemeinderates St. Katharinen')).toBe('St. Katharinen');
+    expect(z.name('Spall')).toBe('Ortsgemeinde Spall');
+  });
+});

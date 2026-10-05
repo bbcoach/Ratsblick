@@ -70,13 +70,14 @@ export function parseIcs(ics: string): IcsTermin[] {
 /**
  * Körperschaft eines Termins aus dem Gremiumsnamen (nur mit `mandanten: true`): „… VG …“/„Verbandsgemeinde…“ → VG,
  * sonst der Ort, auf den der Name endet („Gemeinderat Hütschenhausen“, „Hauptausschuss Stadt Ramstein-Miesenbach“).
- * Orte ergeben sich aus den Rats-Gremien („Gemeinderat X“, „Ortsgemeinderat X“, „Stadtrat X“ → Stadt). null = VG.
+ * Orte ergeben sich aus den Rats-Gremien („Gemeinderat X“, „Sitzung des Gemeinderates X“, „Ortsgemeinderat X“, „Stadtrat X“ → Stadt). null = VG.
  */
 export function orteAusTiteln(titel: string[]): { ort: (t: string) => string | null; name: (ort: string) => string } {
   const staedte = new Set<string>();
   const orte = new Set<string>();
   for (const t of titel) {
-    const m = /^(Ortsgemeinderat|Gemeinderat|Stadtrat)\s+([^/]+)$/.exec(t.trim());
+    // „Gemeinderat X“, „Ortsgemeinderat X“, „Stadtrat X“ und mit Vorsatz „Sitzung des Gemeinderates X“ (VG Rüdesheim)
+    const m = /^(?:Sitzung des\s+)?(Ortsgemeinderat|Gemeinderat|Stadtrat)(?:es)?\s+([^/]+)$/.exec(t.trim());
     if (!m) continue;
     orte.add(m[2]!.trim());
     if (m[1] === 'Stadtrat') staedte.add(m[2]!.trim());

@@ -29,7 +29,7 @@ interface Kurz {
 /** Startseite eines Ratsinformationssystems aus der OParl-Adresse ableiten (nur als Link für Menschen). */
 export function risStartseite(oparlUrl: string): string {
   const u = new URL(oparlUrl);
-  if (/\/termine\/ics\//i.test(u.pathname)) return `${u.protocol}//${u.host}/`; // Kalenderexport (SD.NET RIM)
+  if (/\/termine\/ics\//i.test(u.pathname) || /\.ics$/i.test(u.pathname)) return `${u.protocol}//${u.host}/`; // Kalenderexport (SD.NET RIM, Website-Kalender)
   if (!/oparl/i.test(u.pathname)) return oparlUrl; // schon die Startseite (Systeme ohne OParl)
   const pfad = /^\/(bi|public|buergerinfo)\//.exec(u.pathname)?.[0] ?? '/';
   return `${u.protocol}//${u.host}${pfad}`;
