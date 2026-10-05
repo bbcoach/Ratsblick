@@ -12,6 +12,11 @@ export function openDb(path: string): DatabaseSync {
   // busy_timeout: wartet, wenn ein anderer Prozess gerade schreibt (mehrere Abgleiche nebeneinander)
   db.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 60000;');
   db.exec(readFileSync(schemaPath, 'utf8'));
+  // Spalten, die später zu bestehenden Tabellen dazukamen (die Datenbank liegt im Actions-Cache und wird weiterverwendet)
+  const vorhanden = new Set((db.prepare('PRAGMA table_info(sync_log)').all() as Array<{ name: string }>).map((c) => c.name));
+  for (const [name, typ] of [['version', 'TEXT'], ['umleitung', 'TEXT'], ['vergangen', 'INTEGER'], ['mit_tops', 'INTEGER'], ['mit_dok', 'INTEGER']] as const) {
+    if (!vorhanden.has(name)) db.exec(`ALTER TABLE sync_log ADD COLUMN ${name} ${typ}`);
+  }
   return db;
 }
 

@@ -223,7 +223,7 @@ async function main(): Promise<void> {
                     : s.typ === 'protokolle'
                       ? await syncProtokolle(db, client, s, { log })
                       : await syncSource(db, client, s, { full: values.full, log });
-      schreibeLog(db, s.id, { ok: true, dauerS: Math.round((Date.now() - t0) / 1000) });
+      schreibeLog(db, s.id, { ok: true, dauerS: Math.round((Date.now() - t0) / 1000), ...client.beobachtung(s.url) });
       log(
         `✓ ${st.bodies} Körperschaften, ${st.organizations} Gremien, ${st.meetings} Sitzungen, ` +
           `${st.agendaItems} TOPs, ${st.papers} Vorlagen, ${st.consultations} Beratungen, ${st.files} Dateien ` +
@@ -231,7 +231,7 @@ async function main(): Promise<void> {
       );
     } catch (err) {
       log(`✗ ${(err as Error).message}`);
-      schreibeLog(db, s.id, { ok: false, fehler: (err as Error).message, dauerS: Math.round((Date.now() - t0) / 1000) });
+      schreibeLog(db, s.id, { ok: false, fehler: (err as Error).message, dauerS: Math.round((Date.now() - t0) / 1000), ...client.beobachtung(s.url) });
       process.exitCode = 1;
     }
   }

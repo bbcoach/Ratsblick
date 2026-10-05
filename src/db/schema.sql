@@ -153,6 +153,11 @@ CREATE TABLE IF NOT EXISTS sync_log (
   dauer_s    INTEGER,
   sitzungen  INTEGER,                              -- Stand nach dem Abgleich
   kuenftig   INTEGER,
-  vorlagen   INTEGER
+  vorlagen   INTEGER,
+  version    TEXT,                                 -- Softwareversion der Quelle (z. B. „SessionNet 5.5.1“), falls erkennbar
+  umleitung  TEXT,                                 -- Ziel, falls die Quelle auf eine andere Adresse umleitet
+  vergangen  INTEGER,                              -- Sitzungen der letzten 120 Tage (Grundlage der Plausibilitätsprüfung)
+  mit_tops   INTEGER,                              -- davon mit Tagesordnungspunkten
+  mit_dok    INTEGER                               -- davon mit Dokumenten an der Sitzung
 );
 CREATE INDEX IF NOT EXISTS sync_log_quelle ON sync_log (source_id, id);

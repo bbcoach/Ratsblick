@@ -59,6 +59,24 @@ function isErrorObject(x: unknown): x is OParlErrorObject {
   );
 }
 
+/** Beobachtungen zu einer Quelle während des Abgleichs: erkannte Softwareversion und Umleitung auf eine andere Adresse. */
+export interface Beobachtung {
+  version?: string;
+  umleitung?: string;
+}
+
+/** Schlüssel „Ursprung + erstes Pfadstück“: dort laufen gleiche Systeme (z. B. sessionnet.owl-it.de/mayen/). */
+export function beobachtungsSchluessel(url: string): string {
+  const u = new URL(url);
+  return `${u.origin}/${(u.pathname.split('/').filter(Boolean)[0] ?? '').toLowerCase()}`;
+}
+
+/** Erkennt die Softwareversion aus dem Kopf einer Seite (Meta-Angabe bei SessionNet und ALLRIS). */
+export function erkenneVersion(html: string): string | undefined {
+  const m = /(SessionNet|ALLRIS net)\s+Version\s+([0-9][\w. ]*?)(?:\s+(?:bi|ri)\b|\s*\(|")/i.exec(html.slice(0, 8192));
+  return m ? `${m[1]} ${m[2]!.trim()}` : undefined;
+}
+
 export class OParlClient {
   private readonly fetchImpl: FetchLike;
   private readonly minIntervalMs: number;
@@ -72,6 +90,27 @@ export class OParlClient {
   /** Abweichende Mindestabstände je Server (nur größer als der Standard). */
   private readonly intervalle = new Map<string, number>();
   requestCount = 0;
+  private readonly beobachtet = new Map<string, Beobachtung>();
+
+  /** Was beim Abruf dieser Quelle aufgefallen ist (Version, Umleitung); leer, wenn nichts. */
+  beobachtung(url: string): Beobachtung {
+    return this.beobachtet.get(beobachtungsSchluessel(url)) ?? {};
+  }
+
+  private merke(url: string, res: Response, html?: string): void {
+    const eintrag = this.beobachtet.get(beobachtungsSchluessel(url)) ?? {};
+    // Umleitung nur bei anderem Host oder anderem ersten Pfadstück (http→https und Weiterleitungen einzelner Seiten zählen nicht)
+    if (res.redirected && res.url) {
+      try {
+        const von = new URL(url);
+        const nach = new URL(res.url);
+        const seg = (u: URL) => (u.pathname.split('/').filter(Boolean)[0] ?? '').toLowerCase();
+        if (!/vercel\.app$/i.test(nach.hostname) && (von.hostname !== nach.hostname || seg(von) !== seg(nach))) eintrag.umleitung ??= `${nach.origin}${nach.pathname}`.slice(0, 200);
+      } catch {}
+    }
+    if (html) eintrag.version ??= erkenneVersion(html);
+    if (eintrag.version || eintrag.umleitung) this.beobachtet.set(beobachtungsSchluessel(url), eintrag);
+  }
 
   constructor(opts: ClientOptions = {}) {
     this.fetchImpl = opts.fetchImpl ?? ((url, init) => fetch(url, init));
@@ -137,6 +176,7 @@ export class OParlClient {
       if (!res.ok) {
         throw new OParlHttpError(url, res.status, `HTTP ${res.status}`);
       }
+      this.merke(url, res);
       if (body === undefined) {
         throw new OParlHttpError(url, res.status, 'Antwort ist kein JSON');
       }
@@ -179,7 +219,9 @@ export class OParlClient {
         /<meta[^>]+charset=["']?([\w-]+)/i.exec(anfang)?.[1] ??
         'utf-8'
       ).toLowerCase();
-      return new TextDecoder(cs === 'iso-8859-1' || cs === 'latin1' ? 'windows-1252' : cs).decode(buf);
+      const text = new TextDecoder(cs === 'iso-8859-1' || cs === 'latin1' ? 'windows-1252' : cs).decode(buf);
+      this.merke(url, res, text);
+      return text;
     }
     throw lastError ?? new OParlHttpError(url, null, 'Unbekannter Fehler');
   }

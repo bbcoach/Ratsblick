@@ -99,3 +99,24 @@ describe('OParlClient', () => {
     expect(waits[0]).toBeGreaterThan(1900);
   });
 });
+
+describe('OParlClient: Beobachtungen', () => {
+  const seite = (url: string, html: string, redirected = false) =>
+    (async () => ({ ok: true, status: 200, redirected, url, headers: new Headers({ 'content-type': 'text/html; charset=utf-8' }), arrayBuffer: async () => new TextEncoder().encode(html).buffer, text: async () => html })) as unknown as typeof fetch;
+  it('erkennt die Softwareversion aus dem Seitenkopf', async () => {
+    const html = '<head><meta name="author" content="Somacos GmbH &amp; Co. KG, SessionNet Version 5.5.6 KP3 bi (Layout 6)"/></head>';
+    const client = new OParlClient({ fetchImpl: seite('https://sessionnet.example/mayen/bi/si0040.asp', html), sleep: noSleep, minIntervalMs: 0 });
+    await client.getText('https://sessionnet.example/mayen/bi/si0040.asp');
+    expect(client.beobachtung('https://sessionnet.example/mayen/bi/')).toEqual({ version: 'SessionNet 5.5.6 KP3' });
+    expect(client.beobachtung('https://sessionnet.example/anderes/bi/')).toEqual({});
+  });
+  it('meldet Umleitungen auf anderen Host, aber nicht http→https oder Seitenumleitungen', async () => {
+    const a = new OParlClient({ fetchImpl: seite('https://neu.example/bi/x', '<p>x</p>', true), sleep: noSleep, minIntervalMs: 0 });
+    await a.getText('https://alt.example/bi/x');
+    expect(a.beobachtung('https://alt.example/bi/')).toEqual({ umleitung: 'https://neu.example/bi/x' });
+    const b = new OParlClient({ fetchImpl: seite('https://alt.example/bi/si0050', '<p>x</p>', true), sleep: noSleep, minIntervalMs: 0 });
+    await b.getText('http://alt.example/bi/si0057');
+    expect(b.beobachtung('http://alt.example/bi/')).toEqual({});
+  });
+});
+

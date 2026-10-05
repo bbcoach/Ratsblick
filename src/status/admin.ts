@@ -119,7 +119,7 @@ const alter=(h)=>h===null?'nie':h<1?'<1 h':h<48?h+' h':Math.round(h/24)+' Tage';
 document.getElementById('w').innerHTML=S.warnungen.length?S.warnungen.map((w)=>'<div class="w '+(w.art==='fehler'||w.art==='leer'?'fehler':'')+'"><b>'+e(w.name)+'</b> <span class="m">('+e(w.id)+')</span><br>'+e(w.text)+'</div>').join(''):'<div class="m">Keine Auffälligkeiten.</div>';
 const ver=S.quellen.filter((q)=>q.delta&&(q.delta.sitzungen||q.delta.vorlagen));
 document.getElementById('v').innerHTML=ver.length?ver.sort((a,b)=>Math.abs(b.delta.sitzungen)+Math.abs(b.delta.vorlagen)-Math.abs(a.delta.sitzungen)-Math.abs(a.delta.vorlagen)).slice(0,25).map((q)=>e(q.name)+': Sitzungen '+dt(q.delta.sitzungen)+', Vorlagen '+dt(q.delta.vorlagen)).join('<br>'):'Keine Veränderungen erfasst (nach dem nächsten Abgleich sichtbar).';
-const sp=[['Quelle','name'],['System','typ'],['Status','ampel'],['Abgleich','alterStunden',1],['Sitzungen','sitzungen',1],['Δ','dS',1],['kommend','kuenftig',1],['Vorlagen','vorlagen',1],['letzte Sitzung','letzteSitzung']];
+const sp=[['Quelle','name'],['System','typ'],['Status','ampel'],['Abgleich','alterStunden',1],['Sitzungen','sitzungen',1],['Δ','dS',1],['kommend','kuenftig',1],['Vorlagen','vorlagen',1],['TOP %','anteilTops',1],['letzte Sitzung','letzteSitzung']];
 let sort='ampel',asc=false;
 const rang={fehler:0,warnung:1,unbekannt:2,ok:3};
 function zeichne(){
@@ -128,7 +128,7 @@ function zeichne(){
   l.sort((a,b)=>{let r=sort==='ampel'?rang[a.ampel]-rang[b.ampel]:(a[sort]??-1)<(b[sort]??-1)?-1:(a[sort]??-1)>(b[sort]??-1)?1:0;return asc?r:-r;});
   if(sort==='ampel')l.reverse();
   document.getElementById('h').innerHTML=sp.map((c,i)=>'<th class="'+(c[2]?'n':'')+'" data-i="'+i+'">'+c[0]+'</th>').join('');
-  document.getElementById('b').innerHTML=l.map((x)=>'<tr><td title="'+e(x.id)+'">'+e(x.name)+'</td><td>'+e(x.typ)+'</td><td class="'+x.ampel+'">'+(x.fehler?e(x.fehler.slice(0,60)):x.ampel)+'</td><td class="n">'+alter(x.alterStunden)+'</td><td class="n">'+x.sitzungen+'</td><td class="n">'+dt(x.delta?x.delta.sitzungen:null)+'</td><td class="n">'+x.kuenftig+'</td><td class="n">'+x.vorlagen+'</td><td>'+e((x.letzteSitzung||'').slice(0,10))+'</td></tr>').join('');
+  document.getElementById('b').innerHTML=l.map((x)=>'<tr><td title="'+e(x.id)+'">'+e(x.name)+'</td><td title="'+e(x.umleitung?'leitet um auf '+x.umleitung:'')+'">'+e(x.typ)+(x.version?' <span class="m">'+e(x.version.replace(/^(SessionNet|ALLRIS net) /,''))+'</span>':'')+'</td><td class="'+x.ampel+'">'+(x.fehler?e(x.fehler.slice(0,60)):x.ampel)+'</td><td class="n">'+alter(x.alterStunden)+'</td><td class="n">'+x.sitzungen+'</td><td class="n">'+dt(x.delta?x.delta.sitzungen:null)+'</td><td class="n">'+x.kuenftig+'</td><td class="n">'+x.vorlagen+'</td><td class="n" title="Anteil der Sitzungen der letzten 120 Tage mit Tagesordnung (Dokumente: '+(x.anteilDok===null?'–':Math.round(x.anteilDok*100)+' %')+')">'+(x.anteilTops===null?'–':Math.round(x.anteilTops*100))+'</td><td>'+e((x.letzteSitzung||'').slice(0,10))+'</td></tr>').join('');
 }
 document.getElementById('h').addEventListener('click',(ev)=>{const i=ev.target.dataset.i;if(i===undefined)return;const k=sp[i][1];if(k===sort)asc=!asc;else{sort=k;asc=false;}zeichne();});
 document.getElementById('q').addEventListener('input',zeichne);document.getElementById('nur').addEventListener('change',zeichne);

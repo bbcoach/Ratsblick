@@ -124,3 +124,42 @@ describe('Zugriffe: Klarnamen', () => {
     expect(z.kommunen).toEqual([{ name: 'Enkenbach-Alsenborn', aufrufe: 8 }]);
   });
 });
+
+describe('Quellenstatus: stille Veränderungen', () => {
+  const tops = (d: ReturnType<typeof db>, body: string, n: number, mitTops: number, mitDok: number, start: string) => {
+    for (let i = 0; i < n; i++) {
+      const id = `${body}-${start}-${i}`;
+      d.prepare('INSERT INTO meeting (id, body_id, name, start, raw) VALUES (?, ?, ?, ?, ?)').run(id, body, 'S', start, '{}');
+      if (i < mitTops) d.prepare("INSERT INTO agenda_item (id, meeting_id, raw) VALUES (?, ?, '{}')").run(`ai-${id}`, id);
+      if (i < mitDok) d.prepare("INSERT INTO file (id, body_id, raw) VALUES (?, ?, '{}')").run(`f-${id}`, body) && d.prepare("INSERT INTO file_link (file_id, owner_type, owner_id, role) VALUES (?, 'meeting', ?, 'invitation')").run(`f-${id}`, id);
+    }
+  };
+  it('warnt, wenn der Anteil der Sitzungen mit Tagesordnung stark fällt', () => {
+    const d = db();
+    tops(d, 'ba', 10, 9, 0, '2026-09-20T10:00:00+02:00');
+    for (const h of [1, 2, 3]) schreibeLog(d, 'a', { ok: true, dauerS: 5 }, new Date(`2026-10-0${h}T10:00:00Z`));
+    expect(baueStatus(d, [{ id: 'a', name: 'A' }], new Date('2026-10-03T12:00:00Z')).warnungen).toEqual([]);
+    d.exec("DELETE FROM agenda_item");
+    schreibeLog(d, 'a', { ok: true, dauerS: 5 }, new Date('2026-10-04T10:00:00Z'));
+    const st = baueStatus(d, [{ id: 'a', name: 'A' }], new Date('2026-10-04T12:00:00Z'));
+    expect(st.warnungen[0]).toMatchObject({ id: 'a', art: 'inhalt' });
+    expect(st.warnungen[0]!.text).toContain('Tagesordnungen');
+    expect(st.quellen[0]!.anteilTops).toBe(0);
+  });
+  it('warnt nicht, wenn Quellen nie Tagesordnungen hatten (nur Termine)', () => {
+    const d = db();
+    tops(d, 'ba', 10, 0, 0, '2026-09-20T10:00:00+02:00');
+    for (const h of [1, 2, 3, 4]) schreibeLog(d, 'a', { ok: true, dauerS: 5 }, new Date(`2026-10-0${h}T10:00:00Z`));
+    expect(baueStatus(d, [{ id: 'a', name: 'A' }], new Date('2026-10-04T12:00:00Z')).warnungen).toEqual([]);
+  });
+  it('meldet Umleitungen und Versionswechsel', () => {
+    const d = db();
+    sitzungen(d, 'ba', 6);
+    schreibeLog(d, 'a', { ok: true, dauerS: 5, version: 'SessionNet 5.5.1' }, new Date('2026-10-03T10:00:00Z'));
+    schreibeLog(d, 'a', { ok: true, dauerS: 5, version: 'SessionNet 5.6.0', umleitung: 'https://neu.example/bi' }, new Date('2026-10-04T10:00:00Z'));
+    const st = baueStatus(d, [{ id: 'a', name: 'A' }], new Date('2026-10-04T12:00:00Z'));
+    expect(st.warnungen.map((w) => w.art).sort()).toEqual(['adresse', 'version']);
+    expect(st.quellen[0]).toMatchObject({ version: 'SessionNet 5.6.0', umleitung: 'https://neu.example/bi' });
+  });
+});
+
