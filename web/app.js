@@ -258,6 +258,7 @@
   const BANNER_BILDER = [
     { t: 'Kaiserslautern', img: 'img/kaiserslautern.jpg', pos: '50% 62%' },
     { t: 'Mainz', img: 'img/mainz.jpg', pos: '50% 50%' },
+    { t: 'Cochem', img: 'img/cochem.jpg', pos: '50% 36%' },
     { t: 'Worms', img: 'img/worms.jpg', pos: '50% 40%' },
     { t: 'Mutterstadt', img: 'img/mutterstadt.jpg', pos: '50% 45%' },
     { t: 'Trier', img: 'img/trier.jpg', pos: '50% 50%' },
