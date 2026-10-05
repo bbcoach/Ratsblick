@@ -304,6 +304,18 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
 .spende .spendenknopf { display: block; text-align: center; text-decoration: none; padding: 13px 16px; }
 .textseite .fehlt { color: var(--warn); background: var(--warn-soft); padding: 0 4px; border-radius: 4px; }
 .offline { background: var(--warn-soft); color: var(--warn); font-size: 13px; padding: 6px 16px; text-align: center; }
+.banner { position: relative; margin: 0; border-radius: 16px; overflow: hidden; background: var(--surface); box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 6px 18px rgba(60,20,30,.10); }
+.bn-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.bn-track::-webkit-scrollbar { display: none; }
+.bn-slide { flex: 0 0 100%; margin: 0; position: relative; scroll-snap-align: start; aspect-ratio: 9 / 4; }
+.bn-slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.bn-slide::after { content: ""; position: absolute; inset: auto 0 0 0; height: 46%; background: linear-gradient(0deg, rgba(30,10,16,.55), transparent); pointer-events: none; }
+.bn-slide figcaption { z-index: 1; position: absolute; left: 12px; bottom: 12px; right: 70px; padding: 5px 10px; border-radius: 999px; width: fit-content; max-width: calc(100% - 24px); font-size: 12.5px; font-weight: 600; color: #fff; background: rgba(40,14,22,.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.bn-dots { position: absolute; right: 10px; bottom: 14px; display: flex; gap: 6px; }
+.bn-dots button { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 50%; background: rgba(255,255,255,.55); cursor: pointer; }
+.bn-dots button[aria-current] { background: #fff; width: 18px; border-radius: 4px; }
+@media (min-width: 700px) { .bn-slide { aspect-ratio: 3 / 1; } }
+.home:has(.banner) { padding-top: 8px; gap: 18px; }
 </style>
 </head>
 <body>

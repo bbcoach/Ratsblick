@@ -253,6 +253,36 @@
     return teile.filter(Boolean).join(' · ');
   }
 
+  // ---------- Banner-Slider (Startseite) ----------
+  const BANNER = [
+    { t: 'Kaiserslautern', img: 'img/kaiserslautern.jpg', pos: '50% 62%' },
+    { t: 'Mainz', img: 'img/mainz.jpg', pos: '50% 50%' },
+    { t: 'Mutterstadt', img: 'img/mutterstadt.jpg', pos: '50% 45%' },
+    { t: 'Trier', img: 'img/trier.jpg', pos: '50% 50%' },
+    { t: 'Koblenz', img: 'img/koblenz.jpg', pos: '50% 42%' },
+    { t: 'Neustadt an der Weinstraße', img: 'img/neustadt.jpg', pos: '50% 40%' },
+  ];
+  function banner() {
+    return `<section class="banner" aria-roledescription="Bildergalerie" aria-label="Bilder aus Rheinland-Pfalz">
+      <div class="bn-track" id="bnt">${BANNER.map((b, i) => `<figure class="bn-slide" aria-label="${esc(b.t)}" data-i="${i}"><img src="${b.img}" alt="${esc(b.t)}" style="object-position:${b.pos}" ${i ? 'loading="lazy"' : ''}><figcaption>${esc(b.t)}</figcaption></figure>`).join('')}</div>
+      <div class="bn-dots" id="bnd">${BANNER.map((b, i) => `<button type="button" aria-label="Bild ${i + 1}" data-i="${i}" ${i === 0 ? 'aria-current="true"' : ''}></button>`).join('')}</div>
+    </section>`;
+  }
+  let bannerTimer;
+  function starteBanner() {
+    clearInterval(bannerTimer);
+    const t = document.getElementById('bnt'); if (!t) return;
+    const dots = [...document.querySelectorAll('#bnd button')];
+    const zeige = (i) => t.scrollTo({ left: t.clientWidth * i, behavior: 'smooth' });
+    let aktiv = 0, pause = false;
+    const markiere = () => { aktiv = Math.round(t.scrollLeft / t.clientWidth); dots.forEach((d, i) => d.toggleAttribute('aria-current', i === aktiv)); };
+    t.addEventListener('scroll', () => { clearTimeout(t._m); t._m = setTimeout(markiere, 60); }, { passive: true });
+    dots.forEach((d) => d.addEventListener('click', () => zeige(+d.dataset.i)));
+    ['pointerdown', 'focusin', 'mouseenter'].forEach((e) => t.addEventListener(e, () => (pause = true)));
+    ['mouseleave', 'focusout'].forEach((e) => t.addEventListener(e, () => (pause = false)));
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) bannerTimer = setInterval(() => { if (!t.isConnected) clearInterval(bannerTimer); else if (!pause && !document.hidden) zeige((aktiv + 1) % BANNER.length); }, 5500);
+  }
+
   // ---------- Ansicht: Startseite (nur Suche) ----------
   const rang = { gemeinde: 0, kreisfrei: 0, vg: 1, kreis: 2, body: 8 }; // Zweckverbände und sonstige Körperschaften deutlich nachrangig
   /**
@@ -298,6 +328,7 @@
     const mitDaten = INDEX.gemeinden.filter(([id]) => hatDaten(G.get(id))).length;
     $view.innerHTML = `
       <div class="home">
+        ${banner()}
         ${installCard()}
         <section class="hero">
           <p class="slogan">Guter Rat ist nicht teuer.</p>
@@ -311,6 +342,7 @@
         <div id="hits"></div>
         <p class="coverage">${fmtZahl(gemeinden)} Gemeinden in Rheinland-Pfalz · eigene Sitzungsdaten für ${fmtZahl(eigen)}${mitDaten > eigen ? `, bei weiteren ${fmtZahl(mitDaten - eigen)} nur über die Verbandsgemeinde oder den Kreis` : ''}<br>Datenstand ${esc(stand(INDEX.erstellt))}</p>
       </div>`;
+    starteBanner();
     const input = document.getElementById('q');
     const $hits = document.getElementById('hits');
     const show = () => {
@@ -500,6 +532,7 @@
         ${zeile('datenschutz', ZAEHLER ? 'Keine Cookies, keine Profile, kein Drittanbieter – die Einzelheiten' : 'Keine Cookies, kein Tracking – die Einzelheiten')}
       </div>
       ${spende}
+      <p class="muted small bildnachweis">Bildnachweis: Die Fotos im Bildband der Startseite (Kaiserslautern, Mainz, Mutterstadt, Trier, Koblenz, Neustadt an der Weinstraße) stammen von Adobe Stock und werden im Rahmen einer Standardlizenz verwendet.</p>
       <p class="stand">Datenstand ${esc(stand(INDEX.erstellt))}</p>`;
   }
 

@@ -255,6 +255,7 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
 - `web/` enthält die App (Vanilla-JS, kein Build-Schritt), `npm run web -- --out dist` erzeugt die statische Seite
   mit `data/index.json` und je Quelle `data/<id>.json` (Momentaufnahme aus `src/export/snapshot.ts`).
 - „Kurz erklärt“-Texte liegen von Hand gepflegt in `data/kurz-erklaert.json` (Schlüssel: Vorlagen-ID).
+- Bildband auf der Startseite (seit 05.10.2026, Idee des Projektinhabers): Slider mit 6 Fotos aus RLP (Kaiserslautern, Mainz, Mutterstadt, Trier, Koblenz, Neustadt an der Weinstraße) über der Überschrift, `BANNER` in `web/app.js`, Bilder in `web/img/` (1100 px, ~620 KB gesamt, nur das erste sofort geladen). CSS Scroll-Snap, Format 9:4 (ab 700 px 3:1), Abstand oben 8 px/Lücken 18 px (Mittelweg, vom Projektinhaber so gewählt), Wechsel alle 5,5 s, pausiert bei Berührung, aus bei `prefers-reduced-motion`. Alle Fotos von Adobe Stock; Lizenzhinweis auf Wunsch **nur** auf der Info-Seite („Bildnachweis“), Urhebernamen liegen nicht vor. Neue Bilder: `pos` (object-position) je Bild anpassen.
 - Startseite nur mit Suche (seit 02.10.2026, „Zuletzt angesehen“ entfernt). Reiter „Favoriten“: Kommunen (Gemeinde, Stadt, VG,
   Kreis – Stern neben dem Namen auf der Kommunenseite, je gewählter Ebene) und Gremien (Stern in der Sitzung neben dem Namen und auf
   der Kommunenseite unter „Gremien“) merken; gespeichert nur im Gerät (`localStorage` `ratsblick:favoriten`; Kommune
