@@ -1,0 +1,47 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><style>
+@font-face { font-family: "Nunito"; font-weight: 200 1000; src: url(nunito-latin.woff2) format("woff2"); }
+@font-face { font-family: "Public Sans"; font-weight: 100 900; src: url(public-sans-latin.woff2) format("woff2"); }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { width: var(--w); height: var(--h); position: relative; overflow: hidden; font-family: "Public Sans", sans-serif; color: #fff; background: #4a1421; }
+body.wide { --w: 1200px; --h: 627px; }
+body.sq { --w: 1080px; --h: 1080px; }
+.foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ver { position: absolute; inset: 0; }
+.wide .ver { background: linear-gradient(90deg, rgba(58,14,26,.94) 0%, rgba(110,32,50,.82) 36%, rgba(123,39,54,.35) 62%, rgba(123,39,54,0) 82%), linear-gradient(0deg, rgba(40,10,18,.55) 0%, rgba(40,10,18,0) 35%); }
+.sq .ver { background: linear-gradient(0deg, rgba(58,14,26,.95) 0%, rgba(110,32,50,.85) 38%, rgba(123,39,54,.25) 66%, rgba(123,39,54,0) 82%), linear-gradient(180deg, rgba(40,10,18,.5) 0%, rgba(40,10,18,0) 22%); }
+.stripe { position: absolute; left: 0; right: 0; bottom: 0; height: 14px; background: linear-gradient(90deg, #000 0, #6b1414 28%, #d62828 48%, #e4752c 70%, #f2c230 100%); }
+.wm { display: flex; flex-direction: column; font-family: "Nunito", sans-serif; font-size: 30px; line-height: 1; letter-spacing: .06em; text-transform: uppercase; font-weight: 300; }
+.wm b { font-weight: 900; }
+.wm .rlp { color: #f2c230; font-size: .54em; letter-spacing: .14em; margin-left: .35em; }
+.wm .bars { display: flex; margin-top: 7px; height: 5px; border-radius: 3px; overflow: hidden; }
+.wm .bars i { font-style: normal; color: transparent; height: 5px; overflow: hidden; }
+.wm .bars .k { font-weight: 900; background: linear-gradient(90deg, #000 0 68%, #6b1414); }
+.wm .bars .r { font-weight: 300; background: linear-gradient(90deg, #6b1414, #d62828 28%, #d62828 66%, #e4752c); }
+.wm .bars .g { font-size: .54em; letter-spacing: .14em; padding-left: .35em; background: linear-gradient(90deg, #e4752c, #f2c230 45%); }
+.marke { position: absolute; display: flex; align-items: center; gap: 14px; }
+.marke img { width: 50px; height: 50px; border-radius: 13px; box-shadow: 0 0 0 2px rgba(255,255,255,.4); }
+h1 { position: absolute; margin: 0; font-weight: 800; letter-spacing: -.012em; text-shadow: 0 2px 24px rgba(40,10,18,.35); }
+h1 span { display: block; }
+h1 em { font-style: normal; color: #f2c230; }
+.sub { position: absolute; font-weight: 500; line-height: 1.35; opacity: .95; text-shadow: 0 1px 14px rgba(40,10,18,.4); }
+.url { position: absolute; font-weight: 800; letter-spacing: .01em; color: #fff; }
+.url b { color: #f2c230; }
+.wide .marke { left: 60px; top: 48px; }
+.wide h1 { left: 60px; top: 190px; width: 640px; font-size: 56px; line-height: 1.06; }
+.wide .sub { left: 60px; top: 410px; width: 520px; font-size: 24px; }
+.wide .url { left: 60px; bottom: 54px; font-size: 26px; }
+.sq .marke { left: 70px; top: 70px; }
+.sq h1 { left: 70px; bottom: 300px; width: 940px; font-size: 84px; line-height: 1.05; }
+.sq .sub { left: 70px; bottom: 190px; width: 900px; font-size: 32px; }
+.sq .url { left: 70px; bottom: 80px; font-size: 34px; }
+</style></head>
+<body class="wide">
+  <img class="foto" id="foto" src="emotional-cochem.jpg" alt="">
+  <div class="ver"></div>
+  <div class="marke"><img src="logo.svg" alt=""><span class="wm"><span><b>Wahl</b>heimat<b class="rlp">RLP</b></span><span class="bars"><i class="k">Wahl</i><i class="r">heimat</i><i class="g">RLP</i></span></span></div>
+  <h1><span>Was bei dir im Ort</span><span>entschieden wird,</span><span><em>geht dich etwas an.</em></span></h1>
+  <div class="sub">Wahlheimat RLP macht Kommunalpolitik sichtbar – für alle.</div>
+  <div class="url">wahlheimat-rlp.de <b>→</b></div>
+  <div class="stripe"></div>
+</body></html>
