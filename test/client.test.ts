@@ -120,3 +120,18 @@ describe('OParlClient: Beobachtungen', () => {
   });
 });
 
+describe('OParlClient: Zeitgrenze je Server', () => {
+  const langsam = (async (_url: string, init?: { signal?: AbortSignal }) => {
+    await new Promise((r) => setTimeout(r, 60));
+    if (init?.signal?.aborted) throw new Error('The operation was aborted due to timeout');
+    return { ok: true, status: 200, headers: new Headers(), text: async () => '{"data":[]}' } as unknown as Response;
+  }) as unknown as typeof fetch;
+  it('bricht mit der Standard-Zeitgrenze ab, wartet mit einer längeren für den Server', async () => {
+    const kurz = new OParlClient({ fetchImpl: langsam, sleep: noSleep, minIntervalMs: 0, timeoutMs: 10, maxRetries: 0 });
+    await expect(kurz.get('https://slow.example/oparl/x')).rejects.toThrow(/Netzwerkfehler/);
+    const lang = new OParlClient({ fetchImpl: langsam, sleep: noSleep, minIntervalMs: 0, timeoutMs: 10, maxRetries: 0 });
+    lang.setzeZeitgrenze('https://slow.example/oparl/x', 2000);
+    await expect(lang.get('https://slow.example/oparl/x')).resolves.toEqual({ data: [] });
+  });
+});
+

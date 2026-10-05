@@ -89,6 +89,8 @@ export class OParlClient {
   private readonly nextSlot = new Map<string, number>();
   /** Abweichende Mindestabstände je Server (nur größer als der Standard). */
   private readonly intervalle = new Map<string, number>();
+  /** Abweichende Zeitgrenzen je Server (langsame Systeme, z. B. große Seiten aus den USA abgerufen). */
+  private readonly zeitgrenzen = new Map<string, number>();
   requestCount = 0;
   private readonly beobachtet = new Map<string, Beobachtung>();
 
@@ -134,6 +136,11 @@ export class OParlClient {
     if (slot > now) await this.sleep(slot - now);
   }
 
+  /** Setzt für einen Server eine längere Zeitgrenze je Anfrage (ms). */
+  setzeZeitgrenze(url: string, ms: number): void {
+    this.zeitgrenzen.set(serverKey(url), ms);
+  }
+
   /** Setzt für einen Server einen größeren Mindestabstand (z. B. wenn der Betreiber um Zurückhaltung bittet). */
   setzeIntervall(url: string, ms: number): void {
     this.intervalle.set(serverKey(url), ms);
@@ -150,7 +157,7 @@ export class OParlClient {
       try {
         res = await this.fetchImpl(url, {
           headers: { Accept: 'application/json', 'User-Agent': this.userAgent },
-          signal: AbortSignal.timeout(this.timeoutMs),
+          signal: AbortSignal.timeout(this.zeitgrenzen.get(serverKey(url)) ?? this.timeoutMs),
         });
       } catch (err) {
         lastError = new OParlHttpError(url, null, `Netzwerkfehler: ${(err as Error).message}`);
@@ -199,7 +206,7 @@ export class OParlClient {
       try {
         res = await this.fetchImpl(url, {
           headers: { Accept: 'text/html,*/*', 'User-Agent': this.userAgent, ...zusatz.headers },
-          signal: AbortSignal.timeout(this.timeoutMs),
+          signal: AbortSignal.timeout(this.zeitgrenzen.get(serverKey(url)) ?? this.timeoutMs),
         });
       } catch (err) {
         lastError = new OParlHttpError(url, null, `Netzwerkfehler: ${(err as Error).message}`);

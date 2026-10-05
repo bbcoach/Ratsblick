@@ -168,7 +168,10 @@ async function main(): Promise<void> {
   }
 
   const targets = values.id?.length ? sources : sources.filter((s) => s.status === 'aktiv');
-  for (const s of targets) if (s.intervallMs) client.setzeIntervall(s.url, s.intervallMs);
+  for (const s of targets) {
+    if (s.intervallMs) client.setzeIntervall(s.url, s.intervallMs);
+    if (s.zeitgrenzeMs) client.setzeZeitgrenze(s.url, s.zeitgrenzeMs);
+  }
   // Am längsten nicht abgeglichene Quellen zuerst
   const stand = new Map(
     (db.prepare('SELECT id, last_sync_at FROM source').all() as Array<{ id: string; last_sync_at: string | null }>).map((r) => [

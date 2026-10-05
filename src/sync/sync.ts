@@ -25,6 +25,8 @@ export interface SourceRecord {
   endung?: 'asp' | 'php';
   /** Größerer Mindestabstand zwischen Anfragen an diesen Server (ms). */
   intervallMs?: number;
+  /** Längere Zeitgrenze je Anfrage an diesen Server (ms; Standard 30 000). */
+  zeitgrenzeMs?: number;
   /** Nur SessionNet: Kalender je Mandant (`__cpanr`) lesen, z. B. Ortsgemeinden im System der VG. */
   mandanten?: boolean;
   /** Nur `protokolle`: weitere Listenseiten (die Quell-URL ist die erste). */
