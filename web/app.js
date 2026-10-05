@@ -261,6 +261,7 @@
     { t: 'Cochem', id: '07135020', img: 'img/cochem.jpg', pos: '50% 36%' },
     { t: 'Pirmasens', id: '07317', img: 'img/pirmasens.jpg', pos: '50% 45%' },
     { t: 'Saarburg', id: '07235118', img: 'img/saarburg.jpg', pos: '40% 50%' },
+    { t: 'Bernkastel-Kues', id: '07231008', img: 'img/bernkastel-kues.jpg', pos: '35% 50%' },
     { t: 'Worms', id: '07319', img: 'img/worms.jpg', pos: '50% 40%' },
     { t: 'Mutterstadt', id: '07338019', img: 'img/mutterstadt.jpg', pos: '50% 45%' },
     { t: 'Trier', id: '07211', img: 'img/trier.jpg', pos: '50% 50%' },
