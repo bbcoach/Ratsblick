@@ -260,6 +260,7 @@
     { t: 'Mainz', img: 'img/mainz.jpg', pos: '50% 50%' },
     { t: 'Cochem', img: 'img/cochem.jpg', pos: '50% 36%' },
     { t: 'Pirmasens', img: 'img/pirmasens.jpg', pos: '50% 45%' },
+    { t: 'Saarburg', img: 'img/saarburg.jpg', pos: '40% 50%' },
     { t: 'Worms', img: 'img/worms.jpg', pos: '50% 40%' },
     { t: 'Mutterstadt', img: 'img/mutterstadt.jpg', pos: '50% 45%' },
     { t: 'Trier', img: 'img/trier.jpg', pos: '50% 50%' },
