@@ -257,6 +257,7 @@
   const BANNER = [
     { t: 'Kaiserslautern', img: 'img/kaiserslautern.jpg', pos: '50% 62%' },
     { t: 'Mainz', img: 'img/mainz.jpg', pos: '50% 50%' },
+    { t: 'Worms', img: 'img/worms.jpg', pos: '50% 40%' },
     { t: 'Mutterstadt', img: 'img/mutterstadt.jpg', pos: '50% 45%' },
     { t: 'Trier', img: 'img/trier.jpg', pos: '50% 50%' },
     { t: 'Koblenz', img: 'img/koblenz.jpg', pos: '50% 42%' },
@@ -532,7 +533,7 @@
         ${zeile('datenschutz', ZAEHLER ? 'Keine Cookies, keine Profile, kein Drittanbieter – die Einzelheiten' : 'Keine Cookies, kein Tracking – die Einzelheiten')}
       </div>
       ${spende}
-      <p class="muted small bildnachweis">Bildnachweis: Die Fotos im Bildband der Startseite (Kaiserslautern, Mainz, Mutterstadt, Trier, Koblenz, Neustadt an der Weinstraße) stammen von Adobe Stock und werden im Rahmen einer Standardlizenz verwendet.</p>
+      <p class="muted small bildnachweis">Bildnachweis: Die Fotos im Bildband der Startseite (Kaiserslautern, Mainz, Worms, Mutterstadt, Trier, Koblenz, Neustadt an der Weinstraße) stammen von Adobe Stock und werden im Rahmen einer Standardlizenz verwendet.</p>
       <p class="stand">Datenstand ${esc(stand(INDEX.erstellt))}</p>`;
   }
 
