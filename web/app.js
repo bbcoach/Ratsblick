@@ -316,6 +316,7 @@
     { t: 'Bernkastel-Kues', id: '07231008', img: 'img/bernkastel-kues.jpg', pos: '35% 50%' },
     { t: 'Annweiler am Trifels', id: '07337501', img: 'img/annweiler.jpg', pos: '50% 38%' },
     { t: 'Donnersbergkreis', id: '07333', img: 'img/donnersbergkreis.jpg', pos: '50% 50%' },
+    { t: 'Bad Dürkheim', id: '07332002', img: 'img/bad-duerkheim.jpg', pos: '50% 75%' },
     { t: 'Worms', id: '07319', img: 'img/worms.jpg', pos: '50% 40%' },
     { t: 'Mutterstadt', id: '07338019', img: 'img/mutterstadt.jpg', pos: '50% 45%' },
     { t: 'Trier', id: '07211', img: 'img/trier.jpg', pos: '50% 50%' },
