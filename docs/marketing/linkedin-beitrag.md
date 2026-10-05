@@ -1,20 +1,23 @@
-# LinkedIn-Beitrag (Entwurf)
+# LinkedIn-Beitrag (Entwurf, frech, Problem im Mittelpunkt)
 
-**Was beschließt mein Gemeinderat?**
+**Quizfrage: Wann tagt dein Gemeinderat – und worüber entscheidet er heute Abend?** 🤔
 
-Kommunalpolitik prägt unseren Alltag am direktesten – Schulen, Kitas, Straßen, Windkraft, Feuerwehr. Die Unterlagen dazu sind öffentlich. Aber sie liegen in Hunderten verschiedener Ratsinformationssysteme, jedes mit eigener Bedienung.
+Wenn du jetzt zögerst, bist du in guter Gesellschaft. Dabei sind Tagesordnungen und Vorlagen öffentlich. Theoretisch.
 
-Deshalb gibt es jetzt **Wahlheimat RLP**: Kommune oder Postleitzahl eingeben – und sehen, was beraten und beschlossen wird.
+Praktisch sieht das so aus: Jede Kommune betreibt ihr eigenes Ratsinformationssystem. Anderer Anbieter, andere Bedienung, andere Logik. Wer wissen will, ob nebenan über Windräder, Kita-Gebühren oder das neue Gewerbegebiet beraten wird, klickt sich durch ein Portal nach dem anderen, falls er das richtige überhaupt findet. Eine Übersicht über alle? Gibt es nicht. Zumindest nicht kostenlos.
 
-✔ 2.119 von 2.300 Gemeinden in Rheinland-Pfalz mit eigenen Sitzungsdaten, alle Verbandsgemeinden und fast alle Kreise
-✔ Nächste Sitzungen, Tagesordnungen, Vorlagen und die Sitzverteilung des Rats
-✔ Themensuche über alle angebundenen Räte (z. B. Windkraft)
-✔ Kostenlos, ohne Anmeldung, ohne Cookies und Werbung
-✔ Automatischer Datenabgleich alle 6 Stunden
+Transparenz, die man erst suchen muss, ist … nun ja. Halb transparent. 😉
 
-Ein privates Projekt aus Rheinland-Pfalz, das jetzt wachsen soll. Wir suchen Förderpartner, Kommunen und Kooperationen, die mit uns Kommunalpolitik für alle zugänglich machen.
+Deshalb habe ich **Wahlheimat RLP** gebaut: Kommune oder Postleitzahl eingeben, fertig.
 
-👉 wahlheimat-rlp.de
-Projektbeschreibung gern per Nachricht.
+✅ Nächste Sitzungen, Tagesordnungen, Vorlagen und Sitzverteilung des Rats
+✅ Themensuche über alle Räte: Wo wird in Rheinland-Pfalz gerade über „Windkraft“ entschieden?
+✅ 2.119 von 2.300 Gemeinden mit eigenen Daten, alle Verbandsgemeinden dabei
+✅ Kostenlos, ohne Anmeldung, ohne Cookies, ohne Werbung
+
+Ein privates Projekt, das jetzt wachsen soll. Ich suche Menschen, die es ausprobieren, Kommunen, die mitmachen, und Förderpartner, die Kommunalpolitik für alle sichtbar machen wollen.
+
+👉 wahlheimat-rlp.de  (besser: „Link im ersten Kommentar“ und die Adresse dorthin setzen)
+Schaut rein und sagt mir ehrlich: Stimmt's bei eurer Kommune?
 
 #Kommunalpolitik #OpenData #CivicTech #Rheinlandpfalz #Transparenz #Demokratie #OParl
