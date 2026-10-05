@@ -254,7 +254,8 @@
   }
 
   // ---------- Banner-Slider (Startseite) ----------
-  const BANNER = [
+  // Neue Bilder einfach hier anhängen (Datei nach web/img/, Ort als `t`); die Reihenfolge wird bei jedem Start gemischt.
+  const BANNER_BILDER = [
     { t: 'Kaiserslautern', img: 'img/kaiserslautern.jpg', pos: '50% 62%' },
     { t: 'Mainz', img: 'img/mainz.jpg', pos: '50% 50%' },
     { t: 'Worms', img: 'img/worms.jpg', pos: '50% 40%' },
@@ -263,6 +264,7 @@
     { t: 'Koblenz', img: 'img/koblenz.jpg', pos: '50% 42%' },
     { t: 'Neustadt an der Weinstraße', img: 'img/neustadt.jpg', pos: '50% 40%' },
   ];
+  const BANNER = (() => { const l = [...BANNER_BILDER]; for (let i = l.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; } return l; })();
   function banner() {
     return `<section class="banner" aria-roledescription="Bildergalerie" aria-label="Bilder aus Rheinland-Pfalz">
       <div class="bn-track" id="bnt">${BANNER.map((b, i) => `<figure class="bn-slide" aria-label="${esc(b.t)}" data-i="${i}"><img src="${b.img}" alt="${esc(b.t)}" style="object-position:${b.pos}" ${i ? 'loading="lazy"' : ''}><figcaption>${esc(b.t)}</figcaption></figure>`).join('')}</div>
@@ -533,7 +535,7 @@
         ${zeile('datenschutz', ZAEHLER ? 'Keine Cookies, keine Profile, kein Drittanbieter – die Einzelheiten' : 'Keine Cookies, kein Tracking – die Einzelheiten')}
       </div>
       ${spende}
-      <p class="muted small bildnachweis">Bildnachweis: Die Fotos im Bildband der Startseite (Kaiserslautern, Mainz, Worms, Mutterstadt, Trier, Koblenz, Neustadt an der Weinstraße) stammen von Adobe Stock und werden im Rahmen einer Standardlizenz verwendet.</p>
+      <p class="muted small bildnachweis">Bildnachweis: Die Fotos im Bildband der Startseite (${esc(BANNER_BILDER.map((b) => b.t).sort((x, y) => x.localeCompare(y, 'de')).join(', '))}) stammen von Adobe Stock und werden im Rahmen einer Standardlizenz verwendet.</p>
       <p class="stand">Datenstand ${esc(stand(INDEX.erstellt))}</p>`;
   }
 
