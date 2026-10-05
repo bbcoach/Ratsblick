@@ -530,7 +530,7 @@
   };
   const ang = (v) => (v ? esc(v).replace(/\n/g, '<br>') : '<span class="fehlt">[wird ergänzt]</span>');
   const mail = () => (BETREIBER.email ? `<a href="mailto:${esc(BETREIBER.email)}">${esc(BETREIBER.email)}</a>` : ang(null));
-  const extern = (url, text) => `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(text || url)}</a>`;
+  const extern = (url, text) => `<a href="${esc(sicherUrl(url))}" target="_blank" rel="noopener">${esc(text || url)}</a>`;
 
   const TEXTSEITEN = {
     ueber: () => ({
@@ -753,7 +753,7 @@
     const name = String(x.D.quelle.name || '').replace(/^VG /, 'Verbandsgemeinde ');
     return `<div class="card empty-state"><p><strong>Hier sehen Sie die Sitzungstermine</strong></p>
       <p class="muted">Tagesordnungen, Vorlagen und Beschlüsse stellt die ${esc(name)} technisch bisher nur in ihrem eigenen Ratsinformationssystem bereit – eine vollständige Übernahme in andere Angebote wie Wahlheimat ist dort leider noch nicht vorgesehen. Die vollständigen Unterlagen finden Sie direkt im Ratsinformationssystem.</p>
-      ${x.D.quelle.ris ? `<a class="btn ghost" href="${esc(x.D.quelle.ris)}" target="_blank" rel="noopener">Ratsinformationssystem öffnen</a>` : ''}</div>`;
+      ${x.D.quelle.ris ? `<a class="btn ghost" href="${esc(sicherUrl(x.D.quelle.ris))}" target="_blank" rel="noopener">Ratsinformationssystem öffnen</a>` : ''}</div>`;
   }
 
   function ohneDaten(t, eb) {
@@ -769,7 +769,7 @@
     return `<div class="card empty-state">
         <p><strong>Noch keine Sitzungsdaten</strong></p>
         <p class="muted">${esc(grund)}</p>
-        ${ris ? `<a class="btn ghost" href="${esc(ris.url)}" target="_blank" rel="noopener">Ratsinformationssystem öffnen</a>` : ''}
+        ${ris ? `<a class="btn ghost" href="${esc(sicherUrl(ris.url))}" target="_blank" rel="noopener">Ratsinformationssystem öffnen</a>` : ''}
       </div>
       ${andere.length ? `<section><h2>Mit Daten</h2><div class="list">${andere.map((e) => `<button class="row" type="button" data-go="${esc(link('g', kommune, e.key))}"><div class="body"><span class="title">${esc(anzeigeName(e.g))}</span><span class="meta">${esc({ gemeinde: 'Gemeinde', vg: 'Verbandsgemeinde', kreis: 'Kreis' }[e.key])}</span></div>${chev}</button>`).join('')}</div></section>` : ''}`;
   }
@@ -781,7 +781,8 @@
 
   /** Link ins Original-Ratsinformationssystem: zur Einzelseite, sonst zur Startseite des RIS. */
   function risLink(seite, startseite, was, ohneRis, kalender) {
-    const url = seite || startseite;
+    const url = [seite, startseite].map((u) => sicherUrl(u)).find((u) => u !== '#') || '';
+    seite = sicherUrl(seite) === '#' ? null : seite;
     if (!url) return '';
     const system = ohneRis ? 'auf der Website' : 'im Ratsinformationssystem';
     if (kalender && seite) {
