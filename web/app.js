@@ -254,7 +254,7 @@
   }
 
   // ---------- Banner-Slider (Startseite) ----------
-  // Neue Bilder einfach hier anhängen (Datei nach web/img/, Ort als `t`, Gebiets-ID `id` für den Link auf die Kommunenseite); die Reihenfolge wird bei jedem Start gemischt.
+  // Neue Bilder einfach hier anhängen (Datei nach web/img/, Ort als `t`, Gebiets-ID `id` für den Link auf die Kommunenseite); je Start werden höchstens `BANNER_MAX` (10) zufällig ausgewählt und gemischt.
   const BANNER_BILDER = [
     { t: 'Kaiserslautern', id: '07312', img: 'img/kaiserslautern.jpg', pos: '50% 62%' },
     { t: 'Mainz', id: '07315', img: 'img/mainz.jpg', pos: '50% 50%' },
@@ -270,7 +270,8 @@
     { t: 'Koblenz', id: '07111', img: 'img/koblenz.jpg', pos: '50% 42%' },
     { t: 'Neustadt an der Weinstraße', id: '07316', img: 'img/neustadt.jpg', pos: '50% 40%' },
   ];
-  const BANNER = (() => { const l = [...BANNER_BILDER]; for (let i = l.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; } return l; })();
+  const BANNER_MAX = 10; // höchstens so viele Bilder je Start, zufällig aus dem ganzen Bestand
+  const BANNER = (() => { const l = [...BANNER_BILDER]; for (let i = l.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; } return l.slice(0, BANNER_MAX); })();
   function banner() {
     return `<section class="banner" aria-roledescription="Bildergalerie" aria-label="Bilder aus Rheinland-Pfalz">
       <div class="bn-track" id="bnt">${BANNER.map((b, i) => `<a class="bn-slide" href="${esc(link('g', b.id))}" aria-label="${esc(b.t)}: Sitzungen und Vorlagen ansehen" data-i="${i}"><img src="${b.img}" alt="" draggable="false" style="object-position:${b.pos}" ${i ? 'loading="lazy"' : ''}><span class="bn-cap">${esc(b.t)}<span aria-hidden="true"> ›</span></span></a>`).join('')}</div>
