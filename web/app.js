@@ -491,6 +491,8 @@
         <p>E-Mail: ${mail()}</p>
         <h4>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h4>
         <p>${ang(BETREIBER.name)}, Anschrift wie oben</p>
+        <h4>Bildnachweis</h4>
+        <p>Die Fotos im Bildband der Startseite (${esc(BANNER_BILDER.map((b) => b.t).sort((x, y) => x.localeCompare(y, 'de')).join(', '))}) stammen von Adobe Stock und werden im Rahmen einer Standardlizenz verwendet.</p>
         <h4>Hinweis</h4>
         <p>Wahlheimat ist ein unabhängiges, nicht kommerzielles Angebot und kein Angebot des Landes Rheinland-Pfalz oder der Kommunen. Für die Inhalte verlinkter Seiten, insbesondere der Ratsinformationssysteme, sind deren Betreiber verantwortlich.</p>`,
     }),
@@ -538,7 +540,6 @@
         ${zeile('datenschutz', ZAEHLER ? 'Keine Cookies, keine Profile, kein Drittanbieter – die Einzelheiten' : 'Keine Cookies, kein Tracking – die Einzelheiten')}
       </div>
       ${spende}
-      <p class="muted small bildnachweis">Bildnachweis: Die Fotos im Bildband der Startseite (${esc(BANNER_BILDER.map((b) => b.t).sort((x, y) => x.localeCompare(y, 'de')).join(', '))}) stammen von Adobe Stock und werden im Rahmen einer Standardlizenz verwendet.</p>
       <p class="stand">Datenstand ${esc(stand(INDEX.erstellt))}</p>`;
   }
 
