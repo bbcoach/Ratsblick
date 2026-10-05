@@ -254,23 +254,23 @@
   }
 
   // ---------- Banner-Slider (Startseite) ----------
-  // Neue Bilder einfach hier anhängen (Datei nach web/img/, Ort als `t`); die Reihenfolge wird bei jedem Start gemischt.
+  // Neue Bilder einfach hier anhängen (Datei nach web/img/, Ort als `t`, Gebiets-ID `id` für den Link auf die Kommunenseite); die Reihenfolge wird bei jedem Start gemischt.
   const BANNER_BILDER = [
-    { t: 'Kaiserslautern', img: 'img/kaiserslautern.jpg', pos: '50% 62%' },
-    { t: 'Mainz', img: 'img/mainz.jpg', pos: '50% 50%' },
-    { t: 'Cochem', img: 'img/cochem.jpg', pos: '50% 36%' },
-    { t: 'Pirmasens', img: 'img/pirmasens.jpg', pos: '50% 45%' },
-    { t: 'Saarburg', img: 'img/saarburg.jpg', pos: '40% 50%' },
-    { t: 'Worms', img: 'img/worms.jpg', pos: '50% 40%' },
-    { t: 'Mutterstadt', img: 'img/mutterstadt.jpg', pos: '50% 45%' },
-    { t: 'Trier', img: 'img/trier.jpg', pos: '50% 50%' },
-    { t: 'Koblenz', img: 'img/koblenz.jpg', pos: '50% 42%' },
-    { t: 'Neustadt an der Weinstraße', img: 'img/neustadt.jpg', pos: '50% 40%' },
+    { t: 'Kaiserslautern', id: '07312', img: 'img/kaiserslautern.jpg', pos: '50% 62%' },
+    { t: 'Mainz', id: '07315', img: 'img/mainz.jpg', pos: '50% 50%' },
+    { t: 'Cochem', id: '07135020', img: 'img/cochem.jpg', pos: '50% 36%' },
+    { t: 'Pirmasens', id: '07317', img: 'img/pirmasens.jpg', pos: '50% 45%' },
+    { t: 'Saarburg', id: '07235118', img: 'img/saarburg.jpg', pos: '40% 50%' },
+    { t: 'Worms', id: '07319', img: 'img/worms.jpg', pos: '50% 40%' },
+    { t: 'Mutterstadt', id: '07338019', img: 'img/mutterstadt.jpg', pos: '50% 45%' },
+    { t: 'Trier', id: '07211', img: 'img/trier.jpg', pos: '50% 50%' },
+    { t: 'Koblenz', id: '07111', img: 'img/koblenz.jpg', pos: '50% 42%' },
+    { t: 'Neustadt an der Weinstraße', id: '07316', img: 'img/neustadt.jpg', pos: '50% 40%' },
   ];
   const BANNER = (() => { const l = [...BANNER_BILDER]; for (let i = l.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; } return l; })();
   function banner() {
     return `<section class="banner" aria-roledescription="Bildergalerie" aria-label="Bilder aus Rheinland-Pfalz">
-      <div class="bn-track" id="bnt">${BANNER.map((b, i) => `<figure class="bn-slide" aria-label="${esc(b.t)}" data-i="${i}"><img src="${b.img}" alt="${esc(b.t)}" style="object-position:${b.pos}" ${i ? 'loading="lazy"' : ''}><figcaption>${esc(b.t)}</figcaption></figure>`).join('')}</div>
+      <div class="bn-track" id="bnt">${BANNER.map((b, i) => `<a class="bn-slide" href="${esc(link('g', b.id))}" aria-label="${esc(b.t)}: Sitzungen und Vorlagen ansehen" data-i="${i}"><img src="${b.img}" alt="" draggable="false" style="object-position:${b.pos}" ${i ? 'loading="lazy"' : ''}><span class="bn-cap">${esc(b.t)}<span aria-hidden="true"> ›</span></span></a>`).join('')}</div>
       <div class="bn-dots" id="bnd">${BANNER.map((b, i) => `<button type="button" aria-label="Bild ${i + 1}" data-i="${i}" ${i === 0 ? 'aria-current="true"' : ''}></button>`).join('')}</div>
     </section>`;
   }
