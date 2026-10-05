@@ -143,6 +143,57 @@
     return { v: parts[0] || '', a: parts[1], b: parts[2] };
   }
 
+  // ---------- Spendenhinweis: einmal nach 10 geöffneten Ansichten ----------
+  // Zähler und Merkzeichen liegen nur im Gerät (localStorage), nichts wird übertragen. Wer den Hinweis gesehen hat, bekommt ihn nie wieder.
+  const SPENDENHINWEIS_NACH = 10;
+  let letzteAnsicht = null;
+  function zaehleAnsicht(r) {
+    if (!BETREIBER.paypal || store.get('spendenhinweis', null)) return;
+    if (location.hash !== letzteAnsicht) {
+      letzteAnsicht = location.hash;
+      store.set('ansichten', (Number(store.get('ansichten', 0)) || 0) + 1);
+    }
+    // nicht auf Info-, Rechts- und Unterstützen-Seiten und nicht, bevor 10 Ansichten erreicht sind
+    if (r.v === 'info' || TEXTSEITEN[r.v] || (Number(store.get('ansichten', 0)) || 0) < SPENDENHINWEIS_NACH) return;
+    const hash = location.hash;
+    setTimeout(() => { if (location.hash === hash) zeigeSpendenhinweis(); }, 1500);
+  }
+  function zeigeSpendenhinweis() {
+    if (store.get('spendenhinweis', null) || document.getElementById('spendenhinweis')) return;
+    store.set('spendenhinweis', new Date().toISOString().slice(0, 10)); // vor dem Anzeigen merken: es kommt nie ein zweites Mal
+    const vorher = document.activeElement;
+    const box = document.createElement('div');
+    box.id = 'spendenhinweis';
+    box.className = 'popup';
+    box.innerHTML = `<div class="popup-karte" role="dialog" aria-modal="true" aria-labelledby="sh-t">
+        <h2 id="sh-t">Guter Rat ist nicht teuer – für dich.</h2>
+        <p>Für mich allerdings schon: Wahlheimat wird in meiner Freizeit gepflegt und weiterentwickelt. Wenn dir die App hilft, freue ich mich über eine kleine Unterstützung. 5 € sind für dich nicht viel, machen unser Land aber zu einem besseren Ort.</p>
+        <a class="btn spendenknopf" href="${esc(BETREIBER.paypal)}" target="_blank" rel="noopener">Mit PayPal unterstützen</a>
+        <button class="linkbtn" type="button" data-zu>Schließen</button>
+        <p class="muted small">Freiwillig, keine Spendenbescheinigung. Diesen Hinweis siehst du nur dieses eine Mal.</p>
+      </div>`;
+    const zu = () => {
+      box.remove();
+      document.removeEventListener('keydown', taste);
+      window.removeEventListener('hashchange', zu);
+      try { vorher && vorher.focus && vorher.focus(); } catch {}
+    };
+    const taste = (e) => {
+      if (e.key === 'Escape') { zu(); return; }
+      if (e.key === 'Tab') { // Fokus im Fenster halten
+        const f = [...box.querySelectorAll('a, button')];
+        const i = f.indexOf(document.activeElement);
+        e.preventDefault();
+        f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+      }
+    };
+    box.addEventListener('click', (e) => { if (e.target === box || e.target.closest('[data-zu]') || e.target.closest('a')) zu(); });
+    document.addEventListener('keydown', taste);
+    window.addEventListener('hashchange', zu);
+    document.body.appendChild(box);
+    box.querySelector('[data-zu]').focus();
+  }
+
   async function route() {
     const r = parse();
     let tab = 'wahl';
@@ -175,6 +226,7 @@
       } else {
         vWahl();
       }
+      zaehleAnsicht(r);
     } catch (err) {
       setTitle('');
       $view.innerHTML = `<div class="card empty">Das konnte nicht geladen werden (${esc(err.message)}). Prüfen Sie die Verbindung und laden Sie die Seite neu.</div>`;
@@ -511,7 +563,7 @@
         <p>Die Website liegt bei GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA). Beim Aufruf verarbeitet GitHub technisch notwendige Daten wie IP-Adresse, Zeitpunkt, abgerufene Datei und Browser-Kennung, um die Seite auszuliefern und vor Missbrauch zu schützen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer sicheren, funktionierenden Website). GitHub ist nach dem EU-US Data Privacy Framework zertifiziert. Einzelheiten: ${extern('https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement', 'Datenschutzerklärung von GitHub')}.</p>
         <p>Schriften und alle übrigen Bestandteile der App werden von dieser Website selbst geladen, nicht von Dritten${ZAEHLER ? ' (einzige Ausnahme: der Zähler, siehe 3a)' : ''}.</p>
         <h4>3. Speicher auf Ihrem Gerät</h4>
-        <p>Die App speichert im Speicher Ihres Browsers (<em>localStorage</em>) Ihre Favoriten, die zuletzt gewählte Kommune und die Einstellungen der Themensuche, außerdem App-Dateien und den zuletzt geladenen Datenstand für die Nutzung ohne Verbindung. Diese Angaben verlassen Ihr Gerät nicht und werden nicht an uns übertragen. Sie dienen ausschließlich Funktionen, die Sie selbst nutzen (§ 25 Abs. 2 Nr. 2 TDDDG); eine Einwilligung ist dafür nicht erforderlich. Sie können sie jederzeit löschen, indem Sie die Websitedaten in Ihrem Browser entfernen.</p>
+        <p>Die App speichert im Speicher Ihres Browsers (<em>localStorage</em>) Ihre Favoriten, die zuletzt gewählte Kommune und die Einstellungen der Themensuche, außerdem eine Zahl, wie oft Sie Ansichten der App geöffnet haben, und ein Merkzeichen, ob Ihnen der einmalige Unterstützungshinweis schon angezeigt wurde, außerdem App-Dateien und den zuletzt geladenen Datenstand für die Nutzung ohne Verbindung. Diese Angaben verlassen Ihr Gerät nicht und werden nicht an uns übertragen. Sie dienen ausschließlich Funktionen der App, die Sie selbst nutzen, und dem einmaligen Hinweis; sie werden nicht ausgewertet (§ 25 Abs. 2 TDDDG). Sie können sie jederzeit löschen, indem Sie die Websitedaten in Ihrem Browser entfernen.</p>
         ${ZAEHLER ? `<h4>3a. Reichweitenmessung (eigener Zähler)</h4>
         <p>Um zu verstehen, wie Wahlheimat genutzt wird, zählen wir Seitenaufrufe mit einem eigenen kleinen Zähler. Er läuft als Cloudflare Worker (Cloudflare, Inc., USA; Datenbank bei Cloudflare, Einsatz ohne Drittanbieter-Skript). Bei jedem Seitenwechsel meldet Ihr Browser nur die Art der aufgerufenen App-Seite (zum Beispiel „Kommune 07134005, Ebene VG“, nie Ihre Suchbegriffe oder Sitzungs-/Vorlagen-IDs). Der Zähler erhöht daraufhin eine Tageszahl für diese Seitenart. Es werden keine IP-Adresse, keine Kennung, kein Browser- oder Geräteprofil und kein Verweis gespeichert, und es wird nichts auf Ihrem Gerät abgelegt; Zählungen werden nach 400 Tagen gelöscht. Beim technischen Empfang der Meldung sieht Cloudflare wie jeder Server kurzzeitig die IP-Adresse, speichert sie für diesen Zähler aber nicht. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer bedarfsgerechten Weiterentwicklung). Wenn Ihr Browser „Do Not Track“ oder „Global Privacy Control“ sendet, zählen wir nicht. Sie können der Messung außerdem widersprechen (Art. 21 DSGVO), etwa indem Sie uns schreiben.</p>` : ''}
         <h4>4. Links zu Ratsinformationssystemen</h4>
