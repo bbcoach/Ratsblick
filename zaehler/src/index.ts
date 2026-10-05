@@ -91,7 +91,7 @@ export default {
       const tage = Math.min(MAX_TAGE, Math.max(1, Number(url.searchParams.get('tage')) || 30));
       const ab = berlinTag(new Date(Date.now() - (tage - 1) * 86_400_000));
       const proTag = await env.DB.prepare('SELECT tag, SUM(n) AS n FROM zaehler WHERE tag >= ? GROUP BY tag ORDER BY tag').bind(ab).all<{ tag: string; n: number }>();
-      const seiten = await env.DB.prepare('SELECT pfad, SUM(n) AS n FROM zaehler WHERE tag >= ? GROUP BY pfad ORDER BY n DESC LIMIT 15').bind(ab).all<{ pfad: string; n: number }>();
+      const seiten = await env.DB.prepare('SELECT pfad, SUM(n) AS n FROM zaehler WHERE tag >= ? GROUP BY pfad ORDER BY n DESC LIMIT 300').bind(ab).all<{ pfad: string; n: number }>();
       return antwort(200, { ab, tage: proTag.results, seiten: seiten.results }, null);
     }
 

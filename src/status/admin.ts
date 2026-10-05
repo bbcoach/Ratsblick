@@ -84,7 +84,8 @@ export function dashboardHtml(status: Status, zugriffe: Zugriffe | ZugriffeFehle
 :root{color-scheme:light dark;--bg:#f6f4f4;--s:#fff;--fg:#1f1a1c;--m:#655a5e;--l:#e4dcdf;--ok:#2f6b45;--w:#8a5a0b;--f:#9b2c2c;--a:#7b2736;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 @media(prefers-color-scheme:dark){:root{--bg:#141113;--s:#1e1a1c;--fg:#ece5e8;--m:#a8999f;--l:#392f33;--ok:#86c79c;--w:#e2b866;--f:#ec9a9a;--a:#e6a0ad}}
 body{margin:0;background:var(--bg);color:var(--fg);padding:16px;line-height:1.45}
-main{max-width:1100px;margin:0 auto}h1{font-size:20px;margin:0 0 4px}h2{font-size:15px;margin:22px 0 8px}
+main{max-width:1100px;margin:0 auto}h1{font-size:20px;margin:0 0 4px}h2{font-size:15px;margin:22px 0 8px}h2.erst{margin-top:12px}
+details.mehr{margin-top:12px}details.mehr summary{cursor:pointer;font-size:14px;font-weight:600;padding:8px 0}details.mehr h3{font-size:13px;margin:12px 0 6px;color:var(--m);font-weight:600}
 .m{color:var(--m);font-size:13px}.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:14px 0}
 .k div{background:var(--s);border:1px solid var(--l);border-radius:10px;padding:10px 12px}.k b{display:block;font-size:22px}
 .ok{color:var(--ok)}.warnung{color:var(--w)}.fehler{color:var(--f)}
@@ -97,7 +98,9 @@ main{max-width:1100px;margin:0 auto}h1{font-size:20px;margin:0 0 4px}h2{font-siz
 label{font-size:13px;display:flex;align-items:center;gap:6px}
 .z{background:var(--s);border:1px dashed var(--l);border-radius:10px;padding:12px;color:var(--m);font-size:13px}
 </style></head><body><main>
-<h1>Wahlheimat – Quellenstatus</h1>
+<h1>Wahlheimat – Admin</h1>
+<h2 class="erst">Zugriffe</h2><div id="z" class="z">Der Zähler ist noch nicht eingerichtet.</div>
+<h2>Quellenstatus</h2>
 <div class="m">Stand ${esc(status.erstellt.slice(0, 16).replace('T', ' '))} UTC · aktualisiert sich mit jedem Abgleich (alle 6 Stunden)</div>
 <div class="k"><div><b>${z.quellen}</b>Quellen</div><div><b class="ok">${z.ok}</b>in Ordnung</div><div><b class="warnung">${z.warnung}</b>Warnung</div><div><b class="fehler">${z.fehler}</b>Fehler</div><div><b>${z.sitzungen.toLocaleString('de-DE')}</b>Sitzungen</div><div><b>${z.kuenftig.toLocaleString('de-DE')}</b>kommende</div><div><b>${z.vorlagen.toLocaleString('de-DE')}</b>Vorlagen</div></div>
 <h2>Auffälligkeiten</h2><div id="w"></div>
@@ -105,7 +108,6 @@ label{font-size:13px;display:flex;align-items:center;gap:6px}
 <h2>Alle Quellen</h2>
 <div class="c"><input type="search" id="q" placeholder="Quelle suchen …" aria-label="Quelle suchen"><label><input type="checkbox" id="nur"> nur Auffällige</label></div>
 <div class="sc"><table class="t"><thead><tr id="h"></tr></thead><tbody id="b"></tbody></table></div>
-<h2>Zugriffe</h2><div id="z" class="z">Der Zähler ist noch nicht eingerichtet.</div>
 </main>
 <script type="application/json" id="d">${daten}</script>
 <script type="application/json" id="zd">${zdaten}</script>
@@ -136,9 +138,9 @@ if(Z&&Z.fehler){document.getElementById('z').textContent='Zugriffszahlen konnten
 else if(Z){
   const mx=Math.max(1,...Z.tage.map((t)=>t.aufrufe)),bw=100/Z.tage.length;
   const balken=Z.tage.map((t,i)=>'<rect x="'+(i*bw+0.4).toFixed(2)+'" y="'+(40-t.aufrufe/mx*40).toFixed(1)+'" width="'+(bw-0.8).toFixed(2)+'" height="'+(t.aufrufe/mx*40).toFixed(1)+'" fill="currentColor"><title>'+t.tag+': '+t.aufrufe+'</title></rect>').join('');
-  const liste=(a,k)=>a.length?'<table class="t"><tbody>'+a.map((x)=>'<tr><td>'+e(x[k])+'</td><td class="n">'+x.aufrufe+'</td></tr>').join('')+'</tbody></table>':'<div class="m">noch keine Daten</div>';
+  const liste=(a)=>a.length?'<table class="t"><tbody>'+a.map((x)=>'<tr><td>'+e(x.name)+'</td><td class="n">'+x.aufrufe+'</td></tr>').join('')+'</tbody></table>':'<div class="m">noch keine Daten</div>';
   document.getElementById('z').className='';
-  document.getElementById('z').innerHTML='<div class="k"><div><b>'+Z.heute+'</b>heute</div><div><b>'+Z.sieben+'</b>7 Tage</div><div><b>'+Z.dreissig+'</b>30 Tage</div></div><div class="m">Seitenaufrufe je Tag (30 Tage)</div><svg viewBox="0 0 100 40" preserveAspectRatio="none" style="width:100%;height:80px;color:var(--a)">'+balken+'</svg><div class="m">Seitenaufrufe, keine Personen: der Zähler speichert nur Summen je Tag und Seitenart.</div><h2>Meistgenutzte App-Seiten</h2>'+liste(Z.seiten,'pfad');
+  document.getElementById('z').innerHTML='<div class="k"><div><b>'+Z.heute+'</b>heute</div><div><b>'+Z.sieben+'</b>7 Tage</div><div><b>'+Z.dreissig+'</b>30 Tage</div></div><div class="m">Seitenaufrufe je Tag (30 Tage)</div><svg viewBox="0 0 100 40" preserveAspectRatio="none" style="width:100%;height:80px;color:var(--a)">'+balken+'</svg><div class="m">Seitenaufrufe, keine Personen: der Zähler speichert nur Summen je Tag und Seitenart.</div><details class="mehr"><summary>Meistgenutzte Seiten anzeigen</summary><h3>Nach Seitenart</h3>'+liste(Z.arten||[])+'<h3>Meistbesuchte Kommunen (alle Ebenen zusammen)</h3>'+liste(Z.kommunen||[])+'</details>';
 }
 </script></body></html>`;
 }

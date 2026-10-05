@@ -17,7 +17,7 @@ import { syncRegisafe } from './scrape/regisafe.js';
 import { syncRubinApi } from './scrape/rubin.js';
 import { syncSessionNet } from './scrape/sessionnet.js';
 import { baueStatus, schreibeLog, warnungenMarkdown } from './status/status.js';
-import { holeZugriffe, type Zugriffe, type ZugriffeFehler } from './status/zugriffe.js';
+import { gebietNamen, holeZugriffe, type Zugriffe, type ZugriffeFehler } from './status/zugriffe.js';
 import { dashboardHtml, huelle, verschluessele } from './status/admin.js';
 import { gespeicherteAdresse, leereQuelle, syncSource, type SourceRecord } from './sync/sync.js';
 
@@ -115,7 +115,7 @@ async function main(): Promise<void> {
     let zugriffe: Zugriffe | ZugriffeFehler | null = null;
     if (process.env.ZAEHLER_URL && process.env.ZAEHLER_LESETOKEN) {
       try {
-        zugriffe = await holeZugriffe({ url: process.env.ZAEHLER_URL, token: process.env.ZAEHLER_LESETOKEN.trim() });
+        zugriffe = await holeZugriffe({ url: process.env.ZAEHLER_URL, token: process.env.ZAEHLER_LESETOKEN.trim() }, new Date(), fetch, gebietNamen());
         console.log(`Zugriffe: ${zugriffe.dreissig} Seitenaufrufe in 30 Tagen`);
       } catch (err) {
         zugriffe = { fehler: (err as Error).message };

@@ -81,6 +81,8 @@ describe('Zugriffe (eigener Zähler)', () => {
     expect(z.dreissig).toBe(23);
     expect(z.tage).toHaveLength(30);
     expect(z.seiten).toEqual([{ pfad: '/g/07134005/vg', aufrufe: 9 }]);
+    expect(z.arten).toEqual([{ name: 'Kommunenseite', aufrufe: 9 }]);
+    expect(z.kommunen).toEqual([{ name: 'Gebiet 07134005', aufrufe: 9 }]);
   });
   it('meldet HTTP-Fehler verständlich', async () => {
     const { holeZugriffe } = await import('../src/status/zugriffe.js');
@@ -92,5 +94,33 @@ describe('Zugriffe (eigener Zähler)', () => {
     const st = baueStatus(d, [{ id: 'a', name: 'Quelle A' }]);
     expect(dashboardHtml(st, { fehler: 'Zähler: HTTP 401' })).toContain('HTTP 401');
     expect(dashboardHtml(st, null)).toContain('"zd"');
+  });
+});
+
+describe('Zugriffe: Klarnamen', () => {
+  it('fasst Seitenarten und Kommunen (alle Ebenen) zusammen', async () => {
+    const { holeZugriffe, gebietNamen } = await import('../src/status/zugriffe.js');
+    const namen = gebietNamen();
+    expect(namen.get('07335004')).toBe('Enkenbach-Alsenborn');
+    const f = (async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        tage: [],
+        seiten: [
+          { pfad: '/', n: 10 },
+          { pfad: '/g/07335004', n: 5 },
+          { pfad: '/g/07335004/vg', n: 3 },
+          { pfad: '/s', n: 2 },
+        ],
+      }),
+    })) as unknown as typeof fetch;
+    const z = await holeZugriffe({ url: 'https://z.example', token: 'x' }, new Date('2026-10-05T10:00:00Z'), f, namen);
+    expect(z.arten).toEqual([
+      { name: 'Startseite (Suche)', aufrufe: 10 },
+      { name: 'Kommunenseite', aufrufe: 8 },
+      { name: 'Sitzung (Einzelansicht)', aufrufe: 2 },
+    ]);
+    expect(z.kommunen).toEqual([{ name: 'Enkenbach-Alsenborn', aufrufe: 8 }]);
   });
 });
