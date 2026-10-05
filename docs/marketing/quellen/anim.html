@@ -1,0 +1,109 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><style>
+
+@font-face { font-family: "Nunito"; font-weight: 200 1000; src: url(nunito-latin.woff2) format("woff2"); }
+@font-face { font-family: "Public Sans"; font-weight: 100 900; src: url(public-sans-latin.woff2) format("woff2"); }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { width: var(--w); height: var(--h); position: relative; overflow: hidden; font-family: "Public Sans", sans-serif; color: #fff; background: radial-gradient(120% 140% at 85% 0%, #9a3347 0%, #7B2736 38%, #4a1421 100%); }
+body.wide { --w: 1200px; --h: 627px; }
+body.sq { --w: 1080px; --h: 1080px; }
+body.story { --w: 1080px; --h: 1920px; }
+.stripe { position: absolute; left: 0; right: 0; bottom: 0; height: 14px; background: linear-gradient(90deg, #000 0, #6b1414 28%, #d62828 48%, #e4752c 70%, #f2c230 100%); }
+.wm { display: flex; flex-direction: column; font-family: "Nunito", sans-serif; font-size: 34px; line-height: 1; letter-spacing: .06em; text-transform: uppercase; font-weight: 300; }
+.wm b { font-weight: 900; }
+.wm .rlp { color: #f2c230; font-size: .54em; letter-spacing: .14em; margin-left: .35em; }
+.wm .bars { display: flex; margin-top: 8px; height: 6px; border-radius: 3px; overflow: hidden; }
+.wm .bars i { font-style: normal; color: transparent; height: 6px; overflow: hidden; }
+.wm .bars .k { font-weight: 900; background: linear-gradient(90deg, #000 0 68%, #6b1414); }
+.wm .bars .r { font-weight: 300; background: linear-gradient(90deg, #6b1414, #d62828 28%, #d62828 66%, #e4752c); }
+.wm .bars .g { font-size: .54em; letter-spacing: .14em; padding-left: .35em; background: linear-gradient(90deg, #e4752c, #f2c230 45%); }
+.marke { display: flex; align-items: center; gap: 16px; }
+.marke img { width: 58px; height: 58px; border-radius: 15px; box-shadow: 0 0 0 2px rgba(255,255,255,.35); }
+h1 { margin: 0; font-weight: 800; letter-spacing: -.01em; text-wrap: balance; }
+h1 em { font-style: normal; color: #f2c230; }
+.sub { font-weight: 500; opacity: .93; line-height: 1.35; text-wrap: balance; }
+.zahlen { display: flex; gap: 14px; }
+.z { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); border-radius: 14px; padding: 12px 16px 10px; backdrop-filter: blur(2px); }
+.z strong { display: block; font-size: 34px; line-height: 1; font-weight: 800; color: #f2c230; }
+.z span { display: block; font-size: 14px; margin-top: 5px; opacity: .92; line-height: 1.25; }
+.cta { display: inline-flex; align-items: center; gap: 12px; background: #fff; color: #7B2736; font-weight: 800; border-radius: 999px; }
+.tel { position: absolute; background: #1b1517; border-radius: 40px; padding: 9px; box-shadow: 0 24px 60px rgba(0,0,0,.45), 0 0 0 2px rgba(255,255,255,.12); }
+.tel img { display: block; width: 100%; border-radius: 32px; }
+/* breit */
+.wide .marke { position: absolute; left: 60px; top: 46px; }
+.wide h1 { position: absolute; left: 60px; top: 150px; width: 620px; font-size: 56px; line-height: 1.05; }
+.wide .sub { position: absolute; left: 60px; top: 330px; width: 560px; font-size: 22px; }
+.wide .zahlen { position: absolute; left: 60px; top: 424px; }
+.wide .cta { position: absolute; left: 60px; top: 538px; padding: 13px 26px; font-size: 24px; }
+.wide .t1 { left: 770px; top: 70px; width: 250px; transform: rotate(-4deg); }
+.wide .t2 { left: 930px; top: 130px; width: 250px; transform: rotate(5deg); }
+/* quadrat */
+.sq .marke { position: absolute; left: 70px; top: 64px; }
+.sq h1 { position: absolute; left: 70px; top: 176px; width: 900px; font-size: 80px; line-height: 1.03; }
+.sq .sub { position: absolute; left: 70px; top: 372px; width: 900px; font-size: 32px; }
+.sq .zahlen { position: absolute; left: 70px; top: 590px; gap: 16px; flex-direction: column; width: 420px; }
+.sq .z { display: flex; align-items: center; gap: 18px; padding: 14px 20px; } .sq .z strong { font-size: 42px; min-width: 205px; white-space: nowrap; } .sq .z span { font-size: 18px; margin-top: 0; flex: 1; min-width: 0; }
+.sq .cta { position: absolute; left: 70px; top: 938px; padding: 16px 34px; font-size: 30px; }
+.sq .t1 { left: 505px; top: 560px; width: 260px; transform: rotate(-4deg); }
+.sq .t2 { left: 735px; top: 640px; width: 260px; transform: rotate(5deg); }
+/* Story 9:16 – ruhig und linksbündig wie die anderen Formate; oben ca. 250 px und unten ca. 340 px bleiben für die Oberfläche frei */
+.chip { display: none; }
+.story .marke { position: absolute; left: 70px; top: 262px; gap: 20px; }
+.story .marke img { width: 72px; height: 72px; border-radius: 18px; }
+.story .wm { font-size: 42px; } .story .wm .bars { height: 8px; margin-top: 10px; } .story .wm .bars i { height: 8px; }
+.story h1 { position: absolute; left: 70px; top: 392px; width: 940px; font-size: 94px; line-height: 1.04; }
+.story .sub { position: absolute; left: 70px; top: 628px; width: 880px; font-size: 36px; }
+.story .zahlen { position: absolute; left: 70px; top: 818px; width: 940px; gap: 0; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); border-radius: 24px; padding: 24px 0 22px; }
+.story .z { flex: 1; background: none; border: 0; border-radius: 0; padding: 0 26px; backdrop-filter: none; }
+.story .z + .z { border-left: 1px solid rgba(255,255,255,.25); }
+.story .z strong { font-size: 54px; white-space: nowrap; } .story .z span { font-size: 21px; margin-top: 8px; }
+.story .cta { position: absolute; left: 70px; top: 1000px; padding: 20px 44px; font-size: 38px; white-space: nowrap; }
+.story .t1 { left: 260px; top: 1150px; width: 560px; transform: none; border-radius: 56px; padding: 12px; }
+.story .t1 img { border-radius: 46px; }
+.story .t2 { display: none; }
+
+body { background: radial-gradient(120% 140% at 85% 0%, #9a3347 0%, #7B2736 38%, #4a1421 100%); }
+.story .h1l { display: block; }
+.scr { position: relative; width: 536px; height: 1160px; overflow: hidden; border-radius: 46px; background: #f6f4f4; }
+.scr .hdr, .scr .tabs { position: absolute; left: 0; width: 536px; background: url(tall.jpg) no-repeat; background-size: 536px auto; z-index: 2; }
+.scr .hdr { top: 0; height: 83px; background-position: 0 0; }
+.scr .tabs { top: 1076px; height: 84px; background-position: 0 -1702px; }
+.scr .bodywin { position: absolute; left: 0; top: 83px; width: 536px; height: 993px; overflow: hidden; }
+.scr .bodywin img { position: absolute; left: 0; top: 0; width: 536px; height: auto; }
+.story .t1 { padding: 12px; }
+</style></head>
+<body class="story">
+  <div class="marke" id="marke"><img src="logo.svg" alt=""><span class="wm"><span><b>Wahl</b>heimat<b class="rlp">RLP</b></span><span class="bars"><i class="k">Wahl</i><i class="r">heimat</i><i class="g">RLP</i></span></span></div>
+  <h1 id="h1"><span class="h1l" id="l1">Was beschließt</span><span class="h1l" id="l2">mein <em>Gemeinderat?</em></span></h1>
+  <div class="sub" id="sub">Alle Sitzungen, Tagesordnungen und Vorlagen der Räte in Rheinland-Pfalz – an einem Ort, kostenlos und ohne Anmeldung.</div>
+  <div class="zahlen" id="zahlen">
+    <div class="z"><strong id="n1">2.119</strong><span>Gemeinden<br>mit Sitzungsdaten</span></div>
+    <div class="z"><strong id="n2">189</strong><span>angebundene<br>Quellen</span></div>
+    <div class="z"><strong id="n3">≈ 11.800</strong><span>Sitzungen im<br>Datenstand</span></div>
+  </div>
+  <div class="cta" id="cta">wahlheimat-rlp.de <span>→</span></div>
+  <div class="tel t1" id="tel"><div class="scr"><div class="bodywin"><img id="bimg" src="tall.jpg" alt=""></div><div class="hdr"></div><div class="tabs"></div></div></div>
+  <div class="stripe"></div>
+<script>
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const outCubic = (x) => 1 - Math.pow(1 - x, 3);
+const inOut = (x) => (x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const fmt = (n) => Math.round(n).toLocaleString('de-DE');
+function rein(el, t, a, b, dy = 28) { const k = outCubic(seg(t, a, b)); el.style.opacity = k; el.style.transform = `translateY(${(1 - k) * dy}px)`; }
+const $ = (id) => document.getElementById(id);
+window.DAUER = 9.6;
+window.render = function (t) {
+  rein($('marke'), t, 0.1, 0.7);
+  rein($('l1'), t, 0.6, 1.3); rein($('l2'), t, 0.85, 1.55);
+  rein($('sub'), t, 1.6, 2.3, 22);
+  rein($('zahlen'), t, 2.3, 3.0, 26);
+  const c = outCubic(seg(t, 2.5, 3.9));
+  $('n1').textContent = fmt(2119 * c); $('n2').textContent = fmt(189 * c); $('n3').textContent = '≈ ' + fmt(11800 * c);
+  const k = outCubic(seg(t, 3.6, 4.2)); $('cta').style.opacity = k; $('cta').style.transform = `scale(${.94 + .06 * k})`; $('cta').style.transformOrigin = 'left center';
+  const p = outCubic(seg(t, 3.9, 5.1)); $('tel').style.opacity = clamp(p * 1.4); $('tel').style.transform = `translateY(${(1 - p) * 420}px)`;
+  const s = inOut(seg(t, 5.4, 8.6)) * 456 * 1.374; // Bildlauf in der App (Pixel im Video)
+  $('bimg').style.top = (-60 * 1.374 - s) + 'px';
+};
+render(0);
+</script></body></html>
