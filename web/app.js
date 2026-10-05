@@ -25,6 +25,8 @@
   let depth = 0;                       // Navigationstiefe innerhalb der App (für „Zurück“)
 
   // ---------- Hilfen ----------
+  // Nur http(s)-Adressen als Link zulassen (Daten stammen aus fremden Systemen; „javascript:“ & Co. werden verworfen)
+  const sicherUrl = (u) => (/^https?:\/\//i.test(String(u ?? '')) ? String(u) : '#');
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmt = (iso, o) => (iso ? new Intl.DateTimeFormat('de-DE', { timeZone: TZ, ...o }).format(new Date(iso)) : '');
   const datum = (iso) => fmt(iso, { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -800,7 +802,7 @@
   }
   function docRow(f) {
     const label = f.rolle !== 'auxiliary' && rolleLabel[f.rolle] ? rolleLabel[f.rolle] : f.name;
-    return `<a class="doc" href="${esc(f.url)}" target="_blank" rel="noopener"><span class="ico">${f.seite ? 'WEB' : 'PDF'}</span><span class="body"><span>${esc(label)}</span><span class="muted small">${esc(f.rolle === 'auxiliary' ? 'Anlage' : f.name)}${f.dl ? ' · wird heruntergeladen' : ''}</span></span>${chev}</a>`;
+    return `<a class="doc" href="${esc(sicherUrl(f.url))}" target="_blank" rel="noopener"><span class="ico">${f.seite ? 'WEB' : 'PDF'}</span><span class="body"><span>${esc(label)}</span><span class="muted small">${esc(f.rolle === 'auxiliary' ? 'Anlage' : f.name)}${f.dl ? ' · wird heruntergeladen' : ''}</span></span>${chev}</a>`;
   }
   /** Hinweis unter der Dokumentenliste, wenn das System die Dateien nur als Download liefert */
   const dlHinweis = (docs) => (docs.some((f) => f.dl)

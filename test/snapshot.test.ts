@@ -43,6 +43,8 @@ describe('sessionnetKalender', () => {
 
 describe('Dokument-Links', () => {
   it('hängt bei more!rubin-PDFs inline=1 an, damit sie im Browser statt als Download öffnen', () => {
+    expect(dokumentUrl('javascript:alert(1)')).toBeNull();
+    expect(dokumentUrl('data:text/html,x')).toBeNull();
     expect(dokumentUrl('https://emmelshausen.gremien.info/api.php?document_type_id=4&id=69')).toBe('https://emmelshausen.gremien.info/api.php?document_type_id=4&id=69&inline=1');
     expect(dokumentUrl('https://montabaur.gremien.info/api.php?id=69&inline=true&document_type_id=4')).toBe('https://montabaur.gremien.info/api.php?id=69&inline=true&document_type_id=4');
     expect(dokumentUrl('https://ratsinfo.vgka.de/bi/getfile.asp?id=1&type=do')).toBe('https://ratsinfo.vgka.de/bi/getfile.asp?id=1&type=do');

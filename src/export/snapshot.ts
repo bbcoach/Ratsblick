@@ -89,6 +89,7 @@ export function dokumentUrl(url: string | null): string | null {
   if (!url) return url;
   try {
     const u = new URL(url);
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return null; // z. B. javascript: aus fremden Daten nie als Link ausgeben
     if (u.hostname.endsWith('.gremien.info') && u.pathname === '/api.php' && u.searchParams.has('document_type_id') && !u.searchParams.has('inline')) {
       return `${url}${url.includes('?') ? '&' : '?'}inline=1`;
     }
