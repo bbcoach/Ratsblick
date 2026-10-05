@@ -318,6 +318,7 @@
     { t: 'Donnersbergkreis', id: '07333', img: 'img/donnersbergkreis.jpg', pos: '50% 50%' },
     { t: 'Bad Dürkheim', id: '07332002', img: 'img/bad-duerkheim.jpg', pos: '50% 75%' },
     { t: 'Enkenbach-Alsenborn', id: '07335004', img: 'img/enkenbach-alsenborn.jpg', pos: '45% 50%' },
+    { t: 'Idar-Oberstein', id: '07134045', img: 'img/idar-oberstein.jpg', pos: '70% 50%' },
     { t: 'Worms', id: '07319', img: 'img/worms.jpg', pos: '50% 40%' },
     { t: 'Mutterstadt', id: '07338019', img: 'img/mutterstadt.jpg', pos: '50% 45%' },
     { t: 'Trier', id: '07211', img: 'img/trier.jpg', pos: '50% 50%' },
