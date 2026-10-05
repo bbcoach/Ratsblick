@@ -254,7 +254,7 @@
   }
 
   // ---------- Ansicht: Startseite (nur Suche) ----------
-  const rang = { gemeinde: 0, kreisfrei: 0, vg: 1, kreis: 2, body: 3 };
+  const rang = { gemeinde: 0, kreisfrei: 0, vg: 1, kreis: 2, body: 8 }; // Zweckverbände und sonstige Körperschaften deutlich nachrangig
   /**
    * Suchschlüssel in zwei Schreibweisen: [0] Umlaute als ae/oe/ue/ss („Müllheim“ → „muellheim“), [1] ohne Akzente („mullheim“).
    * „St.“ und „Sankt“ gelten gleich, Bindestriche zählen wie Leerzeichen.
@@ -301,7 +301,7 @@
         ${installCard()}
         <section class="hero">
           <p class="slogan">Guter Rat ist nicht teuer.</p>
-          <h3>Was beschließt mein Gemeinderat?</h3>
+          <h1>Was beschließt mein Gemeinderat?</h1>
           <p class="lead">Sitzungen, Tagesordnungen und Vorlagen meiner Kommune – verständlich an einem Ort.</p>
         </section>
         <form class="searchbox" id="sf" role="search" autocomplete="off">
@@ -381,7 +381,7 @@
     setTitle('Favoriten');
     const favs = favoriten().filter((f) => f.typ !== 'gebiet' || G.has(f.id));
     if (!favs.length) {
-      $view.innerHTML = `<section class="hero"><h3>Favoriten</h3></section>
+      $view.innerHTML = `<section class="hero"><h1>Favoriten</h1></section>
         <div class="card empty">Noch keine Favoriten. Tippen Sie auf den Stern – neben dem Namen einer Gemeinde, Stadt, Verbandsgemeinde oder eines Kreises, bei einem Gremium in einer Sitzung oder auf der Seite Ihrer Kommune unter „Gremien“. Hier finden Sie dann jeweils die nächste und letzte Sitzung.</div>`;
       return;
     }
@@ -414,7 +414,7 @@
         </section>`);
       }
     }
-    $view.innerHTML = `<section class="hero"><h3>Favoriten</h3><p class="muted small">Nur auf diesem Gerät gespeichert.</p></section>
+    $view.innerHTML = `<section class="hero"><h1>Favoriten</h1><p class="muted small">Nur auf diesem Gerät gespeichert.</p></section>
       ${kommunen.length ? `<p class="favgruppe">Kommunen</p>${kommunen.join('')}` : ''}
       ${gremien.length ? `<p class="favgruppe">Gremien</p>${gremien.join('')}` : ''}`;
   }
@@ -493,7 +493,7 @@
         ${BETREIBER.paypal ? `<a class="btn spendenknopf" href="${esc(BETREIBER.paypal)}" target="_blank" rel="noopener">Mit PayPal unterstützen</a>` : ''}
         <p class="muted small">Freiwillige Unterstützung eines privaten Projekts; keine Spendenbescheinigung. Du verlässt dafür die App und wechselst zu PayPal.</p>
       </section>`;
-    $view.innerHTML = `<section class="hero"><h3>Info</h3><p class="muted small">Wahlheimat ist ein unabhängiges Angebot – kein Angebot des Landes oder der Kommunen.</p></section>
+    $view.innerHTML = `<section class="hero"><h1>Info</h1><p class="muted small">Wahlheimat ist ein unabhängiges Angebot – kein Angebot des Landes oder der Kommunen.</p></section>
       <div class="list">
         ${zeile('ueber', 'Was Wahlheimat ist, woher die Daten kommen, Kontakt')}
         ${zeile('impressum', 'Anbieterkennzeichnung')}
@@ -506,7 +506,7 @@
   function vText(art) {
     const t = TEXTSEITEN[art]();
     setTitle(t.titel);
-    $view.innerHTML = `${backLink}<section class="hero"><h3>${esc(t.titel)}</h3></section><div class="card textseite">${t.html}</div>`;
+    $view.innerHTML = `${backLink}<section class="hero"><h1>${esc(t.titel)}</h1></section><div class="card textseite">${t.html}</div>`;
   }
 
   // ---------- Ansicht: Kommune (eine Ebene) ----------
@@ -523,7 +523,7 @@
     setTitle(kurzName(kreisKurz(g.name)));
     const seg = `<div class="seg" role="group" aria-label="Ebene">${eb.map((e) => `<button type="button" ${e.off ? 'disabled' : `data-go="${esc(link('g', id, e.key))}"`} aria-pressed="${e.key === sel.key}" class="${!e.off && !e.g.q ? 'nodata' : ''}">${e.label}<small>${esc(e.sub)}</small></button>`).join('')}</div>`;
     const t = sel.g;
-    const kopf = `<section class="hero"><div class="favkopf"><h3>${esc(anzeigeName(t))}</h3>${sternKnopf({ typ: 'gebiet', id: t.id })}</div><p class="muted small">${esc([t.ew ? fmtZahl(t.ew) + ' Einwohner' : '', sel.key !== 'gemeinde' ? ERKLAERUNG[sel.key] : untertitel(t)].filter(Boolean).join(' · '))}</p></section>`;
+    const kopf = `<section class="hero"><div class="favkopf"><h1>${esc(anzeigeName(t))}</h1>${sternKnopf({ typ: 'gebiet', id: t.id })}</div><p class="muted small">${esc([t.ew ? fmtZahl(t.ew) + ' Einwohner' : '', sel.key !== 'gemeinde' ? ERKLAERUNG[sel.key] : untertitel(t)].filter(Boolean).join(' · '))}</p></section>`;
 
     if (!t.q) {
       $view.innerHTML = seg + kopf + SITZE_PLATZ + ohneDaten(t, eb);
@@ -716,7 +716,7 @@
       ${backLink}
       <section class="hero">
         <span class="meta">${statusPill(m)}<span>${esc(x.k.get(m.k)?.name)}</span></span>
-        <div class="favkopf"><h3>${esc(String(m.gremien[0] || m.name).replace(/\s+/g, ' '))}</h3>${m.gremien[0] ? sternKnopf({ q: x.D.quelle.id, k: m.k, g: m.gremien[0], kn: x.k.get(m.k)?.name || '', ort: kommune || '' }) : ''}</div>
+        <div class="favkopf"><h1>${esc(String(m.gremien[0] || m.name).replace(/\s+/g, ' '))}</h1>${m.gremien[0] ? sternKnopf({ q: x.D.quelle.id, k: m.k, g: m.gremien[0], kn: x.k.get(m.k)?.name || '', ort: kommune || '' }) : ''}</div>
         <p>${esc(langDatum(m.start))}, ${esc(uhrText(m.start))}${m.ende && m.status === 'durchgeführt' ? ' bis ' + esc(uhr(m.ende)) + ' Uhr' : ''}</p>
         ${m.ort ? `<p class="muted">${esc(m.ort)}</p>` : ''}
       </section>
@@ -749,7 +749,7 @@
       ${backLink}
       <section class="hero">
         <span class="meta"><span class="mono">${esc(v.nr)}</span><span>${esc(v.art || '')}</span><span>${esc(datum(v.datum))}</span></span>
-        <h3>${esc(v.name)}</h3>
+        <h1>${esc(v.name)}</h1>
         <p class="muted small">${esc(x.k.get(v.k)?.name)}</p>
       </section>
       ${v.kurz ? `<section class="kurz" aria-label="Kurz erklärt">
@@ -823,7 +823,7 @@
     const filter = gebietsfilter();
     if (!filter.some((f) => f.key === zustand.ort)) zustand.ort = 'alle';
     $view.innerHTML = `
-      <section class="hero"><h3>Was wird zu meinem Thema beraten?</h3>
+      <section class="hero"><h1>Was wird zu meinem Thema beraten?</h1>
         <p class="muted small">Vorlagen und Tagesordnungspunkte aller angebundenen Räte – in Ihrer Kommune, im Kreis oder in ganz Rheinland-Pfalz.</p></section>
       <form class="searchbox" id="tf" role="search" autocomplete="off">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
