@@ -9,8 +9,11 @@ import type { DatabaseSync } from 'node:sqlite';
 export interface SnapshotOptions {
   /** Stichtag für „kommend“; Standard: jetzt. */
   now?: Date;
+  /** Höchstzahl vergangener Sitzungen je Körperschaft (mit `pastMonths`: Obergrenze innerhalb des Zeitraums). */
   pastMeetings?: number;
   papers?: number;
+  /** Rückblick in Monaten: zusätzlich alle Sitzungen und Vorlagen dieses Zeitraums (bis zu den Obergrenzen). */
+  pastMonths?: number;
   /** Höchstlänge der Textauszüge aus PDFs. */
   textLength?: number;
 }
@@ -140,6 +143,8 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
   const now = (opts.now ?? new Date()).toISOString();
   const pastMeetings = opts.pastMeetings ?? 8;
   const paperLimit = opts.papers ?? 20;
+  const cutoffDate = opts.pastMonths ? new Date(new Date(now).setMonth(new Date(now).getMonth() - opts.pastMonths)) : null;
+  const cutoff = cutoffDate ? cutoffDate.toISOString() : null;
   const textLength = opts.textLength ?? 2400;
   const all = (sql: string, ...args: Array<string | number | null>) => db.prepare(sql).all(...args) as Row[];
 
@@ -183,20 +188,22 @@ export function buildSnapshot(db: DatabaseSync, sourceId: string, opts: Snapshot
     )) {
       meetingIds.add(String(m.id));
     }
-    for (const m of all(
-      `SELECT id FROM meeting WHERE body_id = ? AND deleted = 0 AND start < ? ORDER BY start DESC LIMIT ?`,
-      id,
-      now,
-      pastMeetings,
-    )) {
+    // Die jüngsten bleiben immer dabei, auch wenn sie älter als der Rückblick sind (ruhende Gremien)
+    for (const m of all(`SELECT id FROM meeting WHERE body_id = ? AND deleted = 0 AND start < ? ORDER BY start DESC LIMIT ?`, id, now, opts.pastMonths ? 6 : pastMeetings)) {
       meetingIds.add(String(m.id));
     }
-    for (const p of all(
-      `SELECT id FROM paper WHERE body_id = ? AND deleted = 0 ORDER BY date DESC, reference DESC LIMIT ?`,
-      id,
-      paperLimit,
-    )) {
+    if (cutoff) {
+      for (const m of all(`SELECT id FROM meeting WHERE body_id = ? AND deleted = 0 AND start < ? AND start >= ? ORDER BY start DESC LIMIT ?`, id, now, cutoff, pastMeetings)) {
+        meetingIds.add(String(m.id));
+      }
+    }
+    for (const p of all(`SELECT id FROM paper WHERE body_id = ? AND deleted = 0 ORDER BY date DESC, reference DESC LIMIT ?`, id, opts.pastMonths ? 15 : paperLimit)) {
       paperIds.add(String(p.id));
+    }
+    if (cutoff) {
+      for (const p of all(`SELECT id FROM paper WHERE body_id = ? AND deleted = 0 AND date >= ? ORDER BY date DESC, reference DESC LIMIT ?`, id, cutoff.slice(0, 10), paperLimit)) {
+        paperIds.add(String(p.id));
+      }
     }
   }
 

@@ -639,8 +639,12 @@
     const sitz = x.sByK.get(t.b) || [];
     const jetzt = now();
     const kommend = sitz.filter((m) => m.start >= jetzt);
-    const vergangen = sitz.filter((m) => m.start < jetzt).reverse().slice(0, 6);
-    const vorl = (x.vByK.get(t.b) || []).slice(0, 10);
+    const alleVergangen = sitz.filter((m) => m.start < jetzt).reverse();
+    const vergangen = alleVergangen.slice(0, 6);
+    const fruehere = alleVergangen.slice(6);
+    const alleVorl = x.vByK.get(t.b) || [];
+    const vorl = alleVorl.slice(0, 10);
+    const aeltereVorl = alleVorl.slice(10);
     const gremien = gremienVon(sitz);
     // VG-Ebene: auch die Sitzungen der Ortsgemeinden und der Stadt aus demselben System (das RIS zählt sie zur VG)
     const andere = sel.key === 'vg' ? x.D.sitzungen.filter((m) => m.start >= jetzt && m.k !== t.b).sort((a, b) => a.start.localeCompare(b.start)) : [];
@@ -655,19 +659,45 @@
       </section>
       ${x.D.quelle.nurTermine ? '' : `<section class="spalte"><h2>Neue Vorlagen</h2>
         ${vorl.length ? `<div class="list">${vorl.map(vorlageRow).join('')}</div>` : '<div class="card empty">Keine aktuellen Vorlagen.</div>'}
+        ${aeltereVorl.length ? `<details class="gremien archiv" id="avorl"><summary>${fmtZahl(aeltereVorl.length)} ältere Vorlagen</summary><div class="list"></div></details>` : ''}
       </section>`}
       ${andere.length ? `<section><h2>In den Gemeinden der Verbandsgemeinde</h2>
         <p class="muted small">Sitzungen der Ortsgemeinden und der Stadt, die im selben Ratsinformationssystem geführt werden.</p>
         <div class="list">${andere.slice(0, 8).map((m) => sitzungRow(m, knName(m))).join('')}</div>
         ${andere.length > 8 ? `<details class="gremien"><summary>${andere.length - 8} weitere zeigen</summary><div class="list">${andere.slice(8, 80).map((m) => sitzungRow(m, knName(m))).join('')}</div></details>` : ''}
       </section>` : ''}
-      ${vergangen.length ? `<section><h2>Zuletzt getagt</h2><div class="list">${vergangen.map(sitzungRow).join('')}</div></section>` : ''}
+      ${vergangen.length ? `<section><h2>Zuletzt getagt</h2><div class="list">${vergangen.map(sitzungRow).join('')}</div>
+        ${fruehere.length ? `<details class="gremien archiv" id="afrueh"><summary>${fmtZahl(fruehere.length)} frühere Sitzungen (bis ${esc(String(new Date(fruehere[fruehere.length - 1].start).getFullYear()))} zurück)</summary><div class="list"></div></details>` : ''}
+      </section>` : ''}
       ${gremien.length ? `<section><details class="gremien"><summary>Gremien (${gremien.length}) – mit dem Stern als Favorit merken</summary>
         <div class="list">${gremien.map((g) => `<div class="row static"><div class="body"><span class="title">${esc(gremiumKurz(g))}</span></div>${sternKnopf({ q: t.q, k: t.b, g, kn: x.k.get(t.b)?.name || '', ort: id })}</div>`).join('')}</div>
       </details></section>` : ''}
       ${risLink(null, x.D.quelle.ris, '', x.D.quelle.ohneRis)}
       <p class="stand">Abgleich mit ${esc(x.D.quelle.name)}: ${esc(stand(x.D.quelle.abgleich))}</p>`;
     sitzverteilung(t);
+    // Ältere Einträge erst beim Aufklappen zeichnen, je Jahr gruppiert, in Schritten von 40
+    const archiv = (id, eintraege, zeile, jahr) => {
+      const d = document.getElementById(id);
+      if (!d) return;
+      let n = 0;
+      const $l = d.querySelector('.list');
+      const mehr = () => {
+        const teil = eintraege.slice(n, n + 40);
+        let html = '';
+        let j = n ? jahr(eintraege[n - 1]) : null;
+        for (const e of teil) {
+          if (jahr(e) !== j) { j = jahr(e); html += `<p class="favgruppe">${esc(String(j))}</p>`; }
+          html += zeile(e);
+        }
+        n += teil.length;
+        $l.querySelector('.mehr')?.remove();
+        $l.insertAdjacentHTML('beforeend', html + (n < eintraege.length ? `<button type="button" class="btn ghost mehr">Weitere ${fmtZahl(Math.min(40, eintraege.length - n))} zeigen</button>` : ''));
+      };
+      d.addEventListener('toggle', () => { if (d.open && !n) mehr(); });
+      d.addEventListener('click', (e) => { if (e.target.closest('.mehr')) mehr(); });
+    };
+    archiv('afrueh', fruehere, (m) => sitzungRow(m), (m) => new Date(m.start).getFullYear());
+    archiv('avorl', aeltereVorl, vorlageRow, (v) => (v.datum || '').slice(0, 4) || 'ohne Datum');
   }
 
   // ---------- Sitzverteilung (Kommunalwahl 2024, data/sitze.json) ----------

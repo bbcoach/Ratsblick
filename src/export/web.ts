@@ -100,7 +100,7 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
   // Themensuche: Titel aller Vorlagen und öffentlichen TOPs im aktuellen Datenstand
   const suche: SuchEintrag[] = [];
   const quellen = sources.map(({ id }, qi) => {
-    const snap = buildSnapshot(db, id, { now, pastMeetings: 6, papers: 15, textLength: 1600 });
+    const snap = buildSnapshot(db, id, { now, pastMeetings: 150, papers: 300, pastMonths: 24, textLength: 1600 });
     const vorlagen = snap.vorlagen.map((v) => (kurz[v.id] ? { ...v, kurz: kurz[v.id] } : v));
 
     const gebiet = gebietVon.get(id);
