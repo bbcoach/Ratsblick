@@ -127,7 +127,8 @@
       if (r.v === 'g' && r.a) return '/g/' + r.a + (r.b ? '/' + r.b : '');
       return '/' + (r.v || '');
     };
-    const zaehle = () => { try { navigator.sendBeacon(ZAEHLER, pfad()); } catch {} };
+    // Eigener Merker im Gerät („#/ohne-zaehlung“): dieses Gerät wird nicht mitgezählt (Betreiber, Tests, Widerspruch)
+    const zaehle = () => { if (store.get('zaehlung-aus', false)) return; try { navigator.sendBeacon(ZAEHLER, pfad()); } catch {} };
     zaehle();
     window.addEventListener('hashchange', zaehle);
   }
@@ -219,6 +220,9 @@
       } else if (r.v === 'info') {
         tab = 'info';
         vInfo();
+      } else if (r.v === 'ohne-zaehlung' || r.v === 'mit-zaehlung') {
+        tab = 'info';
+        vZaehlung(r.v === 'ohne-zaehlung');
       } else if (TEXTSEITEN[r.v]) {
         tab = 'info';
         vText(r.v);
@@ -574,7 +578,7 @@
         <h4>3. Speicher auf Ihrem Gerät</h4>
         <p>Die App speichert im Speicher Ihres Browsers (<em>localStorage</em>) Ihre Favoriten, die zuletzt gewählte Kommune und die Einstellungen der Themensuche, außerdem eine Zahl, wie oft Sie Ansichten der App geöffnet haben, und ein Merkzeichen, ob Ihnen der einmalige Unterstützungshinweis schon angezeigt wurde, außerdem App-Dateien und den zuletzt geladenen Datenstand für die Nutzung ohne Verbindung. Diese Angaben verlassen Ihr Gerät nicht und werden nicht an uns übertragen. Sie dienen ausschließlich Funktionen der App, die Sie selbst nutzen, und dem einmaligen Hinweis; sie werden nicht ausgewertet (§ 25 Abs. 2 TDDDG). Sie können sie jederzeit löschen, indem Sie die Websitedaten in Ihrem Browser entfernen.</p>
         ${ZAEHLER ? `<h4>3a. Reichweitenmessung (eigener Zähler)</h4>
-        <p>Um zu verstehen, wie Wahlheimat genutzt wird, zählen wir Seitenaufrufe mit einem eigenen kleinen Zähler. Er läuft als Cloudflare Worker (Cloudflare, Inc., USA; Datenbank bei Cloudflare, Einsatz ohne Drittanbieter-Skript). Bei jedem Seitenwechsel meldet Ihr Browser nur die Art der aufgerufenen App-Seite (zum Beispiel „Kommune 07134005, Ebene VG“, nie Ihre Suchbegriffe oder Sitzungs-/Vorlagen-IDs). Der Zähler erhöht daraufhin eine Tageszahl für diese Seitenart. Es werden keine IP-Adresse, keine Kennung, kein Browser- oder Geräteprofil und kein Verweis gespeichert, und es wird nichts auf Ihrem Gerät abgelegt; Zählungen werden nach 400 Tagen gelöscht. Beim technischen Empfang der Meldung sieht Cloudflare wie jeder Server kurzzeitig die IP-Adresse, speichert sie für diesen Zähler aber nicht. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer bedarfsgerechten Weiterentwicklung). Wenn Ihr Browser „Do Not Track“ oder „Global Privacy Control“ sendet, zählen wir nicht. Sie können der Messung außerdem widersprechen (Art. 21 DSGVO), etwa indem Sie uns schreiben.</p>` : ''}
+        <p>Um zu verstehen, wie Wahlheimat genutzt wird, zählen wir Seitenaufrufe mit einem eigenen kleinen Zähler. Er läuft als Cloudflare Worker (Cloudflare, Inc., USA; Datenbank bei Cloudflare, Einsatz ohne Drittanbieter-Skript). Bei jedem Seitenwechsel meldet Ihr Browser nur die Art der aufgerufenen App-Seite (zum Beispiel „Kommune 07134005, Ebene VG“, nie Ihre Suchbegriffe oder Sitzungs-/Vorlagen-IDs). Der Zähler erhöht daraufhin eine Tageszahl für diese Seitenart. Es werden keine IP-Adresse, keine Kennung, kein Browser- oder Geräteprofil und kein Verweis gespeichert, und es wird nichts auf Ihrem Gerät abgelegt; Zählungen werden nach 400 Tagen gelöscht. Beim technischen Empfang der Meldung sieht Cloudflare wie jeder Server kurzzeitig die IP-Adresse, speichert sie für diesen Zähler aber nicht. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer bedarfsgerechten Weiterentwicklung). Wenn Ihr Browser „Do Not Track“ oder „Global Privacy Control“ sendet, zählen wir nicht. Sie können der Messung außerdem widersprechen (Art. 21 DSGVO), etwa indem Sie uns schreiben, oder die Zählung für Ihr Gerät selbst ausschalten: <a href="#/ohne-zaehlung">Zählung auf diesem Gerät ausschalten</a> (dabei wird nur ein Merker in Ihrem Browser abgelegt, an den Zähler wird nichts gesendet).</p>` : ''}
         <h4>4. Links zu Ratsinformationssystemen</h4>
         <p>Wenn Sie einen Link zu einem Ratsinformationssystem oder Dokument antippen, verbindet sich Ihr Browser direkt mit dem Server der jeweiligen Kommune bzw. ihres Anbieters. Dafür gelten deren Datenschutzhinweise.${BETREIBER.paypal ? ` Dasselbe gilt für den freiwilligen Unterstützen-Button auf der Info-Seite: Erst wenn Sie ihn antippen, wechseln Sie zu PayPal (PayPal (Europe) S.à r.l. et Cie, S.C.A., Luxemburg); vorher werden keine Daten an PayPal übertragen. Bei einer Zahlung erhalten wir nur die Angaben, die PayPal uns dazu mitteilt (etwa Name, Betrag und Zeitpunkt), und verwenden sie nur zur Abwicklung und Dokumentation (Art. 6 Abs. 1 lit. b und c DSGVO). Es gelten die Datenschutzhinweise von PayPal.` : ''}</p>
         <h4>5. Personenbezogene Angaben in Ratsunterlagen</h4>
@@ -606,6 +610,17 @@
       </div>
       ${spende}
       <p class="stand">Datenstand ${esc(stand(INDEX.erstellt))}</p>`;
+  }
+
+  // Zählung auf diesem Gerät ein-/ausschalten (Link „#/ohne-zaehlung“ bzw. „#/mit-zaehlung“; speichert nur einen Merker im Gerät)
+  function vZaehlung(aus) {
+    store.set('zaehlung-aus', aus);
+    setTitle('Zählung');
+    $view.innerHTML = `${backLink}<section class="hero"><h1>${aus ? 'Zählung ausgeschaltet' : 'Zählung eingeschaltet'}</h1></section>
+      <div class="card textseite"><p>${aus
+        ? 'Dieses Gerät wird ab sofort nicht mehr in der anonymen Reichweitenstatistik mitgezählt. Gespeichert wird dafür nur ein Merker in diesem Browser.'
+        : 'Dieses Gerät wird wieder in der anonymen Reichweitenstatistik mitgezählt (nur die Art der aufgerufenen Seite, ohne Kennung).'}</p>
+      <p><a class="btn ghost" href="${aus ? '#/mit-zaehlung' : '#/ohne-zaehlung'}">${aus ? 'Wieder mitzählen' : 'Nicht mehr mitzählen'}</a></p></div>`;
   }
 
   function vText(art) {
