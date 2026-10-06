@@ -71,9 +71,14 @@ body { background: radial-gradient(120% 140% at 85% 0%, #9a3347 0%, #7B2736 38%,
 .scr .bodywin { position: absolute; left: 0; top: 83px; width: 536px; height: 993px; overflow: hidden; }
 .scr .bodywin img { position: absolute; left: 0; top: 0; width: 536px; height: auto; }
 .story .t1 { padding: 12px; }
+#s1, #s2 { position: absolute; inset: 0; }
+.story .h2 { position: absolute; left: 70px; top: 560px; width: 940px; font-size: 104px; line-height: 1.05; }
+.story .sub2 { position: absolute; left: 70px; top: 930px; width: 860px; font-size: 42px; }
+.story .cta2 { position: absolute; left: 70px; top: 1130px; padding: 22px 48px; font-size: 42px; white-space: nowrap; }
 </style></head>
 <body class="story">
   <div class="marke" id="marke"><img src="logo.svg" alt=""><span class="wm"><span><b>Wahl</b>heimat<b class="rlp">RLP</b></span><span class="bars"><i class="k">Wahl</i><i class="r">heimat</i><i class="g">RLP</i></span></span></div>
+  <div id="s1">
   <h1 id="h1"><span class="h1l" id="l1">Was beschließt</span><span class="h1l" id="l2">mein <em>Gemeinderat?</em></span></h1>
   <div class="sub" id="sub">Alle Sitzungen, Tagesordnungen und Vorlagen der Räte in Rheinland-Pfalz – an einem Ort, kostenlos und ohne Anmeldung.</div>
   <div class="zahlen" id="zahlen">
@@ -83,6 +88,12 @@ body { background: radial-gradient(120% 140% at 85% 0%, #9a3347 0%, #7B2736 38%,
   </div>
   <div class="cta" id="cta">wahlheimat-rlp.de <span>→</span></div>
   <div class="tel t1" id="tel"><div class="scr"><div class="bodywin"><img id="bimg" src="tall.jpg" alt=""></div><div class="hdr"></div><div class="tabs"></div></div></div>
+  </div>
+  <div id="s2">
+    <h1 class="h2"><span class="h1l" id="m1">Was bei dir im Ort</span><span class="h1l" id="m2">entschieden wird,</span><span class="h1l" id="m3"><em>geht dich etwas an.</em></span></h1>
+    <div class="sub sub2" id="sub2">Wahlheimat RLP macht Kommunalpolitik sichtbar – für alle.</div>
+    <div class="cta cta2" id="cta2">wahlheimat-rlp.de <span>→</span></div>
+  </div>
   <div class="stripe"></div>
 <script>
 const clamp = (x) => Math.max(0, Math.min(1, x));
@@ -92,7 +103,7 @@ const inOut = (x) => (x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 const fmt = (n) => Math.round(n).toLocaleString('de-DE');
 function rein(el, t, a, b, dy = 28) { const k = outCubic(seg(t, a, b)); el.style.opacity = k; el.style.transform = `translateY(${(1 - k) * dy}px)`; }
 const $ = (id) => document.getElementById(id);
-window.DAUER = 9.6;
+window.DAUER = 15.4;
 window.render = function (t) {
   rein($('marke'), t, 0.1, 0.7);
   rein($('l1'), t, 0.6, 1.3); rein($('l2'), t, 0.85, 1.55);
@@ -104,6 +115,12 @@ window.render = function (t) {
   const p = outCubic(seg(t, 3.9, 5.1)); $('tel').style.opacity = clamp(p * 1.4); $('tel').style.transform = `translateY(${(1 - p) * 420}px)`;
   const s = inOut(seg(t, 5.4, 8.6)) * 456 * 1.374; // Bildlauf in der App (Pixel im Video)
   $('bimg').style.top = (-60 * 1.374 - s) + 'px';
+  // Wechsel zu Folie 2: Folie 1 blendet aus, Folie 2 baut sich ruhig auf
+  const aus = 1 - outCubic(seg(t, 9.2, 9.9));
+  $('s1').style.opacity = aus; $('s1').style.visibility = aus <= 0 ? 'hidden' : 'visible';
+  rein($('m1'), t, 10.1, 10.8); rein($('m2'), t, 10.55, 11.25); rein($('m3'), t, 11.0, 11.7);
+  rein($('sub2'), t, 11.9, 12.6, 22);
+  const k2 = outCubic(seg(t, 12.7, 13.4)); $('cta2').style.opacity = k2; $('cta2').style.transform = `scale(${.94 + .06 * k2})`; $('cta2').style.transformOrigin = 'left center';
 };
 render(0);
 </script></body></html>

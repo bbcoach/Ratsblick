@@ -3,7 +3,7 @@ import { mkdirSync, rmSync } from 'node:fs';
 rmSync('/tmp/mk/frames', { recursive: true, force: true }); mkdirSync('/tmp/mk/frames');
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
 const p = await b.newPage({ viewport: { width: 1080, height: 1920 } });
-await p.goto('file:///tmp/mk/li/anim.html'); await p.waitForTimeout(1200);
+await p.goto('file:///home/user/Ratsblick/docs/marketing/quellen/anim.html'); await p.waitForTimeout(1200);
 const fps = 30, dauer = await p.evaluate(() => DAUER), n = Math.round(fps * dauer);
 const t0 = Date.now();
 for (let i = 0; i < n; i++) {
