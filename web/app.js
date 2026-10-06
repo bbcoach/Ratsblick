@@ -329,6 +329,7 @@
     { t: 'Koblenz', id: '07111', img: 'img/koblenz.jpg', pos: '50% 42%' },
     { t: 'Neustadt an der Weinstraße', id: '07316', img: 'img/neustadt.jpg', pos: '50% 40%' },
     { t: 'Montabaur', id: '07143048', img: 'img/montabaur.jpg', pos: '50% 30%' },
+    { t: 'Kusel', id: '07336055', img: 'img/kusel.jpg', pos: '50% 42%' },
   ];
   const BANNER_MAX = 10; // höchstens so viele Bilder je Start, zufällig aus dem ganzen Bestand
   const BANNER = (() => { const l = [...BANNER_BILDER]; for (let i = l.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; } return l.slice(0, BANNER_MAX); })();
