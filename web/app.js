@@ -674,7 +674,7 @@
       </section>
       ${x.D.quelle.nurTermine ? '' : `<section class="spalte"><h2>Neue Vorlagen</h2>
         ${vorl.length ? `<div class="list">${vorl.map(vorlageRow).join('')}</div>` : '<div class="card empty">Keine aktuellen Vorlagen.</div>'}
-        ${aeltereVorl.length ? `<details class="gremien archiv" id="avorl"><summary>${fmtZahl(aeltereVorl.length)} ältere Vorlagen</summary><div class="list"></div></details>` : ''}
+        ${aeltereVorl.length ? `<details class="gremien archiv" id="avorl"><summary>${fmtZahl(aeltereVorl.length)} ältere Vorlagen</summary><div class="list"></div><div class="mehrwrap"></div></details>` : ''}
       </section>`}
       ${andere.length ? `<section><h2>In den Gemeinden der Verbandsgemeinde</h2>
         <p class="muted small">Sitzungen der Ortsgemeinden und der Stadt, die im selben Ratsinformationssystem geführt werden.</p>
@@ -696,6 +696,7 @@
       if (!d) return;
       let n = 0;
       const $l = d.querySelector('.list');
+      const $m = d.querySelector('.mehrwrap');
       const mehr = () => {
         const teil = eintraege.slice(n, n + 40);
         let html = '';
@@ -705,8 +706,8 @@
           html += zeile(e);
         }
         n += teil.length;
-        $l.querySelector('.mehr')?.remove();
-        $l.insertAdjacentHTML('beforeend', html + (n < eintraege.length ? `<button type="button" class="btn ghost mehr">Weitere ${fmtZahl(Math.min(40, eintraege.length - n))} zeigen</button>` : ''));
+        $l.insertAdjacentHTML('beforeend', html);
+        $m.innerHTML = n < eintraege.length ? `<button type="button" class="btn ghost mehr">Weitere ${fmtZahl(Math.min(40, eintraege.length - n))} zeigen</button>` : '';
       };
       d.addEventListener('toggle', () => { if (d.open && !n) mehr(); });
       d.addEventListener('click', (e) => { if (e.target.closest('.mehr')) mehr(); });
