@@ -217,7 +217,11 @@ details.beschluss p { margin-top: 6px; font-size: 14px; color: var(--muted); }
 .field { display: grid; gap: 6px; }
 .field label { font-weight: 600; font-size: 14px; }
 .field input[type="text"] { padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; background: var(--surface); color: var(--fg); }
-.field select { padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; background: var(--surface); color: var(--fg); }
+.field { min-width: 0; }
+.field select { width: 100%; min-width: 0; padding: 14px 16px; border: 2px solid var(--line); border-radius: 14px; font: inherit; font-size: 16px; background: var(--surface); color: var(--fg); }
+.field select:focus { outline: none; border-color: var(--accent); }
+#ortsuche { gap: 8px; }
+#oh:empty { display: none; }
 .switch { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid var(--line); }
 .switch:first-child { border-top: 0; }
 .switch input { width: 20px; height: 20px; accent-color: var(--accent); }

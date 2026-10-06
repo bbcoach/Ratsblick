@@ -971,7 +971,10 @@
       </form>
       <div class="chips" role="group" aria-label="Themen">${Object.keys(THEMEN).map((t) => `<button type="button" class="chip" data-thema="${esc(t)}" aria-pressed="${zustand.thema === t}">${esc(t)}</button>`).join('')}</div>
       <section class="field"><label for="tort">Wo</label><select id="tort">${filter.map((f) => `<option value="${esc(f.key)}" ${f.key === zustand.ort ? 'selected' : ''}>${esc(f.label)}</option>`).join('')}</select></section>
-      <section class="field" id="ortsuche" hidden><label for="tos">Ort, Verbandsgemeinde oder Kreis</label><input id="tos" type="search" enterkeyhint="search" placeholder="z. B. Enkenbach oder Kusel" aria-label="Ort suchen"><div id="oh" class="list suggest"></div></section>
+      <section class="field" id="ortsuche" hidden><label for="tos">Ort, Verbandsgemeinde oder Kreis</label>
+        <div class="searchbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+        <input id="tos" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="z. B. Enkenbach oder Kusel" aria-label="Ort suchen"></div>
+        <div id="oh" class="list suggest"></div></section>
       <div id="treffer"><div class="card empty">Lade Suchverzeichnis …</div></div>`;
     let S;
     try { S = await sucheLaden(); } catch (err) {
