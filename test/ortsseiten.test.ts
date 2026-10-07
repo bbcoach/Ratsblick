@@ -9,6 +9,7 @@ describe('Ortsgemeinde-Websites: Dokumentlisten mit Datum', () => {
     expect(ortsDatum('Niederschrift_2026-09-01')).toBe('2026-09-01');
     expect(ortsDatum('GR_20260826 - Einladung.pdf')).toBe('2026-08-26');
     expect(ortsDatum('19.01.23')).toBe('2023-01-19');
+    expect(ortsDatum('Protokolle Gemeinderatssitzungen/2026/2026_02_03_Niederschrift.pdf')).toBe('2026-02-03');
     expect(ortsDatum('2026-09-29_Einladung-Gemeinderatssitzung_06-10-2026.pdf')).toBe('2026-10-06'); // Sitzungstag, nicht Hochladedatum
     expect(ortsDatum('Haushalt 2026')).toBeNull();
     expect(ortsDatum('31.02.2026')).toBeNull();

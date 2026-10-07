@@ -43,7 +43,7 @@ export function ortsDatum(s: string): string | null {
   if (m) return plausibel(iso(m[3]!, m[2]!, m[1]!)) ? iso(m[3]!, m[2]!, m[1]!) : null;
   m = /(?<![0-9])(\d{1,2})\.\s*([A-Za-zäöüÄÖÜ]+)\s+(20\d{2})(?![0-9])/.exec(s);
   if (m && MONATE[m[2]!.toLowerCase()]) return plausibel(iso(m[3]!, MONATE[m[2]!.toLowerCase()]!, m[1]!)) ? iso(m[3]!, MONATE[m[2]!.toLowerCase()]!, m[1]!) : null;
-  m = /(?<![0-9])(20\d{2})-(\d{2})-(\d{2})(?![0-9])/.exec(s) ?? /(?<![0-9])(20\d{2})(\d{2})(\d{2})(?![0-9])/.exec(s);
+  m = /(?<![0-9])(20\d{2})[-_](\d{2})[-_](\d{2})(?![0-9])/.exec(s) ?? /(?<![0-9])(20\d{2})(\d{2})(\d{2})(?![0-9])/.exec(s);
   if (m && plausibel(iso(m[1]!, m[2]!, m[3]!))) return iso(m[1]!, m[2]!, m[3]!);
   m = /(?<![0-9])(\d{1,2})\.(\d{1,2})\.(\d{2})(?![0-9])/.exec(s);
   if (m) return plausibel(iso('20' + m[3]!, m[2]!, m[1]!)) ? iso('20' + m[3]!, m[2]!, m[1]!) : null;
