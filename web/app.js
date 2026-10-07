@@ -690,24 +690,6 @@
     // VG-Ebene: auch die Sitzungen der Ortsgemeinden und der Stadt aus demselben System (das RIS zählt sie zur VG)
     const andere = sel.key === 'vg' ? x.D.sitzungen.filter((m) => m.start >= jetzt && m.k !== t.b).sort((a, b) => a.start.localeCompare(b.start)) : [];
     const knName = (m) => kurzName(x.k.get(m.k)?.name || '');
-    // „Zuletzt behandelt“: öffentliche Sach-TOPs der letzten 120 Tage mit Beschluss-/Protokolltext, neueste zuerst, höchstens 3 je Sitzung
-    const behandelt = [];
-    const vor120 = new Date(Date.now() - 120 * 86_400_000).toISOString();
-    const FLOSKEL = /^(\d+[.)]?\s*)?(begr(ü|ue)ßung|er(ö|oe)ffnung|feststellung der (beschluss|tages)|genehmigung der (tages|nieder)|niederschrift|einwohner|jugendfrage|mitteilung|bekanntgabe|anfragen|verschiedenes|informationen?\b|anregungen|wünsche|schlusswort|verpflichtung)/i;
-    for (const m of alleVergangen) {
-      if (m.start < vor120) break;
-      let je = 0;
-      for (const tp of m.tops) {
-        if (je >= 3) break;
-        if (tp.oeffentlich === false || !tp.beschluss || !tp.name || FLOSKEL.test(tp.name.trim())) continue;
-        behandelt.push({ m, tp }); je++;
-      }
-      if (behandelt.length >= 8) break;
-    }
-    const behandeltRow = ({ m, tp }) => {
-      const kurzErg = tp.beschluss.length <= 80 && /einstimmig|mehrheitlich|abgelehnt|angenommen|beschlossen|zugestimmt|enthaltung|vertagt|\bja\b|\bnein\b/i.test(tp.beschluss) ? tp.beschluss : '';
-      return `<button class="row" type="button" data-go="${esc(link('s', m.id))}">${dateBox(m.start)}<div class="body"><span class="title">${esc(tp.name)}</span><span class="meta">${esc(gremiumKurz(m.gremien[0] || m.name || 'Sitzung'))}${kurzErg ? `<span class="pill ok">${esc(kurzErg)}</span>` : ''}</span></div>${chev}</button>`;
-    };
     // Gemeinde/Stadt ohne eigene Termine, VG mit Terminen: darauf hinweisen
     const vgEbene = eb.find((e) => e.key === 'vg' && !e.off && e.g.q === t.q);
     const vgHinweis = !kommend.length && vgEbene && sel.key !== 'vg' && sel.key !== 'kreis'
@@ -725,9 +707,6 @@
         <div class="list">${andere.slice(0, 8).map((m) => sitzungRow(m, knName(m))).join('')}</div>
         ${andere.length > 8 ? `<details class="gremien"><summary>${andere.length - 8} weitere zeigen</summary><div class="list">${andere.slice(8, 80).map((m) => sitzungRow(m, knName(m))).join('')}</div></details>` : ''}
       </section>` : ''}
-      ${behandelt.length ? `<section><h2>Zuletzt behandelt</h2>
-        <p class="muted small">Tagesordnungspunkte aus den letzten Sitzungen, zu denen ein Beschluss- oder Protokolltext vorliegt.</p>
-        <div class="list">${behandelt.map(behandeltRow).join('')}</div></section>` : ''}
       ${vergangen.length ? `<section><h2>Zuletzt getagt</h2><div class="list">${vergangen.map(sitzungRow).join('')}</div>
         ${fruehere.length ? `<details class="gremien archiv" id="afrueh"><summary>${fmtZahl(fruehere.length)} frühere Sitzungen (bis ${esc(String(new Date(fruehere[fruehere.length - 1].start).getFullYear()))} zurück)</summary><div class="list"></div></details>` : ''}
       </section>` : ''}
