@@ -69,6 +69,37 @@ export function suchEintraege(
   return out;
 }
 
+/** Gemeinsamer Anfang aller Zeichenketten (für die Kennungen der Themensuche je Quelle). */
+export function gemeinsamerAnfang(werte: string[]): string {
+  if (!werte.length) return '';
+  let a = werte[0]!;
+  for (const w of werte) { let i = 0; while (i < a.length && i < w.length && a[i] === w[i]) i++; a = a.slice(0, i); if (!a) break; }
+  return a;
+}
+
+/**
+ * Themensuche in Teilen: je Kreis (erste 5 Stellen des Gebietsschlüssels, ohne Gebiet „00000“) eine Datei, die Kennungen
+ * ohne den je Quelle gemeinsamen Anfang. Die App lädt nur die Teile, die der gewählte Ort braucht.
+ */
+export function teileSuche(eintraege: SuchEintrag[], quellenZahl: number) {
+  const praefix: string[] = [];
+  for (let qi = 0; qi < quellenZahl; qi++) {
+    const ids = eintraege.filter((e) => e[3] === qi).map((e) => e[5]);
+    // nie die ganze Kennung abschneiden (sonst wäre der Rest leer)
+    praefix.push(gemeinsamerAnfang(ids).slice(0, Math.max(0, Math.min(...ids.map((i) => i.length)) - 1)));
+  }
+  const teile = new Map<string, SuchEintrag[]>();
+  for (const e of eintraege) {
+    const kurz: SuchEintrag = [e[0], e[1], e[2], e[3], e[4], e[5].slice(praefix[e[3]]!.length), e[6]];
+    const key = e[4] ? e[4].slice(0, 5) : '00000';
+    (teile.get(key) ?? teile.set(key, []).get(key)!).push(kurz);
+  }
+  return { praefix, teile };
+}
+
+/** Textauszüge (Vorlagentexte, Beschlusstexte) kommen in Stücken zu je 40 Einträgen in eigene Dateien und werden erst bei Bedarf geladen. */
+export const TEXT_STUECK = 40;
+
 export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions = {}) {
   const webDir = opts.webDir ?? 'web';
   const kurzPath = opts.kurzPath ?? 'data/kurz-erklaert.json';
@@ -116,7 +147,18 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
     const quelle = { ...snap.quelle, ris, ...(typVon.get(id) === 'ics' ? { nurTermine: true } : {}),
       // Kein Ratsinformationssystem, sondern Seiten der Website (Protokolllisten, Politik-Modul): Links sprechen dann von der Website
       ...(typVon.get(id) === 'protokolle' || typVon.get(id) === 'edith' || typVon.get(id) === 'ionas' || typVon.get(id) === 'ortsseiten' ? { ohneRis: true } : {}) };
-    writeFileSync(join(outDir, 'data', `${id}.json`), JSON.stringify({ ...snap, quelle, koerperschaften, vorlagen }));
+    // Texte (Vorlagen-Auszug, Beschlusstext je TOP) liegen in Stücken zu je TEXT_STUECK Einträgen: <id>.v<n>.json / <id>.s<n>.json
+    const schreibeStuecke = <T>(art: 'v' | 's', liste: T[], text: (x: T) => unknown) => {
+      for (let c = 0; c * TEXT_STUECK < liste.length; c++) {
+        const teil = liste.slice(c * TEXT_STUECK, (c + 1) * TEXT_STUECK).map(text);
+        if (teil.some((t) => t !== null)) writeFileSync(join(outDir, 'data', `${id}.${art}${c}.json`), JSON.stringify(teil));
+      }
+    };
+    schreibeStuecke('v', vorlagen, (v) => v.text || null);
+    schreibeStuecke('s', snap.sitzungen, (m) => (m.tops.some((t) => t.beschluss) ? m.tops.map((t) => t.beschluss || null) : null));
+    const vorlagenOhneText = vorlagen.map(({ text: _t, ...v }) => v);
+    const sitzungenOhneText = snap.sitzungen.map((m) => ({ ...m, tops: m.tops.map(({ beschluss: _b, ...t }) => t) }));
+    writeFileSync(join(outDir, 'data', `${id}.json`), JSON.stringify({ ...snap, sitzungen: sitzungenOhneText, quelle, koerperschaften, vorlagen: vorlagenOhneText }));
     suche.push(...suchEintraege(qi, gebiet ?? null, gebietVonBody, snap.sitzungen, vorlagen));
 
     const kommend = new Map<string, number>();
@@ -156,7 +198,9 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
   };
   writeFileSync(join(outDir, 'data', 'index.json'), JSON.stringify(index));
   suche.sort((a, b) => String(b[2]).localeCompare(String(a[2])));
-  writeFileSync(join(outDir, 'data', 'suche.json'), JSON.stringify({ erstellt: build, quellen: quellen.map((q) => q.id), eintraege: suche }));
+  const { praefix, teile } = teileSuche(suche, quellen.length);
+  for (const [key, e] of teile) writeFileSync(join(outDir, 'data', `suche-${key}.json`), JSON.stringify(e));
+  writeFileSync(join(outDir, 'data', 'suche.json'), JSON.stringify({ erstellt: build, quellen: quellen.map((q) => q.id), praefix, teile: Object.fromEntries([...teile].map(([k, e]) => [k, e.length])) }));
 
   // Sitzverteilung der Räte (Kommunalwahl 2024, scripts/sitzverteilung.ts) – lädt die App erst auf der Kommunenseite
   if (existsSync('data/sitze-2024.json')) cpSync('data/sitze-2024.json', join(outDir, 'data', 'sitze.json'));

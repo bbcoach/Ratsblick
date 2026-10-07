@@ -83,10 +83,34 @@
     const D = await getJson(`data/${encodeURIComponent(id)}.json`);
     const x = { D, k: new Map(), s: new Map(), v: new Map(), sByK: new Map(), vByK: new Map() };
     for (const k of D.koerperschaften) { x.k.set(k.id, k); x.sByK.set(k.id, []); x.vByK.set(k.id, []); }
-    for (const m of D.sitzungen) { x.s.set(m.id, m); x.sByK.get(m.k)?.push(m); }
-    for (const v of D.vorlagen) { x.v.set(v.id, v); x.vByK.get(v.k)?.push(v); }
+    x.si = new Map(); x.vi = new Map(); x.texte = new Map();
+    D.sitzungen.forEach((m, i) => { x.s.set(m.id, m); x.si.set(m.id, i); x.sByK.get(m.k)?.push(m); });
+    D.vorlagen.forEach((v, i) => { x.v.set(v.id, v); x.vi.set(v.id, i); x.vByK.get(v.k)?.push(v); });
     loaded.set(id, x);
     return x;
+  }
+
+  // Textauszüge (Vorlagentext, Beschlusstext je TOP) liegen in Stücken zu je TEXT_STUECK Einträgen: data/<quelle>.v<n>.json bzw. .s<n>.json
+  const TEXT_STUECK = 40;
+  function stueck(x, art, c) {
+    const key = art + c;
+    if (!x.texte.has(key)) x.texte.set(key, fetch(`data/${encodeURIComponent(x.D.quelle.id)}.${key}.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null));
+    return x.texte.get(key);
+  }
+  /** Text einer Vorlage (string) bzw. Beschlusstexte der TOPs einer Sitzung (Liste), aus dem passenden Stück */
+  async function textVon(x, art, i) {
+    const a = await stueck(x, art, Math.floor(i / TEXT_STUECK));
+    return a ? a[i % TEXT_STUECK] ?? null : null;
+  }
+  /** Alle Texte der Quelle laden (für die Suche „im Text“) und an die Objekte hängen */
+  function alleTexte(x) {
+    if (!x.alleTexteP) {
+      const arbeit = [];
+      for (let c = 0; c * TEXT_STUECK < x.D.vorlagen.length; c++) arbeit.push(stueck(x, 'v', c).then((a) => a && a.forEach((t, j) => { const v = x.D.vorlagen[c * TEXT_STUECK + j]; if (v && t) v.text = t; })));
+      for (let c = 0; c * TEXT_STUECK < x.D.sitzungen.length; c++) arbeit.push(stueck(x, 's', c).then((a) => a && a.forEach((bs, j) => { const m = x.D.sitzungen[c * TEXT_STUECK + j]; if (m && bs) bs.forEach((b, k) => { if (b && m.tops[k]) m.tops[k].beschluss = b; }); })));
+      x.alleTexteP = Promise.all(arbeit).then(() => true);
+    }
+    return x.alleTexteP;
   }
 
   /** Findet die Quelle zu einer OParl-ID über den Hostnamen. */
@@ -724,8 +748,10 @@
     const $ks = document.getElementById('ks');
     if ($ks) {
       const $ksr = document.getElementById('ksr');
-      const hay = (o, teile) => o._h || (o._h = teile.map((z) => suchSchluessel(z || '').join('|')));
+      const hn = (o, name) => o._hn ?? (o._hn = suchSchluessel(name || '').join('|'));
+      const ht = (o) => (((o.text ?? o.beschluss) ? (o._ht ?? (o._ht = suchSchluessel(o.text ?? o.beschluss).join('|'))) : ''));
       let zeitgeber;
+      let texteDa = false;
       const finde = () => {
         const roh = $ks.value.trim();
         if (roh.length < 2) { $ksr.innerHTML = ''; return; }
@@ -733,9 +759,9 @@
         const passt = (h) => terme.every((tk) => tk.some((k) => h.includes(k)));
         const vTreffer = [];
         for (const v of alleVorl) {
-          const [hn, ht] = hay(v, [`${v.nr || ''} ${v.name}`, v.text]);
-          if (passt(hn)) vTreffer.push({ v, imText: false });
-          else if (passt(hn + ' ' + ht)) vTreffer.push({ v, imText: true });
+          const n = hn(v, `${v.nr || ''} ${v.name}`);
+          if (passt(n)) vTreffer.push({ v, imText: false });
+          else if (texteDa && passt(n + ' ' + ht(v))) vTreffer.push({ v, imText: true });
         }
         vTreffer.sort((a, b) => a.imText - b.imText || (a.v.datum < b.v.datum ? 1 : -1));
         const vIds = new Set(vTreffer.map((r) => r.v.id));
@@ -743,9 +769,9 @@
         for (const m of alleVergangen.concat(kommend)) {
           for (const tp of m.tops) {
             if (tp.oeffentlich === false || (tp.vorlage && vIds.has(tp.vorlage))) continue;
-            const [hn, ht] = hay(tp, [tp.name, tp.beschluss]);
-            if (passt(hn)) tTreffer.push({ m, tp, imText: false });
-            else if (passt(hn + ' ' + ht)) tTreffer.push({ m, tp, imText: true });
+            const n = hn(tp, tp.name);
+            if (passt(n)) tTreffer.push({ m, tp, imText: false });
+            else if (texteDa && passt(n + ' ' + ht(tp))) tTreffer.push({ m, tp, imText: true });
           }
         }
         tTreffer.sort((a, b) => a.imText - b.imText || (a.m.start < b.m.start ? 1 : -1));
@@ -755,10 +781,14 @@
         $ksr.innerHTML = vz.length || tz.length
           ? `${vz.length ? `<h2>Vorlagen${vTreffer.length > vz.length ? ` (${vz.length} von ${vTreffer.length})` : ` (${vz.length})`}</h2><div class="list">${vz.map((r) => vorlageRow(r.v, r.imText)).join('')}</div>` : ''}
              ${tz.length ? `<h2>Tagesordnungspunkte${tTreffer.length > tz.length ? ` (${tz.length} von ${tTreffer.length})` : ` (${tz.length})`}</h2><div class="list">${tz.map(tZeile).join('')}</div>` : ''}
-             <p class="muted small">Durchsucht werden Titel und Textauszüge der letzten 24 Monate in diesem Datenstand, nicht das ganze Archiv.</p>`
+             <p class="muted small">${texteDa ? 'Durchsucht werden Titel und Textauszüge der letzten 24 Monate in diesem Datenstand, nicht das ganze Archiv.' : 'Textauszüge werden nachgeladen …'}</p>`
           : '<div class="card empty">Nichts gefunden. Durchsucht werden Titel und Textauszüge der letzten 24 Monate.</div>';
       };
-      $ks.addEventListener('input', () => { clearTimeout(zeitgeber); zeitgeber = setTimeout(finde, 200); });
+      $ks.addEventListener('input', () => {
+        clearTimeout(zeitgeber); zeitgeber = setTimeout(finde, 200);
+        if (!x.alleTexteP) alleTexte(x).then(() => { texteDa = true; if ($ks.isConnected) finde(); });
+        else alleTexte(x).then(() => { texteDa = true; });
+      });
     }
     // Ältere Einträge erst beim Aufklappen zeichnen, je Jahr gruppiert, in Schritten von 40
     const archiv = (id, eintraege, zeile, jahr) => {
@@ -957,17 +987,24 @@
       </section>
       ${docs.length ? `<section><h2>Dokumente</h2><div class="list">${docs.map(docRow).join('')}</div>${dlHinweis(docs)}</section>` : ''}
       <section><h2>Tagesordnung</h2>
-        ${m.tops.length ? `<div class="list">${m.tops.map((t) => {
+        ${m.tops.length ? `<div class="list">${m.tops.map((t, ti) => {
           const v = t.vorlage && x.v.get(t.vorlage);
           return `<div class="top ${t.oeffentlich === false ? 'np' : ''}"><span class="nr">${esc(t.nr || '')}</span><div class="body">
             <span class="name">${esc(t.name)}</span>
             ${t.oeffentlich === false ? '<span class="meta"><span class="pill plain">nicht öffentlich</span></span>' : ''}
             ${v ? `<button class="linkbtn" type="button" data-go="${esc(link('v', v.id))}">Vorlage <span class="mono">${esc(v.nr)}</span> ansehen${v.kurz ? ' · Kurz erklärt' : ''}</button>` : ''}
-            ${t.beschluss ? `<details class="beschluss"><summary>Beschluss</summary><p>${esc(t.beschluss)}</p></details>` : ''}
+            <div class="bslot" data-i="${ti}"></div>
           </div></div>`;
         }).join('')}</div>` : x.D.quelle.nurTermine ? nurTermineHinweis(x) : m.start < now() ? `<div class="card empty">Zu dieser Sitzung liegen hier keine einzelnen Tagesordnungspunkte vor${docs.length ? ' – siehe Dokumente.' : '.'}</div>` : '<div class="card empty">Die Tagesordnung ist noch nicht veröffentlicht.</div>'}
       </section>
       ${risLink(m.web, x.D.quelle.ris, 'Sitzung', x.D.quelle.ohneRis, m.webKalender)}`;
+    // Beschlusstexte kommen aus einem eigenen, kleinen Stück und erscheinen, sobald sie da sind
+    const fuelleBeschluss = (liste) => (liste || []).forEach((b, i) => {
+      const el = b && $view.querySelector(`.bslot[data-i="${i}"]`);
+      if (el) el.innerHTML = `<details class="beschluss"><summary>Beschluss</summary><p>${esc(b)}</p></details>`;
+    });
+    if (m.tops.some((t) => t.beschluss)) fuelleBeschluss(m.tops.map((t) => t.beschluss || null));
+    else if (m.tops.length) textVon(x, 's', x.si.get(id)).then(fuelleBeschluss);
   }
 
   // ---------- Ansicht: Vorlage ----------
@@ -999,13 +1036,20 @@
         const m = b.sitzung && x.s.get(b.sitzung);
         return `<li class="${done ? 'done' : ''}"><span class="body"><span style="font-weight:600">${esc(gremiumKurz(b.gremium || 'Gremium'))}</span><span class="meta">${b.datum ? esc(datum(b.datum)) : 'Termin offen'}${b.entscheidend ? '<span class="pill">entscheidet</span>' : b.rolle ? `<span>${esc(b.rolle)}</span>` : ''}${done ? '' : '<span class="pill plain">anstehend</span>'}</span>${m ? `<button class="linkbtn small" type="button" data-go="${esc(link('s', m.id))}">Zur Sitzung</button>` : ''}</span></li>`;
       }).join('')}</ol></section>` : ''}
-      ${v.text ? `<section><h2>Aus der Vorlage</h2><div class="card"><div class="excerpt" id="ex">${esc(v.text)}</div><button class="more" type="button" id="exb">Ganzen Auszug zeigen</button></div></section>` : ''}
+      <section id="vtext"></section>
       ${docs.length ? `<section><h2>Dokumente</h2><div class="list">${docs.map(docRow).join('')}</div>${dlHinweis(docs)}</section>` : ''}
       ${risLink(v.web || ersatz?.web, x.D.quelle.ris, ersatz && !v.web ? 'Sitzung mit dieser Vorlage' : 'Vorlage')}`;
-    document.getElementById('exb')?.addEventListener('click', (e) => {
-      const open = document.getElementById('ex').classList.toggle('open');
-      e.target.textContent = open ? 'Auszug einklappen' : 'Ganzen Auszug zeigen';
-    });
+    // Auszug aus dem Vorlagentext: kommt aus einem eigenen, kleinen Stück und erscheint, sobald er da ist
+    const zeigeText = (text) => {
+      const $t = document.getElementById('vtext');
+      if (!text || !$t) return;
+      $t.innerHTML = `<h2>Aus der Vorlage</h2><div class="card"><div class="excerpt" id="ex">${esc(text)}</div><button class="more" type="button" id="exb">Ganzen Auszug zeigen</button></div>`;
+      document.getElementById('exb').addEventListener('click', (e) => {
+        const open = document.getElementById('ex').classList.toggle('open');
+        e.target.textContent = open ? 'Auszug einklappen' : 'Ganzen Auszug zeigen';
+      });
+    };
+    if (v.text) zeigeText(v.text); else textVon(x, 'v', x.vi.get(id)).then(zeigeText);
   }
 
   // ---------- Ansicht: Themensuche ----------
@@ -1028,13 +1072,33 @@
   const norm = (t) => String(t || '').toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
   // Begriffe enthalten nur Buchstaben und Bindestriche; „^“ = nur am Wortanfang (z. B. „PV“, nicht „Pvc“ in Wörtern)
   const begriffRegex = (b) => new RegExp(b.startsWith('^') ? `(?:^|[^a-z0-9])${b.slice(1)}` : b);
+  // Themensuche in Teilen: data/suche.json nennt die Teile (je Kreis eine Datei suche-<Kreis>.json), geladen wird nur, was der gewählte Ort braucht
   let SUCHE = null;
   async function sucheLaden() {
     if (!SUCHE) {
       const d = await getJson('data/suche.json');
-      SUCHE = { quellen: d.quellen, eintraege: d.eintraege.map((e) => ({ art: e[0], titel: e[1], datum: e[2], q: d.quellen[e[3]], gebiet: e[4], id: e[5], nr: e[6], n: norm(e[1]) })) };
+      SUCHE = { quellen: d.quellen, praefix: d.praefix, teile: d.teile, geladen: new Map(), gemischt: new Map() };
     }
     return SUCHE;
+  }
+  /** Einträge der Teile „keys“ (null = alle), neueste zuerst */
+  async function sucheEintraege(keys) {
+    const S = await sucheLaden();
+    const gewollt = (keys ?? Object.keys(S.teile)).filter((k) => S.teile[k]).sort();
+    await Promise.all(gewollt.filter((k) => !S.geladen.has(k)).map(async (k) => {
+      const e = await getJson(`data/suche-${k}.json`);
+      S.geladen.set(k, e.map((z) => ({ art: z[0], titel: z[1], datum: z[2], q: S.quellen[z[3]], gebiet: z[4], id: S.praefix[z[3]] + z[5], nr: z[6], n: norm(z[1]) })));
+    }));
+    if (gewollt.length === 1) return S.geladen.get(gewollt[0]);
+    const mk = gewollt.join(',');
+    if (!S.gemischt.has(mk)) S.gemischt.set(mk, gewollt.flatMap((k) => S.geladen.get(k)).sort((a, b) => String(b.datum || '').localeCompare(String(a.datum || ''))));
+    return S.gemischt.get(mk);
+  }
+  /** Welche Teile braucht der Ortsfilter? Der Kreis steht in den ersten fünf Stellen jedes Gebietsschlüssels. */
+  function sucheTeileFuer(f) {
+    if (!f || f.key === 'alle') return null;
+    const ids = f.id ? [f.id] : (f.ids || []);
+    return [...new Set(ids.map((id) => String(id).slice(0, 5)))];
   }
   // Gebiete für den Ortsfilter: die gewählte Kommune mit VG und Kreis, dazu die Favoriten
   function gebietsfilter(gewaehlt) {
@@ -1059,7 +1123,7 @@
 
   async function vThemen() {
     setTitle('Themen');
-    const zustand = store.get('themensuche', { thema: '', text: '', ort: 'alle' });
+    const zustand = store.get('themensuche', { thema: '', text: '', ort: kommune ? 'g:' + kommune : 'alle' });
     const filter = gebietsfilter(zustand.gewaehlt);
     if (!filter.some((f) => f.key === zustand.ort) || zustand.ort === 'suche') zustand.ort = 'alle';
     $view.innerHTML = `
@@ -1076,12 +1140,12 @@
         <input id="tos" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="z. B. Enkenbach oder Kusel" aria-label="Ort suchen"></div>
         <div id="oh" class="list suggest"></div></section>
       <div id="treffer"><div class="card empty">Lade Suchverzeichnis …</div></div>`;
-    let S;
-    try { S = await sucheLaden(); } catch (err) {
+    try { await sucheLaden(); } catch (err) {
       document.getElementById('treffer').innerHTML = `<div class="card empty">Die Suche konnte nicht geladen werden (${esc(err.message)}).</div>`;
       return;
     }
-    const zeigen = () => {
+    let lauf = 0;
+    const zeigen = async () => {
       store.set('themensuche', zustand);
       const $t = document.getElementById('treffer');
       const begriffe = [...(zustand.thema ? THEMEN[zustand.thema] : []).map(begriffRegex)];
@@ -1092,7 +1156,18 @@
       }
       const f = filter.find((x) => x.key === zustand.ort);
       const imGebiet = (e) => !f || f.key === 'alle' || (f.id ? liegtIn(e.gebiet, f.id) : (f.ids || []).some((id) => liegtIn(e.gebiet, id)));
-      const treffer = S.eintraege.filter((e) =>
+      const mein = ++lauf;
+      let liste;
+      try {
+        const teile = sucheTeileFuer(f);
+        if (!(teile ?? Object.keys(SUCHE.teile)).every((k) => !SUCHE.teile[k] || SUCHE.geladen.has(k))) $t.innerHTML = '<div class="card empty">Lade Suchverzeichnis …</div>';
+        liste = await sucheEintraege(teile);
+      } catch (err) {
+        if (mein === lauf) $t.innerHTML = `<div class="card empty">Die Suche konnte nicht geladen werden (${esc(err.message)}).</div>`;
+        return;
+      }
+      if (mein !== lauf) return;
+      const treffer = liste.filter((e) =>
         (!begriffe.length || begriffe.some((r) => r.test(e.n))) && woerter.every((w) => e.n.includes(w)) && imGebiet(e));
       const ort = (e) => { const g = e.gebiet && G.get(e.gebiet); return g ? anzeigeName(g) : (INDEX.quellen.find((q) => q.id === e.q)?.name || ''); };
       const zeige = treffer.slice(0, 150);
