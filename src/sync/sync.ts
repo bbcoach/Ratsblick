@@ -31,6 +31,8 @@ export interface SourceRecord {
   mandanten?: boolean;
   /** Nur `protokolle`: weitere Listenseiten (die Quell-URL ist die erste). */
   seiten?: string[];
+  /** Nur `protokolle`: Gremium für Listen ohne Gremiumsnamen im Linktext (z. B. „Niederschrift vom …“); Standard „Gemeinderat“. */
+  gremium?: string;
 }
 
 export interface SyncOptions {

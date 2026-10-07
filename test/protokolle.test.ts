@@ -27,4 +27,12 @@ describe('Protokolllisten auf Websites (Stadt Kusel)', () => {
     const p = parseProtokolle(lies('kusel-ausschuss.html'), 'https://stadt.kusel.de/buergerservice/stadtrat/sitzungsprotokolle-bauausschuss');
     expect(p.map((x) => x.gremium).sort()).toEqual(['Bauausschuss', 'Haupt-, Bau und Finanzausschuss']);
   });
+
+  it('liest die einfache Liste „Niederschrift vom …“ (Ortsgemeinde Betteldorf)', () => {
+    const p = parseProtokolle(lies('betteldorf-niederschriften.html'), 'https://betteldorf.de/niederschriften/');
+    expect(p.length).toBe(9);
+    expect(p.every((x) => x.gremium === 'Gemeinderat')).toBe(true);
+    expect(p.find((x) => x.datum === '2026-08-27')?.url).toBe('https://betteldorf.de/download/niederschrift-vom-27-08-2026/');
+    expect(parseProtokolle(lies('betteldorf-niederschriften.html'), 'https://betteldorf.de/', 'Ortsgemeinderat')[0]!.gremium).toBe('Ortsgemeinderat');
+  });
 });

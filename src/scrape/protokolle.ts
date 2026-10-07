@@ -27,8 +27,13 @@ export function gremiumName(genitiv: string): string {
   return genitiv.trim().replace(/ausschusses$/i, 'ausschuss').replace(/rates$/i, 'rat');
 }
 
-export function parseProtokolle(html: string, basis: string): Protokoll[] {
+export function parseProtokolle(html: string, basis: string, standardGremium = 'Gemeinderat'): Protokoll[] {
   const out: Protokoll[] = [];
+  // Ortsgemeinden mit einfacher Liste („Niederschrift vom 27.08.2026“, Link auch auf eine Downloadseite statt direkt auf das PDF)
+  for (const m of html.matchAll(/<a\b[^>]*href="([^"#]+)"[^>]*>([\s\S]*?)<\/a>/gi)) {
+    const k = /^Niederschrift(?:en)?\s+vom\s+(\d{2})\.(\d{2})\.(\d{4})\b/i.exec(text(m[2]!));
+    if (k) out.push({ gremium: standardGremium, datum: `${k[3]}-${k[2]}-${k[1]}`, url: new URL(m[1]!.replace(/&amp;/g, '&'), basis).href });
+  }
   for (const m of html.matchAll(/<a\b[^>]*href="([^"]+\.pdf[^"]*)"[^>]*>([\s\S]*?)<\/a>/gi)) {
     const t = text(m[2]!);
     // „Sitzung des Stadtrates der Stadt Kusel vom 23.04.2026 (PDF)“, auch „Sitzungsniederschrift des … Ausschusses der Stadt …“
@@ -58,7 +63,7 @@ export async function syncProtokolle(
 
   const seiten = [source.url, ...(source.seiten ?? [])];
   const alle: Protokoll[] = [];
-  for (const s of seiten) alle.push(...parseProtokolle(await client.getText(s), s));
+  for (const s of seiten) alle.push(...parseProtokolle(await client.getText(s), s, source.gremium));
   log(`  Protokolle: ${alle.length} auf ${seiten.length} Seite(n)`);
 
   const gremien = new Set<string>();
@@ -82,7 +87,7 @@ export async function syncProtokolle(
       start: berlinIso(p.datum, '00:00'),
       organization: [orgId],
       agendaItem: [],
-      verbatimProtocol: { id: p.url, name: `Protokoll ${p.datum.split('-').reverse().join('.')}`, accessUrl: p.url, mimeType: 'application/pdf' },
+      verbatimProtocol: { id: p.url, name: `Protokoll ${p.datum.split('-').reverse().join('.')}`, accessUrl: p.url, mimeType: /\.pdf(\?|$)/i.test(p.url) ? 'application/pdf' : 'text/html' }, // Downloadseite statt PDF: „WEB“
       web: source.url,
       quelle: 'protokolle',
     } as unknown as OParlMeeting;
