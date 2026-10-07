@@ -694,7 +694,11 @@
     const vgEbene = eb.find((e) => e.key === 'vg' && !e.off && e.g.q === t.q);
     const vgHinweis = !kommend.length && vgEbene && sel.key !== 'vg' && sel.key !== 'kreis'
       ? x.D.sitzungen.filter((m) => m.start >= jetzt && m.k !== t.b).length : 0;
+    const suchbar = !x.D.quelle.nurTermine && (alleVorl.length || sitz.some((m) => m.tops.length));
     $view.innerHTML = `${seg}${kopf}${SITZE_PLATZ}${nurTermineHinweis(x)}
+      ${suchbar ? `<section class="ksuche"><div class="searchbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+        <input id="ks" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="In ${esc(kurzName(kreisKurz(t.name)))} suchen, z. B. Windrad oder Kita" aria-label="In dieser Kommune suchen"></div>
+        <div id="ksr"></div></section>` : ''}
       <section class="spalte"><h2>Nächste Sitzungen</h2>
         ${kommend.length ? `<div class="list">${kommend.map(sitzungRow).join('')}</div>` : `<div class="card empty">Zurzeit sind keine künftigen Sitzungen eingetragen.${vergangen.length ? ` Die letzte war am ${fmt(vergangen[0].start, { day: 'numeric', month: 'long', year: 'numeric' })}.` : ''} Neue Termine erscheinen hier, sobald die Verwaltung sie im ${x.D.quelle.ohneRis ? 'Internetauftritt' : 'Ratsinformationssystem'} veröffentlicht.${vgHinweis ? `<br><br>In der Verbandsgemeinde gibt es ${vgHinweis} künftige Sitzung${vgHinweis > 1 ? 'en' : ''} anderer Gemeinden. <button class="linkbtn" type="button" data-go="${esc(link('g', id, 'vg'))}">Zur Verbandsgemeinde</button>` : ''}</div>`}
       </section>
@@ -716,6 +720,46 @@
       ${risLink(null, x.D.quelle.ris, '', x.D.quelle.ohneRis)}
       <p class="stand">Abgleich mit ${esc(x.D.quelle.name)}: ${esc(stand(x.D.quelle.abgleich))}</p>`;
     sitzverteilung(t);
+    // Suche in der Kommune: Titel und Textauszüge der Vorlagen und Tagesordnungspunkte im aktuellen Datenstand (24 Monate)
+    const $ks = document.getElementById('ks');
+    if ($ks) {
+      const $ksr = document.getElementById('ksr');
+      const hay = (o, teile) => o._h || (o._h = teile.map((z) => suchSchluessel(z || '').join('|')));
+      let zeitgeber;
+      const finde = () => {
+        const roh = $ks.value.trim();
+        if (roh.length < 2) { $ksr.innerHTML = ''; return; }
+        const terme = roh.split(/\s+/).map((w) => suchSchluessel(w));
+        const passt = (h) => terme.every((tk) => tk.some((k) => h.includes(k)));
+        const vTreffer = [];
+        for (const v of alleVorl) {
+          const [hn, ht] = hay(v, [`${v.nr || ''} ${v.name}`, v.text]);
+          if (passt(hn)) vTreffer.push({ v, imText: false });
+          else if (passt(hn + ' ' + ht)) vTreffer.push({ v, imText: true });
+        }
+        vTreffer.sort((a, b) => a.imText - b.imText || (a.v.datum < b.v.datum ? 1 : -1));
+        const vIds = new Set(vTreffer.map((r) => r.v.id));
+        const tTreffer = [];
+        for (const m of alleVergangen.concat(kommend)) {
+          for (const tp of m.tops) {
+            if (tp.oeffentlich === false || (tp.vorlage && vIds.has(tp.vorlage))) continue;
+            const [hn, ht] = hay(tp, [tp.name, tp.beschluss]);
+            if (passt(hn)) tTreffer.push({ m, tp, imText: false });
+            else if (passt(hn + ' ' + ht)) tTreffer.push({ m, tp, imText: true });
+          }
+        }
+        tTreffer.sort((a, b) => a.imText - b.imText || (a.m.start < b.m.start ? 1 : -1));
+        const tZeile = ({ m, tp, imText }) => `<button class="row" type="button" data-go="${esc(link('s', m.id))}">${dateBox(m.start)}<div class="body"><span class="title">${esc(tp.name)}</span><span class="meta">${esc(gremiumKurz(m.gremien[0] || m.name || 'Sitzung'))}${imText ? '<span class="pill plain">im Text</span>' : ''}</span></div>${chev}</button>`;
+        const vz = vTreffer.slice(0, 20);
+        const tz = tTreffer.slice(0, 20);
+        $ksr.innerHTML = vz.length || tz.length
+          ? `${vz.length ? `<h2>Vorlagen${vTreffer.length > vz.length ? ` (${vz.length} von ${vTreffer.length})` : ` (${vz.length})`}</h2><div class="list">${vz.map((r) => vorlageRow(r.v, r.imText)).join('')}</div>` : ''}
+             ${tz.length ? `<h2>Tagesordnungspunkte${tTreffer.length > tz.length ? ` (${tz.length} von ${tTreffer.length})` : ` (${tz.length})`}</h2><div class="list">${tz.map(tZeile).join('')}</div>` : ''}
+             <p class="muted small">Durchsucht werden Titel und Textauszüge der letzten 24 Monate in diesem Datenstand, nicht das ganze Archiv.</p>`
+          : '<div class="card empty">Nichts gefunden. Durchsucht werden Titel und Textauszüge der letzten 24 Monate.</div>';
+      };
+      $ks.addEventListener('input', () => { clearTimeout(zeitgeber); zeitgeber = setTimeout(finde, 200); });
+    }
     // Ältere Einträge erst beim Aufklappen zeichnen, je Jahr gruppiert, in Schritten von 40
     const archiv = (id, eintraege, zeile, jahr) => {
       const d = document.getElementById(id);
@@ -872,8 +916,8 @@
     const n = m.tops.length;
     return `<button class="row" type="button" data-go="${esc(link('s', m.id))}">${dateBox(m.start)}<div class="body"><span class="title">${esc(gremiumKurz(m.gremien[0] || m.name || 'Sitzung'))}</span><span class="meta">${kn ? esc(kn) + ' · ' : ''}${esc(uhrText(m.start))}${m.ort ? ' · ' + esc(ortKurz(m.ort)) : ''}</span><span class="meta">${neu ? '<span class="pill neu">neu</span>' : ''}${statusPill(m)}${n ? `<span>${n} TOP${n > 1 ? 's' : ''}</span>` : ''}</span></div>${chev}</button>`;
   }
-  function vorlageRow(v) {
-    return `<button class="row" type="button" data-go="${esc(link('v', v.id))}"><div class="body"><span class="meta"><span class="mono">${esc(v.nr)}</span><span>${esc(datum(v.datum))}</span>${v.kurz ? '<span class="pill">Kurz erklärt</span>' : ''}</span><span class="title">${esc(v.name)}</span><span class="meta">${esc(v.art || '')}</span></div>${chev}</button>`;
+  function vorlageRow(v, imText) {
+    return `<button class="row" type="button" data-go="${esc(link('v', v.id))}"><div class="body"><span class="meta"><span class="mono">${esc(v.nr)}</span><span>${esc(datum(v.datum))}</span>${imText ? '<span class="pill plain">im Text</span>' : ''}${v.kurz ? '<span class="pill">Kurz erklärt</span>' : ''}</span><span class="title">${esc(v.name)}</span><span class="meta">${esc(v.art || '')}</span></div>${chev}</button>`;
   }
   function docRow(f) {
     const label = f.rolle !== 'auxiliary' && rolleLabel[f.rolle] ? rolleLabel[f.rolle] : f.name;
