@@ -247,6 +247,8 @@
   // Klicks auf Einträge: Navigation über data-Attribute
   $view.addEventListener('click', (e) => {
     if (e.target.closest('[data-back]')) { e.preventDefault(); back(); return; }
+    const tl = e.target.closest('[data-share]');
+    if (tl) { e.preventDefault(); teilen(tl.dataset.share); return; }
     const stern = e.target.closest('[data-fav]');
     if (stern) { e.preventDefault(); favUmschalten(stern); return; }
     const el = e.target.closest('[data-go]');
@@ -493,37 +495,61 @@
       return;
     }
     const jetzt = now();
-    const sitzungen = (sitz) => {
+    // „Neu seit Ihrem letzten Besuch“: je Favorit merkt sich das Gerät Kurzkennungen der bekannten Sitzungen (nur im Gerät).
+    // Beim ersten Öffnen gibt es nichts Neues (Ausgangsstand); Sitzungen, die weiter als 45 Tage zurückliegen, zählen nie als neu.
+    const kurz = (id) => { let h = 5381; for (const c of String(id)) h = ((h << 5) + h + c.charCodeAt(0)) | 0; return (h >>> 0).toString(36); };
+    const gesehenAlt = store.get('gesehen', {});
+    const gesehenNeu = {};
+    const grenze = new Date(Date.now() - 45 * 86_400_000).toISOString();
+    let neuGesamt = 0;
+    const sitzungen = (sitz, key) => {
       const naechste = sitz.find((m) => m.start >= jetzt);
       const letzte = sitz.filter((m) => m.start < jetzt).at(-1);
-      return [naechste, letzte].filter(Boolean);
+      const bekannt = gesehenAlt[key] ? new Set(gesehenAlt[key]) : null;
+      gesehenNeu[key] = sitz.slice(-400).map((m) => kurz(m.id));
+      const neu = bekannt ? sitz.filter((m) => m.start >= grenze && !bekannt.has(kurz(m.id))) : [];
+      neuGesamt += neu.length;
+      const ids = new Set(neu.map((m) => m.id));
+      const zeigen = [...new Set([naechste, letzte, ...neu].filter(Boolean))].sort((a, b) => (a.start < b.start ? -1 : 1));
+      return { liste: zeigen, ids };
     };
+    const neuPille = (n) => (n ? `<span class="pill neu">${n} neu</span>` : '');
     const kommunen = [];
     const gremien = [];
     for (const f of favs) {
       if (f.typ === 'gebiet') {
         const g = G.get(f.id);
-        let liste = [];
+        let r = { liste: [], ids: new Set() };
         if (g.q) {
-          try { const x = await quelle(g.q); liste = sitzungen(x.sByK.get(g.b) || []); } catch { /* Quelle nicht erreichbar */ }
+          try { const x = await quelle(g.q); r = sitzungen(x.sByK.get(g.b) || [], favKey(f)); } catch { /* Quelle nicht erreichbar */ }
         }
         kommunen.push(`<section class="fav">
-          <div class="favkopf"><button class="linkbtn favtitel" type="button" data-go="${esc(link('g', f.id))}"><h2>${esc(anzeigeName(g))}</h2><span class="muted small">${esc(untertitel(g))}</span></button>${sternKnopf(f)}</div>
-          ${liste.length ? `<div class="list">${liste.map(sitzungRow).join('')}</div>` : `<div class="card empty">${g.q ? 'Im aktuellen Datenstand keine Sitzung.' : 'Für diese Kommune gibt es noch keine Sitzungsdaten.'}</div>`}
+          <div class="favkopf"><button class="linkbtn favtitel" type="button" data-go="${esc(link('g', f.id))}"><h2>${esc(anzeigeName(g))}</h2><span class="muted small">${esc(untertitel(g))}</span></button>${neuPille(r.ids.size)}${sternKnopf(f)}</div>
+          ${r.liste.length ? `<div class="list">${r.liste.map((m) => sitzungRow(m, '', r.ids.has(m.id))).join('')}</div>` : `<div class="card empty">${g.q ? 'Im aktuellen Datenstand keine Sitzung.' : 'Für diese Kommune gibt es noch keine Sitzungsdaten.'}</div>`}
         </section>`);
       } else {
         let x = null;
         try { x = await quelle(f.q); } catch { /* Quelle nicht erreichbar */ }
-        const liste = x ? sitzungen((x.sByK.get(f.k) || []).filter((m) => m.gremien.includes(f.g))) : [];
+        const r = x ? sitzungen((x.sByK.get(f.k) || []).filter((m) => m.gremien.includes(f.g)), favKey(f)) : { liste: [], ids: new Set() };
         gremien.push(`<section class="fav">
-          <div class="favkopf"><div><h2>${esc(gremiumKurz(f.g))}</h2><span class="muted small">${esc(x?.k.get(f.k)?.name || f.kn || '')}</span></div>${sternKnopf(f)}</div>
-          ${liste.length ? `<div class="list">${liste.map(sitzungRow).join('')}</div>` : '<div class="card empty">Im aktuellen Datenstand keine Sitzung dieses Gremiums.</div>'}
+          <div class="favkopf"><div><h2>${esc(gremiumKurz(f.g))}</h2><span class="muted small">${esc(x?.k.get(f.k)?.name || f.kn || '')}</span></div>${neuPille(r.ids.size)}${sternKnopf(f)}</div>
+          ${r.liste.length ? `<div class="list">${r.liste.map((m) => sitzungRow(m, '', r.ids.has(m.id))).join('')}</div>` : '<div class="card empty">Im aktuellen Datenstand keine Sitzung dieses Gremiums.</div>'}
         </section>`);
       }
     }
+    const letzterBesuch = store.get('gesehenAm', null);
+    const neuText = !letzterBesuch ? ''
+      : neuGesamt ? `<p class="neuhinweis"><strong>${neuGesamt} neue Sitzung${neuGesamt > 1 ? 'en' : ''}</strong> seit Ihrem letzten Besuch am ${esc(datum(letzterBesuch))}.</p>`
+      : `<p class="muted small">Nichts Neues seit Ihrem letzten Besuch am ${esc(datum(letzterBesuch))}.</p>`;
     $view.innerHTML = `<section class="hero"><h1>Favoriten</h1><p class="muted small">Nur auf diesem Gerät gespeichert.</p></section>
+      ${neuText}
       ${kommunen.length ? `<p class="favgruppe">Kommunen</p>${kommunen.join('')}` : ''}
       ${gremien.length ? `<p class="favgruppe">Gremien</p>${gremien.join('')}` : ''}`;
+    // Stand merken (nur für Favoriten, deren Quelle geladen wurde; andere behalten ihren alten Stand)
+    const merk = {};
+    for (const f of favs) { const k = favKey(f); const w = gesehenNeu[k] || gesehenAlt[k]; if (w) merk[k] = w; }
+    store.set('gesehen', merk);
+    store.set('gesehenAm', new Date().toISOString());
   }
 
   // ---------- Über Wahlheimat, Impressum, Datenschutz ----------
@@ -842,9 +868,9 @@
       <p class="muted small">${ohneRis ? 'Dort finden Sie die veröffentlichten Protokolle und Unterlagen, auch älterer Sitzungen.' : 'Dort finden Sie alle veröffentlichten Unterlagen, auch ältere Sitzungen und Vorlagen.'}</p></section>`;
   }
 
-  function sitzungRow(m, kn) {
+  function sitzungRow(m, kn, neu) {
     const n = m.tops.length;
-    return `<button class="row" type="button" data-go="${esc(link('s', m.id))}">${dateBox(m.start)}<div class="body"><span class="title">${esc(gremiumKurz(m.gremien[0] || m.name || 'Sitzung'))}</span><span class="meta">${kn ? esc(kn) + ' · ' : ''}${esc(uhrText(m.start))}${m.ort ? ' · ' + esc(ortKurz(m.ort)) : ''}</span><span class="meta">${statusPill(m)}${n ? `<span>${n} TOP${n > 1 ? 's' : ''}</span>` : ''}</span></div>${chev}</button>`;
+    return `<button class="row" type="button" data-go="${esc(link('s', m.id))}">${dateBox(m.start)}<div class="body"><span class="title">${esc(gremiumKurz(m.gremien[0] || m.name || 'Sitzung'))}</span><span class="meta">${kn ? esc(kn) + ' · ' : ''}${esc(uhrText(m.start))}${m.ort ? ' · ' + esc(ortKurz(m.ort)) : ''}</span><span class="meta">${neu ? '<span class="pill neu">neu</span>' : ''}${statusPill(m)}${n ? `<span>${n} TOP${n > 1 ? 's' : ''}</span>` : ''}</span></div>${chev}</button>`;
   }
   function vorlageRow(v) {
     return `<button class="row" type="button" data-go="${esc(link('v', v.id))}"><div class="body"><span class="meta"><span class="mono">${esc(v.nr)}</span><span>${esc(datum(v.datum))}</span>${v.kurz ? '<span class="pill">Kurz erklärt</span>' : ''}</span><span class="title">${esc(v.name)}</span><span class="meta">${esc(v.art || '')}</span></div>${chev}</button>`;
@@ -857,6 +883,18 @@
   const dlHinweis = (docs) => (docs.some((f) => f.dl)
     ? '<p class="muted small dlhinweis">Dieses Ratsinformationssystem liefert Dokumente nur als Download. Auf dem Handy öffnet sich danach Ihre PDF-App, oder Sie finden die Datei im Download-Ordner.</p>'
     : '');
+
+  // ---------- Teilen ----------
+  const teilenIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>';
+  const teilenKnopf = (titel) => `<button class="teilen" type="button" data-share="${esc(titel)}">${teilenIcon}Teilen</button>`;
+  async function teilen(titel) {
+    const url = location.origin + location.pathname + location.hash;
+    try {
+      if (navigator.share) { await navigator.share({ title: titel, text: titel, url }); return; }
+    } catch (e) { if (e && e.name === 'AbortError') return; }
+    try { await navigator.clipboard.writeText(`${titel}\n${url}`); toast('Link in die Zwischenablage kopiert'); }
+    catch { toast(`<span>Adresse zum Kopieren: ${esc(url)}</span>`); }
+  }
 
   // ---------- Ansicht: Sitzung ----------
   function vSitzung(x, id) {
@@ -871,6 +909,7 @@
         <div class="favkopf"><h1>${esc(String(m.gremien[0] || m.name).replace(/\s+/g, ' '))}</h1>${m.gremien[0] ? sternKnopf({ q: x.D.quelle.id, k: m.k, g: m.gremien[0], kn: x.k.get(m.k)?.name || '', ort: kommune || '' }) : ''}</div>
         <p>${esc(langDatum(m.start))}, ${esc(uhrText(m.start))}${m.ende && m.status === 'durchgeführt' ? ' bis ' + esc(uhr(m.ende)) + ' Uhr' : ''}</p>
         ${m.ort ? `<p class="muted">${esc(m.ort)}</p>` : ''}
+        ${teilenKnopf(`${(() => { const t = String(m.gremien[0] || m.name || 'Sitzung').replace(/\s+/g, ' '); const kn = x.k.get(m.k)?.name || ''; return kn && !t.includes(kn.replace(/^(Stadt|Gemeinde|Ortsgemeinde|Verbandsgemeinde) /, '')) ? `${t} – ${kn}` : t; })()}, ${langDatum(m.start)}, ${uhrText(m.start)} – Wahlheimat RLP`)}
       </section>
       ${docs.length ? `<section><h2>Dokumente</h2><div class="list">${docs.map(docRow).join('')}</div>${dlHinweis(docs)}</section>` : ''}
       <section><h2>Tagesordnung</h2>
@@ -903,6 +942,7 @@
         <span class="meta"><span class="mono">${esc(v.nr)}</span><span>${esc(v.art || '')}</span><span>${esc(datum(v.datum))}</span></span>
         <h1>${esc(v.name)}</h1>
         <p class="muted small">${esc(x.k.get(v.k)?.name)}</p>
+        ${teilenKnopf(`${v.nr ? 'Vorlage ' + v.nr + ': ' : ''}${v.name} – ${x.k.get(v.k)?.name || ''} – Wahlheimat RLP`)}
       </section>
       ${v.kurz ? `<section class="kurz" aria-label="Kurz erklärt">
         <div class="head"><strong>Kurz erklärt</strong><span class="pill">automatisch erstellt</span></div>

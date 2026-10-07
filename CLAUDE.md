@@ -265,6 +265,7 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
   Kreis – Stern neben dem Namen auf der Kommunenseite, je gewählter Ebene) und Gremien (Stern in der Sitzung neben dem Namen und auf
   der Kommunenseite unter „Gremien“) merken; gespeichert nur im Gerät (`localStorage` `ratsblick:favoriten`; Kommune
   `{typ:'gebiet', id}`, Gremium Quelle + Körperschaft + Gremiumsname), Anzeige gruppiert mit nächster und letzter Sitzung.
+- „Neu seit Ihrem letzten Besuch“ (seit 07.10.2026) im Reiter Favoriten: je Favorit merkt das Gerät Kurzkennungen (djb2-Hash, höchstens 400) der bekannten Sitzungen (`ratsblick:gesehen`, `ratsblick:gesehenAm`, nur im Gerät); neue Sitzungen (nicht in der Kennungsliste, Beginn höchstens 45 Tage zurück) erscheinen mit Marke „neu“ in der Liste, dazu Pille „N neu“ am Favoriten und Hinweiskasten oben. Erstes Öffnen = Ausgangsstand, nichts neu. Betrifft nur Sitzungen, nicht Vorlagen. Teilen-Knopf (`teilenKnopf`/`teilen` in app.js) auf Sitzungs- und Vorlagenseite: `navigator.share` (Titel + aktuelle Adresse), sonst Kopieren in die Zwischenablage mit Hinweis. Ohne Zähler-Ereignis.
 - Reiter „Themen“ (seit 02.10.2026, statt Themen-Abo): Themensuche über Titel aller Vorlagen und öffentlichen Sach-TOPs im
   aktuellen Datenstand (`data/suche.json`, beim Bauen aus den Momentaufnahmen, `suchEintraege` in `src/export/web.ts`; ~4 MB,
   ~0,7 MB übertragen, wird erst im Reiter geladen). Themen als Begriffslisten (`THEMEN` in `web/app.js`, Teilwörter mit
