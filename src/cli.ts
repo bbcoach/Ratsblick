@@ -13,6 +13,7 @@ import { syncAllrisNet } from './scrape/allrisnet.js';
 import { syncIcs } from './scrape/ics.js';
 import { syncEdith } from './scrape/edith.js';
 import { syncIonas } from './scrape/ionas.js';
+import { syncOrtsseiten } from './scrape/ortsseiten.js';
 import { syncProtokolle } from './scrape/protokolle.js';
 import { syncRegisafe } from './scrape/regisafe.js';
 import { syncRubinApi } from './scrape/rubin.js';
@@ -228,7 +229,9 @@ async function main(): Promise<void> {
                       ? await syncProtokolle(db, client, s, { log })
                       : s.typ === 'ionas'
                         ? await syncIonas(db, client, s, { log })
-                        : await syncSource(db, client, s, { full: values.full, log });
+                        : s.typ === 'ortsseiten'
+                          ? await syncOrtsseiten(db, client, s, { log })
+                          : await syncSource(db, client, s, { full: values.full, log });
       schreibeLog(db, s.id, { ok: true, dauerS: Math.round((Date.now() - t0) / 1000), ...client.beobachtung(s.url) });
       log(
         `✓ ${st.bodies} Körperschaften, ${st.organizations} Gremien, ${st.meetings} Sitzungen, ` +

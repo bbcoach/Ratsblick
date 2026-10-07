@@ -20,7 +20,7 @@ export interface SourceRecord {
   /** Amtlicher Schlüssel des Gebiets der Quelle (data/gebiete-rlp.json). */
   gebiet?: string;
   /** Zugang: OParl (Standard) oder ein Scraper für Systeme ohne OParl. */
-  typ?: 'oparl' | 'sessionnet' | 'rubin-api' | 'allris' | 'allris-net' | 'regisafe' | 'ics' | 'edith' | 'protokolle' | 'ionas';
+  typ?: 'oparl' | 'sessionnet' | 'rubin-api' | 'allris' | 'allris-net' | 'regisafe' | 'ics' | 'edith' | 'protokolle' | 'ionas' | 'ortsseiten';
   /** Nur SessionNet: Dateiendung der Seiten (asp oder php). */
   endung?: 'asp' | 'php';
   /** Größerer Mindestabstand zwischen Anfragen an diesen Server (ms). */
@@ -29,9 +29,9 @@ export interface SourceRecord {
   zeitgrenzeMs?: number;
   /** Nur SessionNet: Kalender je Mandant (`__cpanr`) lesen, z. B. Ortsgemeinden im System der VG. */
   mandanten?: boolean;
-  /** Nur `protokolle`: weitere Listenseiten (die Quell-URL ist die erste). */
+  /** Nur `protokolle`/`ortsseiten`: weitere Listenseiten (die Quell-URL ist die erste). */
   seiten?: string[];
-  /** Nur `protokolle`: Gremium für Listen ohne Gremiumsnamen im Linktext (z. B. „Niederschrift vom …“); Standard „Gemeinderat“. */
+  /** Nur `protokolle`/`ortsseiten`: Gremium für Listen ohne Gremiumsnamen im Linktext (z. B. „Niederschrift vom …“); Standard „Gemeinderat“. */
   gremium?: string;
 }
 
