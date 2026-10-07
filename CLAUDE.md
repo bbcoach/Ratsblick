@@ -327,6 +327,7 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
 5. Vorlagentexte für Scraper-Quellen aus den PDFs gewinnen (für Suche und „Kurz erklärt“).
 6. Weitere Systeme: andere Anbieter (ALLRIS, SessionNet, Somacos) mit OParl suchen; bei „nicht freigeschaltet“
    ggf. Verwaltungen ansprechen; robots.txt-Frage bei sitzung-online.de klären.
+7. Zurückgestellt (Projektinhaber, 07.10.2026): Gremienbesetzung und Personensuche. Befund: die Wahldaten des Landeswahlleiters (`rlp-kw24.wahlen.23degrees.eu`) enthalten für Räte nur Ergebnisse je Partei, `candidates` ist in allen 2 456 Dateien leer (Namen nur bei Direktwahlen, Ortsbürgermeister-Stichprobe ebenfalls leer). Namen und Mitgliedschaften liefert OParl (`/body/<id>/person` mit `membership`: Gremium, Funktion; an `montabaur.gremien.info` geprüft), bisher nicht eingelesen (keine Tabellen `person`/`membership`); SessionNet-Mitgliederübersichten ungeprüft. Stufe 1: Besetzung je Gremium auf der Kommunenseite (geringes Risiko), Stufe 2: Personensuche (nur Name, Gremium, Funktion, Fraktion; keine Adressen/Kontaktdaten, `noindex`, Löschweg, vorher juristische Prüfung, Art. 21 DSGVO).
 
 ## Konventionen
 - Oberflächentexte, Kommentare, Fehlermeldungen und Doku auf Deutsch.
