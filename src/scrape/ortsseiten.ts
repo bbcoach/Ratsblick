@@ -67,7 +67,7 @@ export function parseOrtsseite(html: string, basis: string): OrtsDokument[] {
     // Derselbe Link mehrfach (Bild-, Titel-, „Mehr“-Link): das Datum aus dem sichtbaren Text gilt vor dem aus der Adresse
     if (out.get(url)?.ausText || (out.has(url) && !dText)) continue;
     // Beschriftungsloser Link oder „Herunterladen“: Art aus der Adresse
-    const art = /niederschrift|protokoll/i.test(alles) ? 'niederschrift' : /einladung|tagesordnung|sitzung/i.test(alles) ? 'einladung' : 'sonstiges';
+    const art = /niederschrift|protokoll/i.test(alles) ? 'niederschrift' : /einladung|tagesordnung/i.test(alles) ? 'einladung' : 'sonstiges';
     const name = !t || /^(herunterladen|download|mehr|mehr lesen|…)$/i.test(t) ? slug.split('/').filter(Boolean).pop()!.replace(/\.[a-z0-9]+$/i, '') : t;
     out.set(url, { d: { datum, art, name: name.slice(0, 120), url }, ausText: !!dText });
   }

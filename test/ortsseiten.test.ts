@@ -30,9 +30,9 @@ describe('Ortsgemeinde-Websites: Dokumentlisten mit Datum', () => {
     expect(d.map((x) => `${x.datum} ${x.art}`)).toEqual([
       '2026-08-27 niederschrift',
       '2026-10-06 einladung',
-      '2026-07-30 einladung',
+      '2026-07-30 sonstiges',
       '2026-03-01 niederschrift',
-      '2026-10-07 einladung', // Datum aus dem Titel, nicht aus der Adresse (Tippfehler 2021)
+      '2026-10-07 sonstiges', // Datum aus dem Titel, nicht aus der Adresse (Tippfehler 2021)
     ]);
     expect(d[1]!.url).toBe('https://x.de/wp-content/uploads/2026/10/2026-09-29_Einladung-Gemeinderatssitzung_06-10-2026.pdf');
     expect(d[3]!.name).toBe('niederschrift-20260301'); // „Herunterladen“ ersetzt durch den Dateinamen
