@@ -532,7 +532,50 @@
     return [...n].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'de')).map(([g]) => g);
   }
 
+  // „Neu seit Ihrem letzten Besuch“: je Favorit merkt sich das Gerät Kurzkennungen der bekannten Sitzungen (nur im Gerät).
+  // Beim ersten Öffnen gibt es nichts Neues (Ausgangsstand); Sitzungen, die weiter als 45 Tage zurückliegen, zählen nie als neu.
+  const kurzKennung = (id) => { let h = 5381; for (const c of String(id)) h = ((h << 5) + h + c.charCodeAt(0)) | 0; return (h >>> 0).toString(36); };
+  function neueSitzungen(sitz, bekanntListe) {
+    if (!bekanntListe) return [];
+    const bekannt = new Set(bekanntListe);
+    const grenze = new Date(Date.now() - 45 * 86_400_000).toISOString();
+    return sitz.filter((m) => m.start >= grenze && !bekannt.has(kurzKennung(m.id)));
+  }
+  /** Sitzungen eines Favoriten (Kommune oder Gremium) aus der geladenen Quelle */
+  async function favSitzungen(f) {
+    if (f.typ === 'gebiet') {
+      const g = G.get(f.id);
+      if (!g?.q) return null;
+      const x = await quelle(g.q);
+      return x.sByK.get(g.b) || [];
+    }
+    const x = await quelle(f.q);
+    return (x.sByK.get(f.k) || []).filter((m) => m.gremien.includes(f.g));
+  }
+  /** Zahl am Reiter „Favoriten“: neue Sitzungen seit dem letzten Besuch dort (im Hintergrund berechnet) */
+  function setzeFavZahl(n) {
+    const b = document.querySelector('.tabs [data-tab="fav"]');
+    if (!b) return;
+    b.querySelector('.badge')?.remove();
+    if (n > 0) b.insertAdjacentHTML('beforeend', `<span class="badge" aria-label="${n} neue Sitzung${n > 1 ? 'en' : ''}">${n > 99 ? '99+' : n}</span>`);
+  }
+  let favZahlLaeuft = false;
+  async function zaehleFavNeu() {
+    if (favZahlLaeuft || parse().v === 'fav') return;
+    favZahlLaeuft = true;
+    try {
+      const gesehen = store.get('gesehen', {});
+      const favs = favoriten().filter((f) => (f.typ !== 'gebiet' || G.has(f.id)) && gesehen[favKey(f)]);
+      let n = 0;
+      for (const f of favs) {
+        try { const sitz = await favSitzungen(f); if (sitz) n += neueSitzungen(sitz, gesehen[favKey(f)]).length; } catch { /* Quelle nicht erreichbar */ }
+      }
+      if (parse().v !== 'fav') setzeFavZahl(n);
+    } finally { favZahlLaeuft = false; }
+  }
+
   async function vFavoriten() {
+    setzeFavZahl(0);
     setTitle('Favoriten');
     const favs = favoriten().filter((f) => f.typ !== 'gebiet' || G.has(f.id));
     if (!favs.length) {
@@ -541,19 +584,14 @@
       return;
     }
     const jetzt = now();
-    // „Neu seit Ihrem letzten Besuch“: je Favorit merkt sich das Gerät Kurzkennungen der bekannten Sitzungen (nur im Gerät).
-    // Beim ersten Öffnen gibt es nichts Neues (Ausgangsstand); Sitzungen, die weiter als 45 Tage zurückliegen, zählen nie als neu.
-    const kurz = (id) => { let h = 5381; for (const c of String(id)) h = ((h << 5) + h + c.charCodeAt(0)) | 0; return (h >>> 0).toString(36); };
     const gesehenAlt = store.get('gesehen', {});
     const gesehenNeu = {};
-    const grenze = new Date(Date.now() - 45 * 86_400_000).toISOString();
     let neuGesamt = 0;
     const sitzungen = (sitz, key) => {
       const naechste = sitz.find((m) => m.start >= jetzt);
       const letzte = sitz.filter((m) => m.start < jetzt).at(-1);
-      const bekannt = gesehenAlt[key] ? new Set(gesehenAlt[key]) : null;
-      gesehenNeu[key] = sitz.slice(-400).map((m) => kurz(m.id));
-      const neu = bekannt ? sitz.filter((m) => m.start >= grenze && !bekannt.has(kurz(m.id))) : [];
+      gesehenNeu[key] = sitz.slice(-400).map((m) => kurzKennung(m.id));
+      const neu = neueSitzungen(sitz, gesehenAlt[key]);
       neuGesamt += neu.length;
       const ids = new Set(neu.map((m) => m.id));
       const zeigen = [...new Set([naechste, letzte, ...neu].filter(Boolean))].sort((a, b) => (a.start < b.start ? -1 : 1));
@@ -1320,6 +1358,9 @@
     ladeIndex(idx);
     route();
     starteZaehler();
+    // Neu-Zahl am Reiter „Favoriten“ erst nach dem ersten Bild berechnen (Quellen kommen meist aus dem Cache)
+    setTimeout(zaehleFavNeu, 1500);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(zaehleFavNeu, 800); });
   }).catch((err) => {
     $view.innerHTML = `<div class="card empty">Die Daten konnten nicht geladen werden (${esc(err.message)}). Prüfen Sie die Verbindung und laden Sie die Seite neu.</div>`;
   });

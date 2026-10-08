@@ -263,6 +263,8 @@ mark { background: var(--warn-soft); color: inherit; padding: 0 2px; border-radi
 .tabs button { border: 0; background: none; padding: 8px 4px 10px; display: grid; justify-items: center; gap: 2px; font-size: 12px; color: var(--muted); cursor: pointer; }
 .tabs button[aria-current="page"] { color: var(--accent); font-weight: 600; }
 .tabs svg { width: 22px; height: 22px; }
+.tabs button { position: relative; }
+.tabs .badge { position: absolute; top: 4px; left: calc(50% + 6px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #c0392b; color: #fff; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; box-shadow: 0 0 0 2px var(--surface); }
 .loading { padding: 40px 16px; text-align: center; color: var(--muted); }
 @media (prefers-reduced-motion: no-preference) { .row, .chip, .seg button { transition: background-color .15s; } }
 .install { display: flex; gap: 12px; align-items: center; padding: 12px 14px; }
