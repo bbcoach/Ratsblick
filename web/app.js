@@ -271,6 +271,8 @@
   // Klicks auf Einträge: Navigation über data-Attribute
   $view.addEventListener('click', (e) => {
     if (e.target.closest('[data-back]')) { e.preventDefault(); back(); return; }
+    const kl = e.target.closest('[data-ics]');
+    if (kl) { e.preventDefault(); kalenderLaden(JSON.parse(kl.dataset.ics)); return; }
     const tl = e.target.closest('[data-share]');
     if (tl) { e.preventDefault(); teilen(tl.dataset.share); return; }
     const stern = e.target.closest('[data-fav]');
@@ -970,6 +972,49 @@
     catch { toast(`<span>Adresse zum Kopieren: ${esc(url)}</span>`); }
   }
 
+  // ---------- Kalender (.ics) ----------
+  const kalenderIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>';
+  const icsText = (t) => String(t ?? '').replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/;/g, '\\;').replace(/,/g, '\\,');
+  /** Zeile auf höchstens 75 Zeichen umbrechen (RFC 5545), Fortsetzungszeilen beginnen mit einem Leerzeichen */
+  const icsFalten = (z) => { const t = []; let r = z; while (r.length > 70) { t.push(r.slice(0, 70)); r = ' ' + r.slice(70); } t.push(r); return t.join('\r\n'); };
+  const icsZeit = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  /** Eine Sitzung als iCalendar-Datei. Ohne Uhrzeit (00:00) als ganztägiger Termin. */
+  function sitzungIcs(m) {
+    const ganztag = uhr(m.start) === '00:00';
+    const von = new Date(m.start);
+    const tag = (d) => d.toISOString().slice(0, 10).replace(/-/g, '');
+    const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Wahlheimat RLP//DE', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
+      `UID:${tag(von)}-${[...String(m.uid)].reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 7).toString(36).replace('-', 'x')}@wahlheimat-rlp.de`,
+      `DTSTAMP:${icsZeit(new Date())}`];
+    if (ganztag) {
+      const tagLokal = m.start.slice(0, 10).replace(/-/g, '');
+      const folgetag = new Date(Date.UTC(+tagLokal.slice(0, 4), +tagLokal.slice(4, 6) - 1, +tagLokal.slice(6, 8) + 1)).toISOString().slice(0, 10).replace(/-/g, '');
+      L.push(`DTSTART;VALUE=DATE:${tagLokal}`, `DTEND;VALUE=DATE:${folgetag}`);
+    } else {
+      const bis = m.ende && m.ende > m.start ? new Date(m.ende) : new Date(von.getTime() + 2 * 3600_000);
+      L.push(`DTSTART:${icsZeit(von)}`, `DTEND:${icsZeit(bis)}`);
+    }
+    L.push(`SUMMARY:${icsText(m.titel)}`);
+    if (m.ort) L.push(`LOCATION:${icsText(m.ort)}`);
+    L.push(`DESCRIPTION:${icsText(`${ganztag ? 'Uhrzeit siehe Einladung. ' : ''}Tagesordnung und Unterlagen: ${m.url}\nAngaben ohne Gewähr – maßgeblich ist das Ratsinformationssystem der Kommune.`)}`, `URL:${m.url}`, 'END:VEVENT', 'END:VCALENDAR');
+    return L.map(icsFalten).join('\r\n') + '\r\n';
+  }
+  const kalenderKnopf = (m, x) => {
+    const t = String(m.gremien[0] || m.name || 'Sitzung').replace(/\s+/g, ' ');
+    const kn = x.k.get(m.k)?.name || '';
+    const daten = { uid: m.id, start: m.start, ende: m.ende || '', titel: kn && !t.includes(kn.replace(/^(Stadt|Gemeinde|Ortsgemeinde|Verbandsgemeinde) /, '')) ? `${t} – ${kn}` : t, ort: m.ort || '', url: location.origin + location.pathname + link('s', m.id) };
+    return `<button class="teilen" type="button" data-ics="${esc(JSON.stringify(daten))}">${kalenderIcon}Zum Kalender</button>`;
+  };
+  function kalenderLaden(daten) {
+    const blob = new Blob([sitzungIcs(daten)], { type: 'text/calendar;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${String(daten.titel).replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '').slice(0, 50) || 'sitzung'}.ics`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
+    toast('Termin als Kalenderdatei geladen – zum Hinzufügen öffnen');
+  }
+
   // ---------- Ansicht: Sitzung ----------
   function vSitzung(x, id) {
     const m = x.s.get(id);
@@ -983,7 +1028,7 @@
         <div class="favkopf"><h1>${esc(String(m.gremien[0] || m.name).replace(/\s+/g, ' '))}</h1>${m.gremien[0] ? sternKnopf({ q: x.D.quelle.id, k: m.k, g: m.gremien[0], kn: x.k.get(m.k)?.name || '', ort: kommune || '' }) : ''}</div>
         <p>${esc(langDatum(m.start))}, ${esc(uhrText(m.start))}${m.ende && m.status === 'durchgeführt' ? ' bis ' + esc(uhr(m.ende)) + ' Uhr' : ''}</p>
         ${m.ort ? `<p class="muted">${esc(m.ort)}</p>` : ''}
-        ${teilenKnopf(`${(() => { const t = String(m.gremien[0] || m.name || 'Sitzung').replace(/\s+/g, ' '); const kn = x.k.get(m.k)?.name || ''; return kn && !t.includes(kn.replace(/^(Stadt|Gemeinde|Ortsgemeinde|Verbandsgemeinde) /, '')) ? `${t} – ${kn}` : t; })()}, ${langDatum(m.start)}, ${uhrText(m.start)} – Wahlheimat RLP`)}
+        <div class="aktionen">${teilenKnopf(`${(() => { const t = String(m.gremien[0] || m.name || 'Sitzung').replace(/\s+/g, ' '); const kn = x.k.get(m.k)?.name || ''; return kn && !t.includes(kn.replace(/^(Stadt|Gemeinde|Ortsgemeinde|Verbandsgemeinde) /, '')) ? `${t} – ${kn}` : t; })()}, ${langDatum(m.start)}, ${uhrText(m.start)} – Wahlheimat RLP`)}${m.start >= now() && !m.abgesagt ? kalenderKnopf(m, x) : ''}</div>
       </section>
       ${docs.length ? `<section><h2>Dokumente</h2><div class="list">${docs.map(docRow).join('')}</div>${dlHinweis(docs)}</section>` : ''}
       <section><h2>Tagesordnung</h2>
