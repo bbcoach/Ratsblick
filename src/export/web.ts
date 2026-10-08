@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { DatabaseSync } from 'node:sqlite';
@@ -119,8 +120,14 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
   mkdirSync(join(outDir, 'data'), { recursive: true });
 
   const build = now.toISOString();
-  const sw = join(outDir, 'sw.js');
-  if (existsSync(sw)) writeFileSync(sw, readFileSync(sw, 'utf8').replaceAll('__BUILD__', build));
+  // Version der App-Dateien (ändert sich nur bei Code-Änderungen): die App lädt nur dann neu, wenn sich der Code geändert hat;
+  // reine Datenstände (alle 6 h) tauschen nur den Datencache des Service Workers.
+  const appDatei = (f: string) => (existsSync(join(outDir, f)) ? readFileSync(join(outDir, f), 'utf8') : '');
+  const appVersion = createHash('sha256').update(['app.js', 'index.html', 'sw.js', 'manifest.webmanifest'].map(appDatei).join('\0')).digest('hex').slice(0, 12);
+  for (const f of ['sw.js', 'app.js']) {
+    const p = join(outDir, f);
+    if (existsSync(p)) writeFileSync(p, readFileSync(p, 'utf8').replaceAll('__BUILD__', build).replaceAll('__APP__', appVersion));
+  }
 
   const sources = db
     .prepare(`SELECT s.id FROM source s WHERE EXISTS (SELECT 1 FROM body b WHERE b.source_id = s.id) ORDER BY s.name`)
@@ -151,14 +158,14 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
     const schreibeStuecke = <T>(art: 'v' | 's', liste: T[], text: (x: T) => unknown) => {
       for (let c = 0; c * TEXT_STUECK < liste.length; c++) {
         const teil = liste.slice(c * TEXT_STUECK, (c + 1) * TEXT_STUECK).map(text);
-        if (teil.some((t) => t !== null)) writeFileSync(join(outDir, 'data', `${id}.${art}${c}.json`), JSON.stringify(teil));
+        if (teil.some((t) => t !== null)) writeFileSync(join(outDir, 'data', `${id}.${art}${c}.json`), JSON.stringify({ b: build, t: teil }));
       }
     };
     schreibeStuecke('v', vorlagen, (v) => v.text || null);
     schreibeStuecke('s', snap.sitzungen, (m) => (m.tops.some((t) => t.beschluss) ? m.tops.map((t) => t.beschluss || null) : null));
     const vorlagenOhneText = vorlagen.map(({ text: _t, ...v }) => v);
     const sitzungenOhneText = snap.sitzungen.map((m) => ({ ...m, tops: m.tops.map(({ beschluss: _b, ...t }) => t) }));
-    writeFileSync(join(outDir, 'data', `${id}.json`), JSON.stringify({ ...snap, sitzungen: sitzungenOhneText, quelle, koerperschaften, vorlagen: vorlagenOhneText }));
+    writeFileSync(join(outDir, 'data', `${id}.json`), JSON.stringify({ ...snap, bau: build, sitzungen: sitzungenOhneText, quelle, koerperschaften, vorlagen: vorlagenOhneText }));
     suche.push(...suchEintraege(qi, gebiet ?? null, gebietVonBody, snap.sitzungen, vorlagen));
 
     const kommend = new Map<string, number>();

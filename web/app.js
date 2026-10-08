@@ -16,6 +16,8 @@
     set(k, v) { try { localStorage.setItem('ratsblick:' + k, JSON.stringify(v)); } catch {} },
   };
 
+  const APP_VERSION = '__APP__';      // beim Bauen ersetzt (Inhalt der App-Dateien)
+  let datenNeu = false;                // neuer Datenstand im Service Worker: bei der nächsten Ansicht frisch laden
   let INDEX = null;                    // Verzeichnis: Gebiete, Zuordnung zu Quellen, Quellen
   const G = new Map();                 // Gebiets-ID → { id, name, art, typ, plz, kreis, vg, ew, q?, b? }
   const gebietVonBody = new Map();     // Körperschafts-ID → Gebiets-ID
@@ -28,7 +30,15 @@
   // Nur http(s)-Adressen als Link zulassen (Daten stammen aus fremden Systemen; „javascript:“ & Co. werden verworfen)
   const sicherUrl = (u) => (/^https?:\/\//i.test(String(u ?? '')) ? String(u) : '#');
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const fmt = (iso, o) => (iso ? new Intl.DateTimeFormat('de-DE', { timeZone: TZ, ...o }).format(new Date(iso)) : '');
+  // Datumsformate einmal anlegen und wiederverwenden (neu anlegen kostet auf dem Handy spürbar Zeit)
+  const FORMATE = new Map();
+  const fmt = (iso, o) => {
+    if (!iso) return '';
+    const k = JSON.stringify(o);
+    let f = FORMATE.get(k);
+    if (!f) FORMATE.set(k, (f = new Intl.DateTimeFormat('de-DE', { timeZone: TZ, ...o })));
+    return f.format(new Date(iso));
+  };
   const datum = (iso) => fmt(iso, { day: '2-digit', month: '2-digit', year: 'numeric' });
   const uhr = (iso) => fmt(iso, { hour: '2-digit', minute: '2-digit' });
   const langDatum = (iso) => fmt(iso, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -72,7 +82,7 @@
 
   // ---------- Daten ----------
   async function getJson(url) {
-    const r = await fetch(url, { cache: 'no-cache' });
+    const r = await fetch(url);
     if (!r.ok) throw new Error(`HTTP ${r.status} für ${url}`);
     $offline.hidden = r.headers.get('x-ratsblick-cache') !== 'offline';
     return r.json();
@@ -94,20 +104,26 @@
   const TEXT_STUECK = 40;
   function stueck(x, art, c) {
     const key = art + c;
-    if (!x.texte.has(key)) x.texte.set(key, fetch(`data/${encodeURIComponent(x.D.quelle.id)}.${key}.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null));
+    // Stück und Quelldatei müssen aus demselben Build stammen (Zuordnung über die Position); sonst lieber kein Text
+    if (!x.texte.has(key)) x.texte.set(key, fetch(`data/${encodeURIComponent(x.D.quelle.id)}.${key}.json`).then((r) => (r.ok ? r.json() : null))
+      .then((a) => {
+        if (a && a.b === x.D.bau && Array.isArray(a.t)) return a;
+        if (a) datenNeu = true; // Stück aus einem neueren Datenstand: bei der nächsten Ansicht alles neu laden
+        return null;
+      }).catch(() => null));
     return x.texte.get(key);
   }
   /** Text einer Vorlage (string) bzw. Beschlusstexte der TOPs einer Sitzung (Liste), aus dem passenden Stück */
   async function textVon(x, art, i) {
     const a = await stueck(x, art, Math.floor(i / TEXT_STUECK));
-    return a ? a[i % TEXT_STUECK] ?? null : null;
+    return a ? a.t[i % TEXT_STUECK] ?? null : null;
   }
   /** Alle Texte der Quelle laden (für die Suche „im Text“) und an die Objekte hängen */
   function alleTexte(x) {
     if (!x.alleTexteP) {
       const arbeit = [];
-      for (let c = 0; c * TEXT_STUECK < x.D.vorlagen.length; c++) arbeit.push(stueck(x, 'v', c).then((a) => a && a.forEach((t, j) => { const v = x.D.vorlagen[c * TEXT_STUECK + j]; if (v && t) v.text = t; })));
-      for (let c = 0; c * TEXT_STUECK < x.D.sitzungen.length; c++) arbeit.push(stueck(x, 's', c).then((a) => a && a.forEach((bs, j) => { const m = x.D.sitzungen[c * TEXT_STUECK + j]; if (m && bs) bs.forEach((b, k) => { if (b && m.tops[k]) m.tops[k].beschluss = b; }); })));
+      for (let c = 0; c * TEXT_STUECK < x.D.vorlagen.length; c++) arbeit.push(stueck(x, 'v', c).then((a) => a && a.t.forEach((t, j) => { const v = x.D.vorlagen[c * TEXT_STUECK + j]; if (v && t) v.text = t; })));
+      for (let c = 0; c * TEXT_STUECK < x.D.sitzungen.length; c++) arbeit.push(stueck(x, 's', c).then((a) => a && a.t.forEach((bs, j) => { const m = x.D.sitzungen[c * TEXT_STUECK + j]; if (m && bs) bs.forEach((b, k) => { if (b && m.tops[k]) m.tops[k].beschluss = b; }); })));
       x.alleTexteP = Promise.all(arbeit).then(() => true);
     }
     return x.alleTexteP;
@@ -222,6 +238,10 @@
   }
 
   async function route() {
+    if (datenNeu) {
+      datenNeu = false;
+      try { const idx = await getJson('data/index.json'); G.clear(); gebietVonBody.clear(); ladeIndex(idx); loaded.clear(); SUCHE = null; } catch { /* alter Stand bleibt */ }
+    }
     const r = parse();
     let tab = 'wahl';
     try {
@@ -1270,9 +1290,25 @@
   // ---------- Service Worker: offline nutzbar, Hinweis bei neuer Version ----------
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     const hadController = !!navigator.serviceWorker.controller;
-    navigator.serviceWorker.register('sw.js').catch(() => {});
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
+    navigator.serviceWorker.register('sw.js').then((reg) => {
+      // Neue Daten kommen mit einem neuen Service Worker: beim Zurückkehren zur App höchstens alle 10 Minuten nachsehen
+      let zuletzt = Date.now();
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden || Date.now() - zuletzt < 600_000) return;
+        zuletzt = Date.now();
+        reg.update().catch(() => {});
+      });
+    }).catch(() => {});
+    navigator.serviceWorker.addEventListener('controllerchange', async () => {
       if (!hadController) return;
+      // Nur neue Daten (gleicher Code): nicht neu laden, die nächste Ansicht holt den neuen Stand
+      const neu = await new Promise((ok) => {
+        const k = new MessageChannel();
+        k.port1.onmessage = (e) => ok(e.data);
+        try { navigator.serviceWorker.controller.postMessage('app-version', [k.port2]); } catch { ok(null); }
+        setTimeout(() => ok(null), 1500);
+      });
+      if (neu === APP_VERSION) { datenNeu = true; return; }
       // Kurz nach dem Start sofort neu laden (sonst läuft bis zum nächsten Start die alte Version), später nur anbieten
       if (performance.now() < 15000) location.reload();
       else toast('Neue Daten oder Funktionen verfügbar.', { label: 'Neu laden', run: () => location.reload() });
