@@ -784,10 +784,10 @@
         <input id="ks" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="In ${esc(kurzName(kreisKurz(t.name)))} suchen, z. B. Windrad oder Kita" aria-label="In dieser Kommune suchen"></div>
         <div id="ksr"></div></section>` : ''}
       <section class="spalte"><h2>Nächste Sitzungen</h2>
-        ${kommend.length ? `<div class="list">${kommend.map(sitzungRow).join('')}</div>` : `<div class="card empty">Zurzeit sind keine künftigen Sitzungen eingetragen.${vergangen.length ? ` Die letzte war am ${fmt(vergangen[0].start, { day: 'numeric', month: 'long', year: 'numeric' })}.` : ''} Neue Termine erscheinen hier, sobald die Verwaltung sie im ${x.D.quelle.ohneRis ? 'Internetauftritt' : 'Ratsinformationssystem'} veröffentlicht.${vgHinweis ? `<br><br>In der Verbandsgemeinde gibt es ${vgHinweis} künftige Sitzung${vgHinweis > 1 ? 'en' : ''} anderer Gemeinden. <button class="linkbtn" type="button" data-go="${esc(link('g', id, 'vg'))}">Zur Verbandsgemeinde</button>` : ''}</div>`}
+        ${kommend.length ? `<div class="list">${kommend.map((m) => sitzungRow(m)).join('')}</div>` : `<div class="card empty">Zurzeit sind keine künftigen Sitzungen eingetragen.${vergangen.length ? ` Die letzte war am ${fmt(vergangen[0].start, { day: 'numeric', month: 'long', year: 'numeric' })}.` : ''} Neue Termine erscheinen hier, sobald die Verwaltung sie im ${x.D.quelle.ohneRis ? 'Internetauftritt' : 'Ratsinformationssystem'} veröffentlicht.${vgHinweis ? `<br><br>In der Verbandsgemeinde gibt es ${vgHinweis} künftige Sitzung${vgHinweis > 1 ? 'en' : ''} anderer Gemeinden. <button class="linkbtn" type="button" data-go="${esc(link('g', id, 'vg'))}">Zur Verbandsgemeinde</button>` : ''}</div>`}
       </section>
       ${x.D.quelle.nurTermine ? '' : `<section class="spalte"><h2>Neue Vorlagen</h2>
-        ${vorl.length ? `<div class="list">${vorl.map(vorlageRow).join('')}</div>` : '<div class="card empty">Keine aktuellen Vorlagen.</div>'}
+        ${vorl.length ? `<div class="list">${vorl.map((v) => vorlageRow(v)).join('')}</div>` : '<div class="card empty">Keine aktuellen Vorlagen.</div>'}
         ${aeltereVorl.length ? `<details class="gremien archiv" id="avorl"><summary>${fmtZahl(aeltereVorl.length)} ältere Vorlagen</summary><div class="list"></div><div class="mehrwrap"></div></details>` : ''}
       </section>`}
       ${andere.length ? `<section><h2>In den Gemeinden der Verbandsgemeinde</h2>
@@ -795,7 +795,7 @@
         <div class="list">${andere.slice(0, 8).map((m) => sitzungRow(m, knName(m))).join('')}</div>
         ${andere.length > 8 ? `<details class="gremien"><summary>${andere.length - 8} weitere zeigen</summary><div class="list">${andere.slice(8, 80).map((m) => sitzungRow(m, knName(m))).join('')}</div></details>` : ''}
       </section>` : ''}
-      ${vergangen.length ? `<section><h2>Zuletzt getagt</h2><div class="list">${vergangen.map(sitzungRow).join('')}</div>
+      ${vergangen.length ? `<section><h2>Zuletzt getagt</h2><div class="list">${vergangen.map((m) => sitzungRow(m)).join('')}</div>
         ${fruehere.length ? `<details class="gremien archiv" id="afrueh"><summary>${fmtZahl(fruehere.length)} frühere Sitzungen (bis ${esc(String(new Date(fruehere[fruehere.length - 1].start).getFullYear()))} zurück)</summary><div class="list"></div></details>` : ''}
       </section>` : ''}
       ${gremien.length ? `<section><details class="gremien"><summary>Gremien (${gremien.length}) – mit dem Stern als Favorit merken</summary>
