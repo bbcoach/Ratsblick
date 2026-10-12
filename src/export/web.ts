@@ -6,6 +6,7 @@ import type { Gebiete } from '../sync/discover.js';
 import type { SourceRecord } from '../sync/sync.js';
 import { zuordnen } from './gebiete.js';
 import { buildSnapshot } from './snapshot.js';
+import { baueSeoSeiten, type SeoKoerperschaft } from './seo.js';
 
 /**
  * Baut die Web-App (PWA) als statische Seite: App-Dateien aus `web/`, je Quelle eine Datendatei
@@ -137,6 +138,8 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
   const daten: Record<string, [string, string]> = {};
   // Themensuche: Titel aller Vorlagen und öffentlichen TOPs im aktuellen Datenstand
   const suche: SuchEintrag[] = [];
+  // Kurzfassung je Körperschaft für die Suchmaschinen-Seiten (/ort/…)
+  const seo = new Map<string, SeoKoerperschaft>();
   const quellen = sources.map(({ id }, qi) => {
     const snap = buildSnapshot(db, id, { now, pastMeetings: 150, papers: 300, pastMonths: 24, textLength: 1600 });
     const vorlagen = snap.vorlagen.map((v) => (kurz[v.id] ? { ...v, kurz: kurz[v.id] } : v));
@@ -167,6 +170,21 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
     const sitzungenOhneText = snap.sitzungen.map((m) => ({ ...m, tops: m.tops.map(({ beschluss: _b, ...t }) => t) }));
     writeFileSync(join(outDir, 'data', `${id}.json`), JSON.stringify({ ...snap, bau: build, sitzungen: sitzungenOhneText, quelle, koerperschaften, vorlagen: vorlagenOhneText }));
     suche.push(...suchEintraege(qi, gebiet ?? null, gebietVonBody, snap.sitzungen, vorlagen));
+    for (const k of snap.koerperschaften) {
+      const sitz = snap.sitzungen.filter((m) => m.k === k.id && m.start).sort((a, b) => String(a.start).localeCompare(String(b.start)));
+      const kurzSitzung = (m: (typeof sitz)[number]) => ({
+        id: m.id, start: m.start, gremium: String(m.gremien[0] || m.name || 'Sitzung').replace(/\s+/g, ' '), ort: m.ort, abgesagt: !!m.abgesagt,
+        themen: m.tops.filter((t) => t.oeffentlich !== false && t.name && !FORMALIE.test(t.name.trim())).slice(0, 3).map((t) => String(t.name).replace(/\s+/g, ' ').slice(0, 160)),
+      });
+      seo.set(`${id}|${k.id}`, {
+        name: k.name,
+        kommend: sitz.filter((m) => String(m.start) >= snap.stichtag).slice(0, 8).map(kurzSitzung),
+        vergangen: sitz.filter((m) => String(m.start) < snap.stichtag).slice(-5).reverse().map(kurzSitzung),
+        vorlagen: vorlagen.filter((v) => v.k === k.id && v.name).sort((a, b) => String(b.datum ?? '').localeCompare(String(a.datum ?? ''))).slice(0, 10)
+          .map((v) => ({ id: v.id, name: String(v.name).slice(0, 200), datum: v.datum, art: v.art })),
+        ris: quelle.ris, ohneRis: !!(quelle as { ohneRis?: boolean }).ohneRis,
+      });
+    }
 
     const kommend = new Map<string, number>();
     for (const m of snap.sitzungen) {
@@ -208,6 +226,9 @@ export function buildWeb(db: DatabaseSync, outDir: string, opts: WebBuildOptions
   const { praefix, teile } = teileSuche(suche, quellen.length);
   for (const [key, e] of teile) writeFileSync(join(outDir, 'data', `suche-${key}.json`), JSON.stringify(e));
   writeFileSync(join(outDir, 'data', 'suche.json'), JSON.stringify({ erstellt: build, quellen: quellen.map((q) => q.id), praefix, teile: Object.fromEntries([...teile].map(([k, e]) => [k, e.length])) }));
+
+  // Statische Seiten für Suchmaschinen (/ort/…, /orte/, sitemap.xml, robots.txt)
+  baueSeoSeiten(outDir, { gebiete, daten, koerperschaft: (q, b) => seo.get(`${q}|${b}`), stand: build });
 
   // Sitzverteilung der Räte (Kommunalwahl 2024, scripts/sitzverteilung.ts) – lädt die App erst auf der Kommunenseite
   if (existsSync('data/sitze-2024.json')) cpSync('data/sitze-2024.json', join(outDir, 'data', 'sitze.json'));

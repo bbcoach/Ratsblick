@@ -73,7 +73,8 @@ self.addEventListener('fetch', (e) => {
     return;
   }
   if (req.mode === 'navigate') {
-    e.respondWith(huelle(e, req, 'index.html'));
+    // Nur die App selbst (/ bzw. /index.html) aus dem Cache; statische Kommunenseiten (/ort/…, /orte/) immer direkt laden
+    if (url.pathname === '/' || url.pathname.endsWith('/index.html') && !url.pathname.startsWith('/ort')) e.respondWith(huelle(e, req, 'index.html'));
     return;
   }
   e.respondWith(huelle(e, req, req));
