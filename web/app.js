@@ -463,7 +463,8 @@
           <input id="q" type="search" inputmode="search" enterkeyhint="search" placeholder="Kommune oder Postleitzahl" value="${esc(q)}" aria-label="Kommune oder Postleitzahl">
         </form>
         <div id="hits"></div>
-        <p class="coverage">${fmtZahl(gemeinden)} Gemeinden in Rheinland-Pfalz · eigene Sitzungsdaten für ${fmtZahl(eigen)}${mitDaten > eigen ? `, bei weiteren ${fmtZahl(mitDaten - eigen)} nur über die Verbandsgemeinde oder den Kreis` : ''}<br>Datenstand ${esc(stand(INDEX.erstellt))} · <a href="/orte/">Alle Kommunen von A bis Z</a></p>
+        <p class="coverage">${fmtZahl(gemeinden)} Gemeinden in Rheinland-Pfalz · eigene Sitzungsdaten für ${fmtZahl(eigen)}${mitDaten > eigen ? `, bei weiteren ${fmtZahl(mitDaten - eigen)} nur über die Verbandsgemeinde oder den Kreis` : ''}<br>Datenstand ${esc(stand(INDEX.erstellt))}</p>
+        <p class="alle-orte"><a href="/orte/">Alle Kommunen von A bis Z</a></p>
       </div>`;
     starteBanner();
     const input = document.getElementById('q');
