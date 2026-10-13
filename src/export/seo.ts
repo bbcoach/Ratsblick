@@ -83,7 +83,18 @@ const CSS = `@font-face{font-family:"Public Sans";src:url(/fonts/public-sans-lat
 :root{--bg:#f6f4f4;--surface:#fff;--fg:#1f1a1c;--muted:#655a5e;--line:#e4dcdf;--accent:#7b2736}
 @media (prefers-color-scheme:dark){:root{--bg:#141112;--surface:#1f1a1c;--fg:#f1eced;--muted:#b3a7ab;--line:#3a3135;--accent:#e7a1ae}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 "Public Sans",system-ui,sans-serif}
-header{background:#7b2736;color:#fff;padding:14px 16px}header a{color:#fff;text-decoration:none;font-weight:800;letter-spacing:.04em}header span{color:#f2c230;font-size:12px;font-weight:700;margin-left:4px}
+@font-face{font-family:"Nunito";src:url(/fonts/nunito-latin.woff2) format("woff2");font-weight:200 900;font-display:swap}
+header{background:#7b2736;color:#fff;padding:10px 16px;min-height:54px;display:flex;align-items:center}
+.logo{display:flex;align-items:center;gap:9px;color:#fff;text-decoration:none;max-width:760px;width:100%;margin:0 auto}
+.logo img{width:32px;height:32px;flex:none;border-radius:8px;box-shadow:0 0 0 1.5px rgba(255,255,255,.3)}
+.logo .wm{display:flex;flex-direction:column;font-family:"Nunito",sans-serif;font-size:20px;line-height:1;letter-spacing:.06em;text-transform:uppercase;font-weight:300}
+.logo .wm b{font-weight:900}.logo .wm .rlp{color:#f2c230;font-size:.54em;letter-spacing:.14em;margin-left:.35em}
+.logo .wm .bars{display:flex;margin-top:5px;height:4px;border-radius:2px;overflow:hidden;user-select:none}
+.logo .wm .bars i{font-style:normal;color:transparent;height:4px;overflow:hidden}
+.logo .wm .bars .k{font-weight:900;background:linear-gradient(90deg,#000 0 68%,#6b1414)}
+.logo .wm .bars .r{font-weight:300;background:linear-gradient(90deg,#6b1414,#d62828 28%,#d62828 66%,#e4752c)}
+.logo .wm .bars .g{font-size:.54em;letter-spacing:.14em;padding-left:.35em;background:linear-gradient(90deg,#e4752c,#f2c230 45%)}
+@media (max-width:360px){.logo .wm{font-size:16px}.logo img{width:28px;height:28px}}
 main{max-width:760px;margin:0 auto;padding:16px 16px 48px}nav.pfad{font-size:13px;color:var(--muted);margin-bottom:10px}nav.pfad a{color:var(--muted)}
 h1{font-size:26px;line-height:1.25;margin:4px 0 8px;hyphens:auto}h2{font-size:18px;margin:32px 0 10px}p{margin:0 0 12px}
 a{color:var(--accent)}.lead{color:var(--muted)}.knopf{display:inline-block;background:#7b2736;color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:700;margin:8px 0 4px}
@@ -100,7 +111,7 @@ function rahmen(o: { titel: string; beschreibung: string; pfad: string; inhalt: 
 <meta property="og:description" content="${esc(o.beschreibung)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${SITE}/img/og.jpg">
 <meta property="og:locale" content="de_DE"><link rel="icon" href="/icons/icon.svg" type="image/svg+xml"><meta name="theme-color" content="#7b2736">
 <style>${CSS}</style>${(o.jsonld ?? []).map((j) => `<script type="application/ld+json">${JSON.stringify(j).replace(/</g, '\\u003c')}</script>`).join('')}</head>
-<body><header><a href="/">WAHLHEIMAT</a><span>RLP</span></header><main>${o.inhalt}</main>
+<body><header><a class="logo" href="/" aria-label="Wahlheimat – zur Startseite"><img src="/icons/icon.svg" alt="" width="32" height="32"><span class="wm"><span><b>Wahl</b>heimat<b class="rlp">RLP</b></span><span class="bars" aria-hidden="true"><i class="k">Wahl</i><i class="r">heimat</i><i class="g">RLP</i></span></span></a></header><main>${o.inhalt}</main>
 <footer>Wahlheimat RLP ist ein unabhängiges, privates Angebot – kein Angebot des Landes oder der Kommunen. Maßgeblich sind die Ratsinformationssysteme der Kommunen.
 · <a href="/#/impressum">Impressum</a> · <a href="/#/datenschutz">Datenschutz</a> · <a href="/orte/">Alle Kommunen</a></footer></body></html>`;
 }
