@@ -1,0 +1,109 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><style>
+/* Reel 2 (9:16, 1080×1920): emotionaler – Heimat, Betroffenheit, Auflösung. Oben ca. 250 px, unten ca. 340 px bleiben für die Oberfläche frei. */
+@font-face { font-family: "Nunito"; font-weight: 200 1000; src: url(nunito-latin.woff2) format("woff2"); }
+@font-face { font-family: "Public Sans"; font-weight: 100 900; src: url(public-sans-latin.woff2) format("woff2"); }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { width: 1080px; height: 1920px; position: relative; overflow: hidden; font-family: "Public Sans", sans-serif; color: #fff; background: #2a0d14; }
+.szene { position: absolute; inset: 0; opacity: 0; }
+.foto { position: absolute; top: 0; height: 1920px; width: auto; will-change: transform; }
+.schleier { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,6,10,.35) 0%, rgba(20,6,10,.05) 30%, rgba(20,6,10,.25) 52%, rgba(30,8,14,.88) 78%, rgba(30,8,14,.95) 100%); }
+.weinrot { background: radial-gradient(120% 140% at 85% 0%, #9a3347 0%, #7B2736 38%, #4a1421 100%); }
+.dunkel { background: radial-gradient(110% 90% at 50% 40%, #3a1119 0%, #1d070c 70%, #12040a 100%); }
+.zeile { display: block; opacity: 0; }
+h1 { margin: 0; font-weight: 800; letter-spacing: -.01em; line-height: 1.05; text-wrap: balance; }
+em { font-style: normal; color: #f2c230; }
+.text { position: absolute; left: 80px; width: 920px; text-shadow: 0 2px 24px rgba(0,0,0,.45); }
+.t1 { top: 1130px; } .t1 h1 { font-size: 104px; }
+.t1 .klein { font-size: 46px; font-weight: 500; margin-top: 26px; opacity: .95; line-height: 1.25; }
+.t2 { top: 1030px; } .t2 .vor { font-size: 54px; font-weight: 600; margin-bottom: 24px; }
+.t2 h1 { font-size: 82px; line-height: 1.1; } .t2 h1 .zeile { margin-bottom: 14px; }
+.t3 { top: 760px; text-align: center; left: 90px; width: 900px; }
+.t3 p { margin: 0; font-size: 62px; font-weight: 500; line-height: 1.3; opacity: 0; }
+.t3 p.leise { font-size: 44px; color: #d9b8bf; margin-top: 40px; }
+.t4 { top: 330px; } .t4 h1 { font-size: 112px; }
+.tel { position: absolute; left: 272px; top: 640px; width: 536px; background: #1b1517; border-radius: 56px; padding: 12px; box-shadow: 0 30px 80px rgba(0,0,0,.55), 0 0 0 2px rgba(255,255,255,.12); opacity: 0; }
+.scr { position: relative; width: 512px; height: 1040px; overflow: hidden; border-radius: 46px; background: #f6f4f4; }
+.scr .hdr, .scr .tabs { position: absolute; left: 0; width: 512px; background: url(tall.jpg) no-repeat; background-size: 512px auto; z-index: 2; }
+.scr .hdr { top: 0; height: 79px; background-position: 0 0; }
+.scr .tabs { bottom: 0; height: 80px; background-position: 0 100%; }
+.scr .fenster { position: absolute; left: 0; top: 79px; width: 512px; height: 881px; overflow: hidden; }
+.scr .fenster img { position: absolute; left: 0; top: 0; width: 512px; }
+.marke { display: flex; align-items: center; gap: 22px; }
+.marke img { width: 84px; height: 84px; border-radius: 20px; box-shadow: 0 0 0 2px rgba(255,255,255,.35); }
+.wm { display: flex; flex-direction: column; font-family: "Nunito", sans-serif; font-size: 48px; line-height: 1; letter-spacing: .06em; text-transform: uppercase; font-weight: 300; }
+.wm b { font-weight: 900; } .wm .rlp { color: #f2c230; font-size: .54em; letter-spacing: .14em; margin-left: .35em; }
+.wm .bars { display: flex; margin-top: 10px; height: 9px; border-radius: 4px; overflow: hidden; }
+.wm .bars i { font-style: normal; color: transparent; height: 9px; overflow: hidden; }
+.wm .bars .k { font-weight: 900; background: linear-gradient(90deg, #000 0 68%, #6b1414); }
+.wm .bars .r { font-weight: 300; background: linear-gradient(90deg, #6b1414, #d62828 28%, #d62828 66%, #e4752c); }
+.wm .bars .g { font-size: .54em; letter-spacing: .14em; padding-left: .35em; background: linear-gradient(90deg, #e4752c, #f2c230 45%); }
+.ende { position: absolute; left: 80px; top: 420px; width: 920px; }
+.ende .marke { opacity: 0; }
+.ende h1 { font-size: 132px; margin-top: 110px; line-height: 1.0; }
+.ende .sub { font-size: 44px; font-weight: 500; line-height: 1.32; margin-top: 46px; opacity: 0; }
+.ende .cta { display: inline-block; margin-top: 64px; background: #fff; color: #7B2736; font-weight: 800; border-radius: 999px; padding: 24px 52px; font-size: 46px; opacity: 0; }
+.ende .slogan { margin-top: 40px; font-size: 38px; font-weight: 700; color: #f2c230; opacity: 0; }
+.streifen { position: absolute; left: 0; right: 0; bottom: 0; height: 16px; background: linear-gradient(90deg, #000 0, #6b1414 28%, #d62828 48%, #e4752c 70%, #f2c230 100%); }
+</style></head>
+<body>
+  <!-- 1 Heimat -->
+  <div class="szene" id="s1"><img class="foto" id="f1" src="emotional-enkenbach.jpg" alt=""><div class="schleier"></div>
+    <div class="text t1"><h1><span class="zeile" id="a1">Hier bist du</span><span class="zeile" id="a2"><em>zu Hause.</em></span></h1>
+      <div class="klein zeile" id="a3">Hier kennst du jede Straße, jede Bank, jeden Nachbarn.</div></div></div>
+  <!-- 2 Was entschieden wird -->
+  <div class="szene" id="s2"><img class="foto" id="f2" src="emotional-cochem.jpg" alt=""><div class="schleier"></div>
+    <div class="text t2"><div class="vor zeile" id="b0">Und hier wird entschieden:</div>
+      <h1><span class="zeile" id="b1">über die <em>Kita</em> deiner Kinder.</span><span class="zeile" id="b2">über die <em>Straße</em> vor deiner Tür.</span><span class="zeile" id="b3">über das, was dein Ort <em>morgen</em> ist.</span></h1></div></div>
+  <!-- 3 Die Stille -->
+  <div class="szene dunkel" id="s3"><div class="text t3"><p id="c1">Oft erfährst du davon erst,</p><p id="c2">wenn alles beschlossen ist.</p><p class="leise" id="c3">Irgendwo in einem PDF, das niemand findet.</p></div></div>
+  <!-- 4 Die Wende -->
+  <div class="szene weinrot" id="s4"><div class="text t4"><h1><span class="zeile" id="d1">Das muss</span><span class="zeile" id="d2"><em>nicht sein.</em></span></h1></div>
+    <div class="tel" id="tel"><div class="scr"><div class="fenster"><img id="bild" src="tall.jpg" alt=""></div><div class="hdr"></div><div class="tabs"></div></div></div></div>
+  <!-- 5 Aufruf -->
+  <div class="szene weinrot" id="s5"><div class="ende">
+    <div class="marke" id="e0"><img src="logo.svg" alt=""><span class="wm"><span><b>Wahl</b>heimat<b class="rlp">RLP</b></span><span class="bars"><i class="k">Wahl</i><i class="r">heimat</i><i class="g">RLP</i></span></span></div>
+    <h1><span class="zeile" id="e1">Schau hin.</span><span class="zeile" id="e2"><em>Rede mit.</em></span></h1>
+    <div class="sub" id="e3">Jede Sitzung, jede Tagesordnung deines Gemeinderats – an einem Ort. Kostenlos und ohne Anmeldung.</div>
+    <div class="cta" id="e4">wahlheimat-rlp.de</div>
+    <div class="slogan" id="e5">Guter Rat ist nicht teuer.</div>
+  </div></div>
+  <div class="streifen"></div>
+<script>
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const outCubic = (x) => 1 - Math.pow(1 - x, 3);
+const inOut = (x) => (x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const $ = (id) => document.getElementById(id);
+function rein(id, t, a, b, dy = 34) { const k = outCubic(seg(t, a, b)); const el = $(id); el.style.opacity = k; el.style.transform = `translateY(${(1 - k) * dy}px)`; }
+function szene(id, t, an, aus, blende = .8) { $(id).style.opacity = Math.min(seg(t, an, an + blende), 1 - seg(t, aus, aus + blende)); }
+// Foto füllt die Höhe, fährt langsam seitlich und zoomt leicht (Ken Burns)
+function fahrt(id, t, a, b, von, bis, zoomVon = 1.06, zoomBis = 1.0) {
+  const img = $(id); const k = inOut(seg(t, a, b)); const breite = img.naturalWidth * 1920 / img.naturalHeight;
+  const x = -(breite - 1080) * (von + (bis - von) * k); const z = zoomVon + (zoomBis - zoomVon) * k;
+  img.style.transform = `translateX(${x}px) scale(${z})`; img.style.transformOrigin = '50% 50%';
+}
+window.DAUER = 22.5;
+window.render = function (t) {
+  // 1 Heimat 0–5,6
+  szene('s1', t, -1, 5.0); fahrt('f1', t, 0, 6, .33, .47, 1.1, 1.02);
+  rein('a1', t, .5, 1.3); rein('a2', t, 1.0, 1.8); rein('a3', t, 2.3, 3.2, 24);
+  // 2 Entscheidungen 5,0–10,8
+  szene('s2', t, 5.0, 10.2); fahrt('f2', t, 5, 11, .62, .28, 1.0, 1.1);
+  rein('b0', t, 5.7, 6.4, 24); rein('b1', t, 6.6, 7.3); rein('b2', t, 7.6, 8.3); rein('b3', t, 8.6, 9.3);
+  // 3 Die Stille 10,2–13,8
+  szene('s3', t, 10.2, 13.6, 1.0);
+  for (const [id, a] of [['c1', 10.9], ['c2', 11.7], ['c3', 12.6]]) { const k = seg(t, a, a + 1.0); $(id).style.opacity = k; }
+  // 4 Die Wende 13,6–18,2
+  szene('s4', t, 13.6, 17.8, .6);
+  rein('d1', t, 13.9, 14.5); rein('d2', t, 14.3, 14.9);
+  const p = outCubic(seg(t, 15.0, 16.1)); $('tel').style.opacity = clamp(p * 1.4); $('tel').style.transform = `translateY(${(1 - p) * 500}px)`;
+  const bild = $('bild'); const h = bild.naturalHeight * 512 / bild.naturalWidth;
+  bild.style.top = (-30 - inOut(seg(t, 15.8, 17.9)) * Math.min(700, h - 881)) + 'px';
+  // 5 Aufruf 17,8–22,5
+  szene('s5', t, 17.8, 99, .7);
+  rein('e0', t, 18.2, 18.9, 20); rein('e1', t, 18.6, 19.3); rein('e2', t, 19.0, 19.7);
+  rein('e3', t, 19.9, 20.6, 22); rein('e4', t, 20.5, 21.1, 18); rein('e5', t, 21.0, 21.7, 14);
+};
+render(0);
+</script></body></html>
