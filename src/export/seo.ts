@@ -84,7 +84,7 @@ const CSS = `@font-face{font-family:"Public Sans";src:url(/fonts/public-sans-lat
 @media (prefers-color-scheme:dark){:root{--bg:#141112;--surface:#1f1a1c;--fg:#f1eced;--muted:#b3a7ab;--line:#3a3135;--accent:#e7a1ae}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 "Public Sans",system-ui,sans-serif}
 @font-face{font-family:"Nunito";src:url(/fonts/nunito-latin.woff2) format("woff2");font-weight:200 900;font-display:swap}
-header{background:#7b2736;color:#fff;padding:10px 16px;min-height:54px;display:flex;align-items:center}
+header{position:sticky;top:0;z-index:5;background:#7b2736;color:#fff;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;min-height:54px;display:flex;align-items:center}
 .logo{display:flex;align-items:center;gap:9px;color:#fff;text-decoration:none;max-width:760px;width:100%;margin:0 auto}
 .logo img{width:32px;height:32px;flex:none;border-radius:8px;box-shadow:0 0 0 1.5px rgba(255,255,255,.3)}
 .logo .wm{display:flex;flex-direction:column;font-family:"Nunito",sans-serif;font-size:20px;line-height:1;letter-spacing:.06em;text-transform:uppercase;font-weight:300}
@@ -105,7 +105,7 @@ footer{max-width:760px;margin:0 auto;padding:16px;font-size:13px;color:var(--mut
 
 function rahmen(o: { titel: string; beschreibung: string; pfad: string; inhalt: string; jsonld?: unknown[] }): string {
   const url = `${SITE}${o.pfad}`;
-  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>${esc(o.titel)}</title><meta name="description" content="${esc(o.beschreibung)}"><link rel="canonical" href="${url}">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Wahlheimat RLP"><meta property="og:title" content="${esc(o.titel)}">
 <meta property="og:description" content="${esc(o.beschreibung)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${SITE}/img/og.jpg">
