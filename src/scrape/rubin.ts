@@ -48,6 +48,8 @@ export interface RubinKalenderSitzung {
   fraktionssitzung: string;
   room?: RubinRaum | null;
   full_url?: string;
+  /** Letzte Änderung der Sitzung im RIS („JJJJ-MM-TT HH:MM:SS“), teils null. */
+  updated_at?: string | null;
 }
 
 export interface RubinDokument {
@@ -128,6 +130,8 @@ export interface RubinOptionen {
   /** Bereits gespeicherte Sitzungen, die länger als so viele Tage zurückliegen, nicht erneut laden. */
   festNachTagen?: number;
   alles?: boolean;
+  /** Unveränderte Sitzungen (gleiches `updated_at` im Kalender) erst nach so vielen Stunden erneut laden. */
+  unveraendertStunden?: number;
   log?: (msg: string) => void;
   now?: Date;
 }
@@ -169,6 +173,16 @@ export async function syncRubinApi(
   // 3. Sitzungen mit Tagesordnung
   const festVor = new Date(jetzt.getTime() - (opts.festNachTagen ?? 14) * 86_400_000).toISOString().slice(0, 10);
   const vorhanden = db.prepare('SELECT COUNT(*) AS n FROM agenda_item WHERE meeting_id = ?');
+  // Alle *.gremien.info teilen sich einen Server (1 Abruf/s). Sitzungen, die sich laut Kalender seit dem letzten
+  // Abruf nicht geändert haben, werden übersprungen – so reicht das Zeitbudget, um alle Quellen in jedem Lauf
+  // abzugleichen. Zur Sicherheit (Dokumente ändern `updated_at` evtl. nicht) nach `unveraendertStunden` doch neu.
+  const gespeichert = db.prepare(
+    `SELECT state, json_extract(raw, '$.rubinStand') AS stand, json_extract(raw, '$.abgerufen') AS abgerufen
+     FROM meeting WHERE id = ?`,
+  );
+  const frischNach = jetzt.getTime() - (opts.unveraendertStunden ?? 48) * 3_600_000;
+  const heute = jetzt.toISOString().slice(0, 10);
+  let uebersprungen = 0;
   const gremien = new Set<string>();
   const vorlagen = new Map<string, { v: RubinVorlage; body: string; docs: RubinDokument[] }>();
   const sitzungId = (nummer: string) => `${base}meeting?id=${encodeURIComponent(nummer)}`;
@@ -177,6 +191,14 @@ export async function syncRubinApi(
   for (const t of termine) {
     const meetingId = sitzungId(t.nummer);
     if (!opts.alles && t.datum < festVor && (vorhanden.get(meetingId) as { n: number }).n > 0) continue;
+    if (!opts.alles && t.updated_at) {
+      const g = gespeichert.get(meetingId) as { state: string | null; stand: string | null; abgerufen: string | null } | undefined;
+      if (g && g.stand === t.updated_at && g.abgerufen && Date.parse(g.abgerufen) > frischNach
+        && (g.state === 'durchgeführt') === (t.datum < heute)) {
+        uebersprungen++;
+        continue;
+      }
+    }
     let s: RubinSitzung;
     try {
       s = await client.get<RubinSitzung>(`${api}?id=meetings&action=get&meeting_id=${encodeURIComponent(t.nummer)}&with_agenda_item_documents=1`);
@@ -222,7 +244,7 @@ export async function syncRubinApi(
     const sitzungsDokumente = tops
       .filter((a) => !(a.topart === 'vl' && a.submission?.id))
       .flatMap((a) => a.documents ?? []);
-    const vergangen = t.datum < jetzt.toISOString().slice(0, 10);
+    const vergangen = t.datum < heute;
     const meeting = {
       id: meetingId,
       name: gremium?.Bezeichnung ?? einzeilig(t.titel),
@@ -234,11 +256,13 @@ export async function syncRubinApi(
       agendaItem,
       auxiliaryFile: sitzungsDokumente.map(datei),
       quelle: 'more-rubin-api',
+      rubinStand: t.updated_at ?? null,
+      abgerufen: jetzt.toISOString(),
     } as unknown as OParlMeeting;
     tx(db, () => upsertMeeting(db, koerperschaft, meeting, stats));
     stats.meetings++;
   }
-  log(`    Sitzungen: ${stats.meetings} gelesen`);
+  log(`    Sitzungen: ${stats.meetings} gelesen, ${uebersprungen} unverändert übersprungen`);
 
   // 4. Vorlagen mit Beratungsfolge aus allen gespeicherten Tagesordnungen
   const auftritte = db.prepare(

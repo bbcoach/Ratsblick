@@ -54,6 +54,45 @@ describe('more!rubin-Schnittstelle (echte Antworten aus Rockenhausen)', () => {
     expect(f.access_url).not.toMatch(/json=1/);
   });
 
+  it('überspringt Sitzungen, deren Stand im Kalender sich nicht geändert hat', async () => {
+    let kalender = json('calendar-2026-09-10.json');
+    const aufrufe: string[] = [];
+    const fetchImpl = async (url: string) => {
+      aufrufe.push(url);
+      const u = new URL(url);
+      const id = u.searchParams.get('id');
+      const body = id === 'organizations' ? json('bodies.json')
+        : id === 'calendar' ? kalender
+        : u.searchParams.get('meeting_id') === '2026-VGRATNPL-61' ? json('meeting-2026-VGRATNPL-61.json')
+        : JSON.stringify({ agenda_items: [], committees: [{ Kuerzel: 'X', Bezeichnung: 'Gemeinderat', Koerperschaftsnummer: 'VGNPL' }] });
+      return new Response(body, { headers: { 'content-type': 'application/json' } });
+    };
+    const client = new OParlClient({ fetchImpl, minIntervalMs: 0, sleep: async () => {} });
+    const db = openDb(':memory:');
+    const src = { id: 'vg-nordpfaelzer-land', name: 'VG Nordpfälzer Land', url: BASE, typ: 'rubin-api' as const };
+    const sitzungsAbrufe = () => aufrufe.filter((u) => u.includes('id=meetings')).length;
+
+    await syncRubinApi(db, client, src, { now: new Date('2026-10-01T10:00:00Z') });
+    const erst = sitzungsAbrufe();
+    expect(erst).toBeGreaterThan(5);
+
+    // Sechs Stunden später, nichts geändert: keine Sitzung wird neu geladen
+    aufrufe.length = 0;
+    await syncRubinApi(db, client, src, { now: new Date('2026-10-01T16:00:00Z') });
+    expect(sitzungsAbrufe()).toBe(0);
+
+    // Eine Sitzung geändert → nur sie wird geladen
+    kalender = kalender.replace('"updated_at":"2026-09-29 10:18:20"', '"updated_at":"2026-10-01 15:00:00"');
+    aufrufe.length = 0;
+    await syncRubinApi(db, client, src, { now: new Date('2026-10-01T17:00:00Z') });
+    expect(aufrufe.filter((u) => u.includes('id=meetings')).map((u) => new URL(u).searchParams.get('meeting_id'))).toEqual(['2026-GR02-81']);
+
+    // Nach Ablauf der Frist wieder alles im Fenster
+    aufrufe.length = 0;
+    await syncRubinApi(db, client, src, { now: new Date('2026-10-04T10:00:00Z') });
+    expect(sitzungsAbrufe()).toBeGreaterThan(0);
+  });
+
   it('vereinheitlicht Körperschaftsnamen (Maikammer, Maxdorf)', () => {
     expect(koerperschaftsName('Ortsgemeinde Kirrweiler c/o Verbandsgemeinde Maikammer')).toBe('Ortsgemeinde Kirrweiler');
     expect(koerperschaftsName('Verbandsgemeinde Maxdorf für OG Birkenheide')).toBe('Ortsgemeinde Birkenheide');

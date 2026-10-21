@@ -203,6 +203,10 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   `src/scrape/rubin.ts`. Kalender in einem Abruf für das ganze Fenster, je Sitzung ein Abruf (TOPs enthalten die
   Vorlage samt Drucksachennummer und Dokumenten; TOP-Status 1 = öffentlich, 2 = nicht öffentlich).
   PDF-Links = `documentUrl` ohne `json=1`. Erster Lauf: 38 Körperschaften, 55 Sitzungen, 124 Vorlagen in 63 s.
+  Unveränderte Sitzungen (seit 21.10.2026, Anlass: neue Termine in Münsterappel fehlten, weil die 109 gremien.info-Quellen sich einen
+  Server teilen und im 50-min-Budget nur alle 12–24 h drankamen): der Kalender liefert je Sitzung `updated_at`; stimmt es mit dem
+  gespeicherten `raw.rubinStand` überein, liegt der letzte Abruf (`raw.abgerufen`) unter 48 h (`unveraendertStunden`) und passt der
+  Status (vergangen/künftig), wird die Sitzung nicht neu geladen. `--full` lädt alles.
   Ebenso freigegeben (Nutzer, 01.10.2026): Donnersbergkreis; (02.10.2026): Rhein-Pfalz-Kreis, Südwestpfalz, Alzey-Worms, VG Lambrecht (VG, Stadt und 6 Ortsgemeinden), VG Deidesheim, VG Leiningerland (enthält auch die
   Vorgänger-VGs Grünstadt-Land und Hettenleidelheim ohne Sitzungen), VG Simmern-Rheinböllen (`simmern.gremien.info`, 56 Körperschaften).
   Auf Wunsch „alle verbleibenden VGs anbinden“ (Nutzer, 02.10.2026) zusätzlich alle 24 bisher inaktiven more!rubin-VGs
