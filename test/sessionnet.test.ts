@@ -89,6 +89,18 @@ describe('SessionNet: Abgleich', () => {
     const datei = db.prepare(`SELECT access_url FROM file f JOIN file_link l ON l.file_id = f.id WHERE l.owner_id = ? AND l.role = 'main'`)
       .get(`${BASE}vo0050.asp?__kvonr=19902`);
     expect(datei).toEqual({ access_url: `${BASE}getfile.asp?id=128429&type=do` });
+
+    // Ein früherer Kalendereintrag ohne Link, der inzwischen nicht mehr im Kalender steht (Sitzung wurde mit Tagesordnung
+    // veröffentlicht), verschwindet beim nächsten Abgleich; außerhalb des gelesenen Zeitraums bleibt alles stehen
+    const ein = db.prepare(`INSERT INTO meeting (id, body_id, name, start, raw) VALUES (?, ?, 'Stadtrat', ?, '{}')`);
+    ein.run(`${BASE}si0040.asp#2026-09-08-alt`, `${BASE}#koerperschaft`, '2026-09-08T09:30:00+02:00');
+    ein.run(`${BASE}si0040.asp#2025-01-08-alt`, `${BASE}#koerperschaft`, '2025-01-08T09:30:00+01:00');
+    const vorher = (db.prepare(`SELECT COUNT(*) AS n FROM meeting WHERE id LIKE '%si0040.asp#%'`).get() as { n: number }).n;
+    await syncSessionNet(db, client, src, { now: new Date('2026-10-01T10:00:00Z'), monateZurueck: 1, monateVoraus: 0 });
+    const ids = (db.prepare(`SELECT id FROM meeting WHERE id LIKE '%si0040.asp#%'`).all() as Array<{ id: string }>).map((r) => r.id);
+    expect(ids).not.toContain(`${BASE}si0040.asp#2026-09-08-alt`);
+    expect(ids).toContain(`${BASE}si0040.asp#2025-01-08-alt`);
+    expect(ids).toHaveLength(vorher - 1);
   });
 });
 

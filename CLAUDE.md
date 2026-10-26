@@ -241,6 +241,9 @@ Gefunden über die Startseiten (Links aufs RIS), DNS-Namen (ratsinfo./buergerinf
   an (VG Landstuhl: VG + 12 Ortsgemeinden/Stadt; VG Kusel-Altenglan; VG Eisenberg auf `vgeisenberg.ris.itebo.de`: VG,
   Stadt Eisenberg, Kerzenheim, Ramsen). Ohne `__cpanr` zeigt der Kalender nur den Standardmandanten (VG).
   `npm run sync -- --full --id …` lädt bei Scrapern alle Sitzungen im Fenster neu.
+  Veraltete Kalendereinträge (seit 26.10.2026, Anlass: Koblenz zeigte jede Sitzung doppelt): eine Sitzung steht oft erst ohne Link im
+  Kalender (Id `si0040…#datum-gremium`, „terminiert“) und später mit Tagesordnung (`si0057…?__ksinr=`). Reine Kalendereinträge im gelesenen
+  Zeitraum, die im aktuellen Kalender fehlen, entfernt der Abgleich jetzt (`entferneSitzung` in sync.ts).
 - Kaiserslautern (`ris.kaiserslautern.de`) sperrt Zugriffe außerhalb Europas (GitHub Actions läuft in den USA) und
   schickt sein Zwischenzertifikat nicht mit. Lösung: Weiterleiter `relay/` bei Vercel in Frankfurt
   (`ratsblick-relay.vercel.app`), lädt fehlende Zwischenzertifikate per AIA nach. Nutzung über

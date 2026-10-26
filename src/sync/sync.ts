@@ -76,6 +76,14 @@ export function leereQuelle(db: DatabaseSync, sourceId: string): number {
   return bodies.length;
 }
 
+/** Entfernt eine einzelne Sitzung samt Tagesordnung, Gremienzuordnung und Dateiverweisen (Dateien bleiben). */
+export function entferneSitzung(db: DatabaseSync, id: string): void {
+  db.prepare(`DELETE FROM file_link WHERE owner_type = 'meeting' AND owner_id = ?`).run(id);
+  db.prepare('DELETE FROM agenda_item WHERE meeting_id = ?').run(id);
+  db.prepare('DELETE FROM meeting_organization WHERE meeting_id = ?').run(id);
+  db.prepare('DELETE FROM meeting WHERE id = ?').run(id);
+}
+
 /** Gespeicherte Adresse einer Quelle (null, wenn noch nie abgeglichen). */
 export function gespeicherteAdresse(db: DatabaseSync, sourceId: string): string | null {
   return (db.prepare('SELECT system_url FROM source WHERE id = ?').get(sourceId) as { system_url: string } | undefined)?.system_url ?? null;

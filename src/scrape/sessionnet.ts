@@ -5,6 +5,7 @@ import type { OParlFile, OParlMeeting, OParlPaper } from '../oparl/types.js';
 import {
   upsertBody,
   upsertMeeting,
+  entferneSitzung,
   upsertOrganization,
   upsertPaper,
   upsertSource,
@@ -334,10 +335,12 @@ export async function syncSessionNet(
   const vorlagenGesehen = new Map<string, string>(); // kvonr → Körperschaft
   const festVor = new Date(jetzt.getTime() - (opts.festNachTagen ?? 14) * 86_400_000).toISOString().slice(0, 10);
   const vorhanden = db.prepare('SELECT COUNT(*) AS n FROM agenda_item WHERE meeting_id = ?');
+  const gesehen = new Set<string>();
   for (const e of eintraege) {
     const meetingId = e.ksinr
       ? `${base}si0057.${ext}?__ksinr=${e.ksinr}`
       : `${base}si0040.${ext}#${e.cpanr ? `${e.cpanr}-` : ''}${e.datum}-${slug(e.gremium)}`;
+    gesehen.add(meetingId);
     const start = berlinIso(e.datum, e.beginn ?? '00:00');
     const vergangen = start < jetzt.toISOString();
     if (!opts.alles && e.verlinkt && e.datum < festVor && (vorhanden.get(meetingId) as { n: number }).n > 0) continue;
@@ -386,6 +389,21 @@ export async function syncSessionNet(
     stats.meetings++;
   }
   log(`    Sitzungen: ${stats.meetings} gelesen`);
+
+  // Reine Kalendereinträge (ohne Link), die im gelesenen Zeitraum nicht mehr im Kalender stehen, entfernen: meist hat
+  // die Verwaltung die Sitzung inzwischen mit Tagesordnung veröffentlicht (dann unter si0057), sonst wurde sie gestrichen.
+  // Ohne das stünde jede Sitzung doppelt in der App (Koblenz, Oktober 2026).
+  const fensterVon = new Date(Date.UTC(jetzt.getUTCFullYear(), jetzt.getUTCMonth() - von, 1)).toISOString().slice(0, 10);
+  const fensterBis = new Date(Date.UTC(jetzt.getUTCFullYear(), jetzt.getUTCMonth() + bis + 1, 1)).toISOString().slice(0, 10);
+  const alteEintraege = db.prepare(
+    `SELECT id FROM meeting WHERE id LIKE ? AND body_id IN (SELECT id FROM body WHERE source_id = ?)
+       AND substr(start, 1, 10) >= ? AND substr(start, 1, 10) < ?`,
+  ).all(`${base}si0040.${ext}#%`, source.id, fensterVon, fensterBis) as Array<{ id: string }>;
+  const weg = alteEintraege.map((r) => r.id).filter((id) => !gesehen.has(id));
+  if (weg.length) {
+    tx(db, () => { for (const id of weg) entferneSitzung(db, id); });
+    log(`    ${weg.length} veraltete Kalendereinträge entfernt`);
+  }
 
   // 4. Vorlagen: neue immer, bekannte nur, wenn sie in einer jetzt gelesenen Sitzung vorkommen (Beratungsfolge)
   const bekannt = db.prepare('SELECT raw FROM paper WHERE id = ?');
