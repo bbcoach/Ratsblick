@@ -390,15 +390,17 @@ export async function syncSessionNet(
   }
   log(`    Sitzungen: ${stats.meetings} gelesen`);
 
-  // Reine Kalendereinträge (ohne Link), die im gelesenen Zeitraum nicht mehr im Kalender stehen, entfernen: meist hat
-  // die Verwaltung die Sitzung inzwischen mit Tagesordnung veröffentlicht (dann unter si0057), sonst wurde sie gestrichen.
-  // Ohne das stünde jede Sitzung doppelt in der App (Koblenz, Oktober 2026).
+  // Reine Kalendereinträge (ohne Tagesordnung, nie veröffentlicht), die im gelesenen Zeitraum nicht mehr unter derselben
+  // Kennung im Kalender stehen, entfernen: meist hat die Verwaltung die Sitzung inzwischen mit Tagesordnung veröffentlicht
+  // (dann unter si0057), oder der Kalender führt sie nach dem Termin ohne iCal-Link (yvcs) und damit unter `#…` (Mainz,
+  // Bodenheim). Ohne das stünde die Sitzung doppelt in der App (Koblenz, Oktober 2026).
   const fensterVon = new Date(Date.UTC(jetzt.getUTCFullYear(), jetzt.getUTCMonth() - von, 1)).toISOString().slice(0, 10);
   const fensterBis = new Date(Date.UTC(jetzt.getUTCFullYear(), jetzt.getUTCMonth() + bis + 1, 1)).toISOString().slice(0, 10);
   const alteEintraege = db.prepare(
-    `SELECT id FROM meeting WHERE id LIKE ? AND body_id IN (SELECT id FROM body WHERE source_id = ?)
+    `SELECT id FROM meeting m WHERE body_id IN (SELECT id FROM body WHERE source_id = ?)
+       AND (id LIKE ? OR (state = 'terminiert' AND NOT EXISTS (SELECT 1 FROM agenda_item a WHERE a.meeting_id = m.id)))
        AND substr(start, 1, 10) >= ? AND substr(start, 1, 10) < ?`,
-  ).all(`${base}si0040.${ext}#%`, source.id, fensterVon, fensterBis) as Array<{ id: string }>;
+  ).all(source.id, `${base}si0040.${ext}#%`, fensterVon, fensterBis) as Array<{ id: string }>;
   const weg = alteEintraege.map((r) => r.id).filter((id) => !gesehen.has(id));
   if (weg.length) {
     tx(db, () => { for (const id of weg) entferneSitzung(db, id); });

@@ -95,12 +95,18 @@ describe('SessionNet: Abgleich', () => {
     const ein = db.prepare(`INSERT INTO meeting (id, body_id, name, start, raw) VALUES (?, ?, 'Stadtrat', ?, '{}')`);
     ein.run(`${BASE}si0040.asp#2026-09-08-alt`, `${BASE}#koerperschaft`, '2026-09-08T09:30:00+02:00');
     ein.run(`${BASE}si0040.asp#2025-01-08-alt`, `${BASE}#koerperschaft`, '2025-01-08T09:30:00+01:00');
+    // Termin, der früher über den iCal-Link (yvcs) unter si0057 lief und jetzt ohne ihn im Kalender steht
+    db.prepare(`INSERT INTO meeting (id, body_id, name, state, start, raw) VALUES (?, ?, 'Stadtvorstand', 'terminiert', ?, '{}')`)
+      .run(`${BASE}si0057.asp?__ksinr=999999`, `${BASE}#koerperschaft`, '2026-09-09T09:00:00+02:00');
     const vorher = (db.prepare(`SELECT COUNT(*) AS n FROM meeting WHERE id LIKE '%si0040.asp#%'`).get() as { n: number }).n;
     await syncSessionNet(db, client, src, { now: new Date('2026-10-01T10:00:00Z'), monateZurueck: 1, monateVoraus: 0 });
     const ids = (db.prepare(`SELECT id FROM meeting WHERE id LIKE '%si0040.asp#%'`).all() as Array<{ id: string }>).map((r) => r.id);
     expect(ids).not.toContain(`${BASE}si0040.asp#2026-09-08-alt`);
     expect(ids).toContain(`${BASE}si0040.asp#2025-01-08-alt`);
     expect(ids).toHaveLength(vorher - 1);
+    expect(db.prepare('SELECT COUNT(*) AS n FROM meeting WHERE id = ?').get(`${BASE}si0057.asp?__ksinr=999999`)).toEqual({ n: 0 });
+    // Veröffentlichte Sitzungen mit Tagesordnung bleiben
+    expect(db.prepare('SELECT COUNT(*) AS n FROM meeting WHERE id = ?').get(`${BASE}si0057.asp?__ksinr=2331`)).toEqual({ n: 1 });
   });
 });
 
