@@ -327,8 +327,11 @@ Icons (PNG) mit `scripts/icons.sh` aus den SVGs über das vorinstallierte Chromi
   ohne `ni_`; ALLRIS 4 mit `&refresh=false`; ohne verlässliche Einzelseite → null, die App verlinkt dann die Startseite).
 - `.github/workflows/website.yml`: alle 6 h Abgleich + Veröffentlichung auf GitHub Pages; bei Pushes nur neu bauen.
   Die Datenbank wird zwischen Läufen im Actions-Cache gehalten.
-  Abgleich mit Zeitbudget (`--budget-min 50`, Schritt-Zeitgrenze 75 min): je Server nacheinander, älteste zuerst, Rest im
-  nächsten Lauf; danach `wal_checkpoint`, damit auch ein abgebrochener Abgleich gesichert wird.
+  Abgleich mit Zeitbudget (`--budget-min 100`, Schritt-Zeitgrenze 130 min, Job 180 min; bis 18.11.2026 50/75/120): je Server nacheinander, älteste zuerst, Rest im
+  nächsten Lauf; danach `wal_checkpoint`, damit auch ein abgebrochener Abgleich gesichert wird. Anlass der Erhöhung: GitHub startet den
+  6-h-Zeitplan tatsächlich nur 2–3-mal am Tag, die 109 gremien.info-Quellen (ein Server) schafften je Lauf nur ~31 → 41 Quellen „seit > 36 h
+  kein Abgleich“. Engpass sind die OParl-Quellen auf gremien.info (Vollabgleich, VG Prüm ~9 min); rubin-api-Quellen brauchen dank
+  `updated_at` nur ~20 s. VG Alzey-Land: OParl-Testzugang am 31.10.2026 abgelaufen („OParl test expired“) → seit 18.11.2026 `rubin-api`.
   Achtung Concurrency-Gruppe „website“: nur EIN wartender Lauf – jeder neue ersetzt den wartenden. Nicht gleichzeitig
   pushen und manuell starten; ein Push auf den Standard-Branch baut und veröffentlicht ohnehin.
 
